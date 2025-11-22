@@ -106,7 +106,7 @@ class Gallery extends Model
             return '<div class="instagram-embed">'  .
                 '<blockquote class="instagram-media" data-instgrm-permalink="' . $escaped . '" data-instgrm-version="14"></blockquote>' .
                 '<script async defer src="https://www.instagram.com/embed.js"></script>' .
-                
+
                 '</div>';
         }
 
