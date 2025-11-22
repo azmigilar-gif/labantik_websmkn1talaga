@@ -23,6 +23,9 @@ Route::get('/', [LandingPageController::class, 'index'])->name('landingpage');
 Route::get('/news', [NewsController::class, 'index'])->name('news.index');
 Route::get('/news/{id}', [NewsController::class, 'show'])->name('news.show');
 
+// Public profile show route used by landing page 'Selengkapnya' links
+Route::get('/profiles/{id}', [App\Http\Controllers\PublicProfileController::class, 'show'])->name('profiles.show');
+
 Route::get('/adminkrituga', function () {
     return redirect()->route('login');
 });
@@ -65,6 +68,7 @@ Route::middleware(['auth'])->prefix('adminkrituga')->name('admin.')->group(funct
     Route::resource('menus', MenuController::class);
     Route::resource('visionmissions', VisionMissionController::class);
     Route::resource('profiles', ProfileController::class);
+    Route::resource('galleries', App\Http\Controllers\Admin\GalleryController::class);
     // Admin management for expertise descriptions
     Route::get('expertise', [App\Http\Controllers\Admin\ExpertiseController::class, 'index'])->name('expertise.index');
     Route::get('expertise/create', [App\Http\Controllers\Admin\ExpertiseController::class, 'create'])->name('expertise.create');

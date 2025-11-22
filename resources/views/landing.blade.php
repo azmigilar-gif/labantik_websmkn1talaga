@@ -19,8 +19,8 @@
     @endphp
 
     <section class="relative pb-28 xl:pb-36 pt-44 xl:pt-52" id="home" style="min-height:100vh;">
-        <div class="absolute top-0 left-0 size-64 bg-custom-500 opacity-10 blur-3xl"></div>
-        <div class="absolute bottom-0 right-0 size-64 bg-purple-500/10 blur-3xl"></div>
+        <div class="absolute top-0 left-0 size-64 bg-custom-500 opacity-10 blur-3xl z-10"></div>
+        <div class="absolute bottom-0 right-0 size-64 bg-purple-500/10 blur-3xl z-10"></div>
         @php
             $heroImage = null;
             if (!empty($heroProfile->photo)) {
@@ -123,9 +123,21 @@
                         <div class="mx-auto text-center xl:max-w-3xl">
                                             <h1 class="mb-6 leading-normal capitalize">Profil<span class="relative inline-block px-2 mx-2 before:block before:absolute before:-inset-1 before:-skew-y-6 before:bg-sky-50 dark:before:bg-sky-500/20 before:rounded-md before:backdrop-blur-xl"><span class="relative text-sky-500">SMKN 1 Talaga</span></span></h1>
 
-                            <p class="text-lg text-slate-500 dark:text-zink-200">{{ $p->content }}</p>
-                        </div>
-                    </div><!--end container-->
+                            <div class="profile-container">
+                                @php
+                                    $plain = trim(strip_tags($p->content ?? ''));
+                                    $cut = 220; // character cutoff for summary
+                                @endphp
+
+                                <div class="text-lg text-slate-500 dark:text-zink-200 profile-summary" style="display:inline-block; max-width:100%; word-break:break-word;">
+                                    @php $summary = \Illuminate\Support\Str::limit($plain, $cut); @endphp
+                                    <span style="display:inline">{{ $summary }}</span>
+                                    @if(mb_strlen($plain) > $cut)
+                                        <a href="{{ route('profiles.show', $p->id) }}" class="profile-readmore text-lg text-slate-500 dark:text-zink-200 hover:underline" style="white-space:nowrap; margin-left:.5rem; display:inline;" aria-label="Baca selengkapnya tentang profil sekolah">Selengkapnya</a>
+                                    @endif
+                                </div>
+                            </div>
+                        </div><!--end container-->
                 </section><!--end -->
             @endif
         @endforeach
@@ -273,7 +285,7 @@
 
                                         </h6>
                                         <p class="text-sm text-slate-500 dark:text-zink-200 mb-2">
-                                            {{ Str::limit(strip_tags($item->content), 150, '...') }}
+                                            {{ Str::limit(strip_tags($item->content), 150) }}
                                         </p>
                                         <p class="text-xs text-slate-400 dark:text-zink-300">
                                             {{ $item->created_at->diffForHumans() }}
@@ -575,6 +587,22 @@
             } catch (e) {
                 console.error('Swiper init error', e);
             }
+        });
+    </script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function () {
+            // show 'Selengkapnya' if profile content is overflowing 2 lines
+            document.querySelectorAll('.profile-summary').forEach(function (el) {
+                // small tolerance to account for rounding
+                if (el.scrollHeight > el.clientHeight + 2) {
+                    // prefer an ancestor wrapper with a known class, fallback to parent
+                    var container = el.closest('.profile-container') || el.parentElement;
+                    var btn = container ? container.querySelector('.profile-readmore') : null;
+                    if (btn) {
+                        btn.style.display = 'inline';
+                    }
+                }
+            });
         });
     </script>
 @endpush
