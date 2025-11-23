@@ -10,6 +10,7 @@ use App\Models\S_Menu;
 use App\Models\S_News;
 use App\Models\S_Profile;
 use App\Models\S_VisionMission;
+use App\Models\Gallery;
 
 class LandingPageController extends Controller
 {
@@ -31,6 +32,9 @@ class LandingPageController extends Controller
         $extrakurikulers = S_Extrakulikuler::where('approve', 'approve')->get();
         $mitras = S_Mitra::orderBy('created_at', 'desc')->get();
         $contacts = S_Contact::all();
-        return view('landing', compact('menus',  'visionmissions', 'profiles', 'news', 'expertiseConcentrations', 'extrakurikulers', 'mitras', 'contacts'));
+
+        // Recent galleries for landing page (show latest 6)
+        $galleries = Gallery::latest()->get();
+        return view('landing', compact('menus',  'visionmissions', 'profiles', 'news', 'expertiseConcentrations', 'extrakurikulers', 'mitras', 'contacts', 'galleries'));
     }
 }

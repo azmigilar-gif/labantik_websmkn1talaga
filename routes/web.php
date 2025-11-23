@@ -15,13 +15,16 @@ use App\Http\Controllers\Admin\ContactController;
 use App\Http\Controllers\Admin\ProfileController;
 use App\Http\Controllers\Admin\VisionMissionController;
 use App\Http\Controllers\Admin\UploadController;
-
+use App\Http\Controllers\GalleriesController;
 
 Route::get('/', [LandingPageController::class, 'index'])->name('landingpage');
 
 
 Route::get('/news', [NewsController::class, 'index'])->name('news.index');
 Route::get('/news/{id}', [NewsController::class, 'show'])->name('news.show');
+
+Route::get('/galleries', [GalleriesController::class, 'index'])->name('galleries.index');
+Route::get('/galleries/{id}', [GalleriesController::class, 'show'])->name('galleries.show');
 
 // Public profile show route used by landing page 'Selengkapnya' links
 Route::get('/profiles/{id}', [App\Http\Controllers\PublicProfileController::class, 'show'])->name('profiles.show');

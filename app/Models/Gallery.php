@@ -9,6 +9,7 @@ class Gallery extends Model
 {
     public $incrementing = false;
     protected $keyType = 'string';
+    protected $table = 'galleries';
 
     const TYPE_PHOTO = 'photo';
     const TYPE_VIDEO = 'video';
@@ -116,5 +117,10 @@ class Gallery extends Model
         }
 
         return '<a href="' . e($url) . '" target="_blank" rel="noopener">Open link</a>';
+    }
+
+        public function createdBy()
+    {
+        return $this->belongsTo(User::class, 'created_by', 'id');
     }
 }
