@@ -536,86 +536,97 @@
                     <h2 class="text-gradient mb-0 capitalize leading-normal">Galeri</h2>
                 </div>
 
-                <div class="grid grid-cols-1 gap-6">
-                    @foreach ($galleries as $item)
-                        <div class="card dark:bg-zink-600 cursor-pointer transition-all duration-300 ease-linear hover:-translate-y-2"
-                            data-aos="fade-up" data-aos-easing="linear"
-                            @if (Route::has('galleries.show')) onclick="window.location.href='{{ route('galleries.show', $item->id) }}'" @endif>
-                            <div class="flex gap-4 p-4">
-                                <div class="shrink-0">
-                                    <div
-                                        class="group/gallery card relative mb-0 overflow-hidden rounded-md transition-all duration-300 ease-linear hover:-translate-y-2">
-                                        <div class="group/gallery relative overflow-hidden rounded-md">
-                                            @if ($item->type == 'photo')
-                                                <div
-                                                    style="width:200px; aspect-ratio:1/1; display:flex; align-items:center; justify-content:center; overflow:hidden; background-color:#f3f4f6; position:relative;">
-                                                    @if ($item->embed_html)
-                                                        <div style="width:100%; height:100%; pointer-events:none;">
-                                                            {!! $item->embed_html !!}
-                                                        </div>
-                                                        {{-- Overlay transparan untuk menangkap klik --}}
-                                                        <div style="position:absolute; inset:0; z-index:10;"></div>
-                                                    @else
-                                                        <img src="{{ asset('assets/images/default-news.png') }}"
-                                                            alt="{{ $item->title }}"
-                                                            style="width:100%; height:100%; object-fit:cover;"
-                                                            class="rounded-md">
-                                                    @endif
-                                                </div>
-                                            @elseif ($item->type == 'video')
-                                                <div
-                                                    style="width:300px; aspect-ratio:16/9; display:flex; align-items:center; justify-content:center; overflow:hidden; background-color:#f3f4f6; position:relative;">
-                                                    @if ($item->embed_html)
-                                                        <div style="width:100%; height:100%; pointer-events:none;">
-                                                            {!! $item->embed_html !!}
-                                                        </div>
-                                                        {{-- Overlay transparan untuk menangkap klik --}}
-                                                        <div style="position:absolute; inset:0; z-index:10;"></div>
-                                                    @else
-                                                        <img src="{{ asset('assets/images/default-news.png') }}"
-                                                            alt="{{ $item->title }}"
-                                                            style="width:100%; height:100%; object-fit:cover;"
-                                                            class="rounded-md">
-                                                    @endif
-                                                </div>
-                                            @else
-                                                <div
-                                                    style="width:150px; height:150px; display:flex; align-items:center; justify-content:center; overflow:hidden; background-color:#f3f4f6;">
-                                                    <img src="{{ asset('assets/images/default-news.png') }}"
-                                                        alt="{{ $item->title }}"
-                                                        style="max-width:100%; max-height:100%; object-fit:contain;"
-                                                        class="rounded-md">
-                                                </div>
-                                            @endif
+                <div class="grid grid-cols-1 gap-4 mb-4 md:grid-cols-2">
+                    <div class="text-center font-semibold">Foto</div>
+                    <div class="text-center font-semibold">Video</div>
+                </div>
 
-                                            <div
-                                                class="absolute inset-0 bg-gradient-to-t from-gray-900 to-transparent opacity-0 transition-all duration-300 ease-linear group-hover/gallery:opacity-50">
-                                            </div>
-                                            <div
-                                                class="absolute bottom-0 left-3 right-3 z-20 opacity-0 transition-all duration-300 ease-linear group-hover/gallery:bottom-3 group-hover/gallery:opacity-100">
-                                                <h5 class="truncate font-normal text-white">
-                                                    {{ $item->title }}
-                                                </h5>
+                <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
+                    {{-- Photos column (left) --}}
+                    <div class="space-y-4">
+                        @php $photos = $galleries->where('type', 'photo')->take(3); @endphp
+                        @if ($photos->count() === 0)
+                            <div class="text-slate-500">Belum ada foto.</div>
+                        @endif
+                        @foreach ($photos as $item)
+                            <div class="card dark:bg-zink-600 cursor-pointer transition-all duration-300 ease-linear hover:-translate-y-2"
+                                data-aos="fade-up" data-aos-easing="linear"
+                                @if (Route::has('galleries.show')) onclick="window.location.href='{{ route('galleries.show', $item->id) }}'" @endif>
+                                <div class="flex gap-4 p-4">
+                                    <div class="shrink-0">
+                                        <div class="group/gallery card relative mb-0 overflow-hidden rounded-md transition-all duration-300 ease-linear hover:-translate-y-2">
+                                            <div class="group/gallery relative overflow-hidden rounded-md">
+                                                <div style="width:200px; aspect-ratio:1/1; display:flex; align-items:center; justify-content:center; overflow:hidden; background-color:#f3f4f6; position:relative;">
+                                                    @if ($item->embed_html)
+                                                        <div style="width:100%; height:100%; pointer-events:none;">
+                                                            {!! $item->embed_html !!}
+                                                        </div>
+                                                        <div style="position:absolute; inset:0; z-index:10;"></div>
+                                                    @else
+                                                        <img src="{{ asset('assets/images/default-news.png') }}" alt="{{ $item->title }}" style="width:100%; height:100%; object-fit:cover;" class="rounded-md">
+                                                    @endif
+                                                </div>
+
+                                                <div class="absolute inset-0 bg-gradient-to-t from-gray-900 to-transparent opacity-0 transition-all duration-300 ease-linear group-hover/gallery:opacity-50"></div>
+                                                <div class="absolute bottom-0 left-3 right-3 z-20 opacity-0 transition-all duration-300 ease-linear group-hover/gallery:bottom-3 group-hover/gallery:opacity-100">
+                                                    <h5 class="truncate font-normal text-white">{{ $item->title }}</h5>
+                                                </div>
                                             </div>
                                         </div>
                                     </div>
-                                </div>
 
-                                <div class="grow">
-                                    <h6
-                                        class="dark:text-zink-50 hover:text-custom-500 mb-2 text-lg font-semibold text-slate-800 transition-colors">
-                                        {{ $item->title }}
-                                    </h6>
-                                    <p class="dark:text-zink-200 mb-2 text-sm text-slate-500">
-                                        {{ Str::limit(strip_tags($item->description ?? ($item->caption ?? '')), 150) }}
-                                    </p>
-                                    <p class="dark:text-zink-300 text-xs text-slate-400">
-                                        {{ optional($item->created_at)->diffForHumans() }}
-                                    </p>
+                                    <div class="grow">
+                                        <h6 class="dark:text-zink-50 hover:text-custom-500 mb-2 text-lg font-semibold text-slate-800 transition-colors">{{ $item->title }}</h6>
+                                        <p class="dark:text-zink-200 mb-2 text-sm text-slate-500">{{ Str::limit(strip_tags($item->description ?? ($item->caption ?? '')), 150) }}</p>
+                                        <p class="dark:text-zink-300 text-xs text-slate-400">{{ optional($item->created_at)->diffForHumans() }}</p>
+                                    </div>
                                 </div>
                             </div>
-                        </div><!--end card-->
-                    @endforeach
+                        @endforeach
+                    </div>
+
+                    {{-- Videos column (right) --}}
+                    <div class="space-y-4">
+                        @php $videos = $galleries->where('type', 'video')->take(3); @endphp
+                        @if ($videos->count() === 0)
+                            <div class="text-slate-500">Belum ada video.</div>
+                        @endif
+                        @foreach ($videos as $item)
+                            <div class="card dark:bg-zink-600 cursor-pointer transition-all duration-300 ease-linear hover:-translate-y-2"
+                                data-aos="fade-up" data-aos-easing="linear"
+                                @if (Route::has('galleries.show')) onclick="window.location.href='{{ route('galleries.show', $item->id) }}'" @endif>
+                                <div class="flex gap-4 p-4 items-start">
+                                    <div class="shrink-0">
+                                        <div class="group/gallery card relative mb-0 overflow-hidden rounded-md transition-all duration-300 ease-linear hover:-translate-y-2">
+                                            <div class="group/gallery relative overflow-hidden rounded-md">
+                                                <div style="width:100%; max-width:400px; aspect-ratio:16/9; display:flex; align-items:center; justify-content:center; overflow:hidden; background-color:#f3f4f6; position:relative;">
+                                                    @if ($item->embed_html)
+                                                        <div style="width:100%; height:100%; pointer-events:none;">
+                                                            {!! $item->embed_html !!}
+                                                        </div>
+                                                        <div style="position:absolute; inset:0; z-index:10;"></div>
+                                                    @else
+                                                        <img src="{{ asset('assets/images/default-news.png') }}" alt="{{ $item->title }}" style="width:100%; height:100%; object-fit:cover;" class="rounded-md">
+                                                    @endif
+                                                </div>
+
+                                                <div class="absolute inset-0 bg-gradient-to-t from-gray-900 to-transparent opacity-0 transition-all duration-300 ease-linear group-hover/gallery:opacity-50"></div>
+                                                <div class="absolute bottom-0 left-3 right-3 z-20 opacity-0 transition-all duration-300 ease-linear group-hover/gallery:bottom-3 group-hover/gallery:opacity-100">
+                                                    <h5 class="truncate font-normal text-white">{{ $item->title }}</h5>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+
+                                    <div class="grow">
+                                        <h6 class="dark:text-zink-50 hover:text-custom-500 mb-2 text-lg font-semibold text-slate-800 transition-colors">{{ $item->title }}</h6>
+                                        <p class="dark:text-zink-200 mb-2 text-sm text-slate-500">{{ Str::limit(strip_tags($item->description ?? ($item->caption ?? '')), 150) }}</p>
+                                        <p class="dark:text-zink-300 text-xs text-slate-400">{{ optional($item->created_at)->diffForHumans() }}</p>
+                                    </div>
+                                </div>
+                            </div>
+                        @endforeach
+                    </div>
                 </div><!--end grid-->
 
                 <!-- Tombol Lihat Semua Galeri -->

@@ -24,45 +24,8 @@
                 @endforeach
             </ul>
         </div>
-        <div class="ml-auto md:hidden">
-            <button id="navbar-toggle" aria-expanded="false" aria-controls="navbar7" type="button"
-                class="inline-flex items-center justify-center rounded p-2 text-slate-700 hover:bg-slate-100">
-                <svg width="24" height="24" viewBox="0 0 24 24" fill="none"
-                    xmlns="http://www.w3.org/2000/svg">
-                    <path d="M4 6H20" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                        stroke-linejoin="round"></path>
-                    <path d="M4 12H20" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                        stroke-linejoin="round"></path>
-                    <path d="M4 18H20" stroke="currentColor" stroke-width="2" stroke-linecap="round"
-                        stroke-linejoin="round"></path>
-                </svg>
-            </button>
-        </div>
+       <div class="ltr:ml-auto rtl:mr-auto md:hidden navbar-toggale-button">
+                    <button type="button" class="flex items-center  justify-center size-[37.5px] p-0 text-white btn bg-custom-500 border-custom-500 hover:text-white hover:bg-custom-600 hover:border-custom-600 focus:text-white focus:bg-custom-600 focus:border-custom-600 focus:ring focus:ring-custom-100 active:text-white active:bg-custom-600 active:border-custom-600 active:ring active:ring-custom-100 dark:ring-custom-400/20"><i data-lucide="menu"></i></button>
+                </div>
     </div>
 </nav>
-
-<script>
-    (function() {
-        var btn = document.getElementById('navbar-toggle');
-        var menu = document.getElementById('navbar7');
-        if (!btn || !menu) return;
-        btn.addEventListener('click', function() {
-            var expanded = this.getAttribute('aria-expanded') === 'true';
-            this.setAttribute('aria-expanded', expanded ? 'false' : 'true');
-            if (menu.classList.contains('hidden')) {
-                menu.classList.remove('hidden');
-            } else {
-                menu.classList.add('hidden');
-            }
-        });
-        // close menu when a link is clicked (mobile)
-        menu.querySelectorAll('a').forEach(function(link) {
-            link.addEventListener('click', function() {
-                if (window.innerWidth < 768) {
-                    menu.classList.add('hidden');
-                    btn.setAttribute('aria-expanded', 'false');
-                }
-            });
-        });
-    })();
-</script>

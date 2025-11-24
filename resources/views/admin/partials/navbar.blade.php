@@ -1,4 +1,3 @@
-<div id="sidebar-overlay" class="absolute inset-0 z-[1002] hidden bg-slate-500/30"></div>
 <header id="page-topbar"
     class="ltr:md:left-vertical-menu rtl:md:right-vertical-menu group-data-[sidebar-size=md]:ltr:md:left-vertical-menu-md group-data-[sidebar-size=md]:rtl:md:right-vertical-menu-md group-data-[sidebar-size=sm]:ltr:md:left-vertical-menu-sm group-data-[sidebar-size=sm]:rtl:md:right-vertical-menu-sm group/topbar fixed left-0 right-0 z-[1000] transition-all duration-300 ease-linear group-data-[navbar=scroll]:absolute group-data-[layout=horizontal]:z-[1004] group-data-[navbar=bordered]:m-4 group-data-[navbar=hidden]:hidden group-data-[layout=horizontal]:ltr:left-0 group-data-[layout=horizontal]:rtl:right-0 print:hidden group-data-[navbar=bordered]:[&.is-sticky]:mt-0">
     <div class="layout-width">
@@ -27,12 +26,11 @@
                         </span>
                     </a>
                 </div>
-                <button type="button" id="topnav-hamburger-icon"
-                    class="text-topbar-item bg-topbar btn relative z-[1010] block inline-flex h-[37.5px] w-[37.5px] items-center justify-center rounded-md p-0 transition-all duration-75 ease-linear hover:bg-slate-100 md:hidden"
-                    aria-label="Toggle sidebar">
-                    <i data-lucide="chevrons-left" class="icon-left h-5 w-5"></i>
-                    <i data-lucide="chevrons-right" class="icon-right hidden h-5 w-5"></i>
-                </button>
+                <button type="button" class="inline-flex relative justify-center items-center p-0 text-topbar-item transition-all w-[37.5px] h-[37.5px] duration-75 ease-linear bg-topbar rounded-md btn hover:bg-slate-100 group-data-[topbar=dark]:bg-topbar-dark group-data-[topbar=dark]:border-topbar-dark group-data-[topbar=dark]:text-topbar-item-dark group-data-[topbar=dark]:hover:bg-topbar-item-bg-hover-dark group-data-[topbar=dark]:hover:text-topbar-item-hover-dark group-data-[topbar=brand]:bg-topbar-brand group-data-[topbar=brand]:border-topbar-brand group-data-[topbar=brand]:text-topbar-item-brand group-data-[topbar=brand]:hover:bg-topbar-item-bg-hover-brand group-data-[topbar=brand]:hover:text-topbar-item-hover-brand group-data-[topbar=dark]:dark:bg-zink-700 group-data-[topbar=dark]:dark:text-zink-200 group-data-[topbar=dark]:dark:border-zink-700 group-data-[topbar=dark]:dark:hover:bg-zink-600 group-data-[topbar=dark]:dark:hover:text-zink-50 group-data-[layout=horizontal]:flex group-data-[layout=horizontal]:md:hidden hamburger-icon" id="topnav-hamburger-icon">
+                        <i data-lucide="chevrons-left" class="w-5 h-5 group-data-[sidebar-size=sm]:hidden"></i>
+                        <i data-lucide="chevrons-right" class="hidden w-5 h-5 group-data-[sidebar-size=sm]:block"></i>
+                    </button>
+
 
                 <div class="ms-auto flex gap-3">
 
@@ -87,56 +85,5 @@
 </header>
 
 @push('scripts')
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const btn = document.getElementById('topnav-hamburger-icon');
-            const sidebar = document.querySelector('.app-menu');
-            const overlay = document.getElementById('sidebar-overlay');
-
-            if (!btn) return;
-
-            function showSidebar() {
-                if (!sidebar) return;
-                sidebar.classList.remove('hidden');
-                sidebar.style.display = 'block';
-                sidebar.style.transform = 'translateX(0)';
-                sidebar.style.transition = 'transform 200ms ease';
-                sidebar.style.zIndex = '1003';
-                if (overlay) {
-                    overlay.classList.remove('hidden');
-                    overlay.style.display = 'block';
-                }
-            }
-
-            function hideSidebar() {
-                if (!sidebar) return;
-                sidebar.classList.add('hidden');
-                sidebar.style.display = 'none';
-                sidebar.style.transform = '';
-                sidebar.style.zIndex = '';
-                if (overlay) {
-                    overlay.classList.add('hidden');
-                    overlay.style.display = 'none';
-                }
-            }
-
-            btn.addEventListener('click', function(e) {
-                e.preventDefault();
-                if (!sidebar) return;
-                const isHidden = window.getComputedStyle(sidebar).display === 'none' || sidebar.classList
-                    .contains('hidden');
-                if (isHidden) {
-                    showSidebar();
-                } else {
-                    hideSidebar();
-                }
-            });
-
-            if (overlay) {
-                overlay.addEventListener('click', function() {
-                    hideSidebar();
-                });
-            }
-        });
-    </script>
+    
 @endpush
