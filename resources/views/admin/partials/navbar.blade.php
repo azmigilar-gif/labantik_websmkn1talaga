@@ -84,6 +84,5 @@
     </div>
 </header>
 
-@push('scripts')
-    
-@endpush
+
+

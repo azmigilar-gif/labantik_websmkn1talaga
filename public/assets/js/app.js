@@ -258,6 +258,16 @@ function updateParentActive(button) {
 function toggleHamburgerMenu() {
     var windowSize = document.documentElement.clientWidth;
     var verticalOverlay = document.getElementById("sidebar-overlay");
+    var appMenu = document.querySelector(".app-menu");
+
+    // VALIDASI: Pastikan elemen ada
+    if (!verticalOverlay || !appMenu) {
+        console.error("Required elements not found:", {
+            verticalOverlay: !!verticalOverlay,
+            appMenu: !!appMenu,
+        });
+        return;
+    }
 
     if (windowSize > 768)
         document.querySelector(".hamburger-icon").classList.toggle("open");
@@ -265,35 +275,75 @@ function toggleHamburgerMenu() {
     //For collapse vertical menu
     if (document.documentElement.getAttribute("data-layout") === "vertical") {
         if (windowSize <= 1025 && windowSize >= 768) {
-            document.documentElement.getAttribute("data-sidebar-size") == "sm" ?
-                document.documentElement.setAttribute("data-sidebar-size", "lg") :
-                document.documentElement.setAttribute("data-sidebar-size", "sm");
+            document.documentElement.getAttribute("data-sidebar-size") == "sm"
+                ? document.documentElement.setAttribute(
+                      "data-sidebar-size",
+                      "lg"
+                  )
+                : document.documentElement.setAttribute(
+                      "data-sidebar-size",
+                      "sm"
+                  );
         } else if (windowSize > 1025) {
-            document.documentElement.getAttribute("data-sidebar-size") == sessionStorage.getItem("data-sidebar-size") ?
-                document.documentElement.setAttribute("data-sidebar-size", sessionStorage.getItem("data-sidebar-size") == 'sm' ? 'lg' : 'sm') :
-                document.documentElement.setAttribute("data-sidebar-size", sessionStorage.getItem("data-sidebar-size"));
+            document.documentElement.getAttribute("data-sidebar-size") ==
+            sessionStorage.getItem("data-sidebar-size")
+                ? document.documentElement.setAttribute(
+                      "data-sidebar-size",
+                      sessionStorage.getItem("data-sidebar-size") == "sm"
+                          ? "lg"
+                          : "sm"
+                  )
+                : document.documentElement.setAttribute(
+                      "data-sidebar-size",
+                      sessionStorage.getItem("data-sidebar-size")
+                  );
         } else if (windowSize < 768) {
-            // document.getElementById("sidebar-overlay").classList.remove("hidden")
             document.body.classList.add("overflow-hidden");
+
+            // Toggle overlay
             if (verticalOverlay.classList.contains("hidden")) {
                 verticalOverlay.classList.remove("hidden");
-                document.querySelector(".app-menu").classList.remove("hidden");
+            } else {
+                verticalOverlay.classList.add("hidden");
             }
+
+            // Toggle sidebar
+            if (appMenu.classList.contains("hidden")) {
+                appMenu.classList.remove("hidden");
+            } else {
+                appMenu.classList.add("hidden");
+            }
+
             document.documentElement.setAttribute("data-sidebar-size", "lg");
         }
-        applyScrollbarLogic();
-        handleDropdownMenu();
+
+        if (typeof applyScrollbarLogic === "function") {
+            applyScrollbarLogic();
+        }
+        if (typeof handleDropdownMenu === "function") {
+            handleDropdownMenu();
+        }
     } else {
         if (windowSize < 768) {
-            // document.getElementById("sidebar-overlay").classList.remove("hidden")
             document.body.classList.add("overflow-hidden");
+
+            // Toggle overlay
             if (verticalOverlay.classList.contains("hidden")) {
                 verticalOverlay.classList.remove("hidden");
-                document.querySelector(".app-menu").classList.remove("hidden");
+            } else {
+                verticalOverlay.classList.add("hidden");
+            }
+
+            // Toggle sidebar
+            if (appMenu.classList.contains("hidden")) {
+                appMenu.classList.remove("hidden");
+            } else {
+                appMenu.classList.add("hidden");
             }
         }
     }
 }
+
 
 function hideShowLayoutOptions(dataLayout) {
     if (dataLayout == "horizontal") {
@@ -858,6 +908,22 @@ function initFilters(){
         });
     });
 }
+document.addEventListener("DOMContentLoaded", function () {
+    const overlay = document.getElementById("sidebar-overlay");
+    const appMenu = document.querySelector(".app-menu");
+
+    if (overlay) {
+        overlay.addEventListener("click", function () {
+            // Sembunyikan overlay dan sidebar
+            this.classList.add("hidden");
+            if (appMenu) {
+                appMenu.classList.add("hidden");
+            }
+            // Kembalikan scroll body
+            document.body.classList.remove("overflow-hidden");
+        });
+    }
+});
 // Call the function when the page loads
 applyScrollbarLogic();
 

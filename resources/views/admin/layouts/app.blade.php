@@ -1,4 +1,6 @@
+{{-- ini app --}}
 <!DOCTYPE html>
+
 <html lang="en" class="light group scroll-smooth" data-layout="vertical" data-sidebar="light" data-sidebar-size="lg"
     data-mode="light" data-topbar="light" data-skin="default" data-navbar="sticky" data-content="fluid" dir="ltr">
 @include('admin.layouts.head')
@@ -6,6 +8,8 @@
 <body
     class="bg-body-bg text-body font-public dark:text-zink-100 dark:bg-zink-800 group-data-[skin=bordered]:bg-body-bordered group-data-[skin=bordered]:dark:bg-zink-700 text-base">
     <div class="group-data-[sidebar-size=sm]:min-h-sm group-data-[sidebar-size=sm]:relative">
+       <div id="sidebar-overlay" class="fixed inset-0 z-[1002] bg-slate-900/50 hidden"></div>
+
         @include('admin.partials.sidebar')
         @include('admin.partials.navbar')
         <div class="group-data-[sidebar-size=sm]:min-h-sm relative min-h-screen">
