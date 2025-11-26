@@ -923,6 +923,11 @@ document.addEventListener("DOMContentLoaded", function () {
             document.body.classList.remove("overflow-hidden");
         });
     }
+
+    // TAMBAHKAN INI: Initialize dropdown handlers
+    setTimeout(function () {
+        handleDropdownMenu();
+    }, 100); // Delay sedikit untuk memastikan DOM sudah siap
 });
 // Call the function when the page loads
 applyScrollbarLogic();
@@ -939,7 +944,9 @@ function init() {
     lightDarkMode();
     initLanguage();
     initFilters();
-    initMenuItemScroll()
+    initMenuItemScroll();
+    handleDropdownMenu();
+
 };
 
 init();

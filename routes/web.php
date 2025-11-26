@@ -73,12 +73,17 @@ Route::middleware(['auth'])->prefix('adminkrituga')->name('admin.')->group(funct
     Route::resource('profiles', ProfileController::class);
     Route::resource('galleries', App\Http\Controllers\Admin\GalleryController::class);
     // Admin management for expertise descriptions
-    Route::get('expertise', [App\Http\Controllers\Admin\ExpertiseController::class, 'index'])->name('expertise.index');
-    Route::get('expertise/create', [App\Http\Controllers\Admin\ExpertiseController::class, 'create'])->name('expertise.create');
-    Route::post('expertise', [App\Http\Controllers\Admin\ExpertiseController::class, 'store'])->name('expertise.store');
-    Route::get('expertise/{id}', [App\Http\Controllers\Admin\ExpertiseController::class, 'show'])->name('expertise.show');
-    Route::get('expertise/{id}/edit', [App\Http\Controllers\Admin\ExpertiseController::class, 'edit'])->name('expertise.edit');
-    Route::put('expertise/{id}', [App\Http\Controllers\Admin\ExpertiseController::class, 'update'])->name('expertise.update');
+   // Route upload image HARUS di atas route {id}
+Route::post('expertise/upload/image', [App\Http\Controllers\Admin\ExpertiseController::class, 'uploadImage'])->name('expertise.upload.image');
+
+// Route CRUD
+Route::get('expertise', [App\Http\Controllers\Admin\ExpertiseController::class, 'index'])->name('expertise.index');
+Route::get('expertise/create', [App\Http\Controllers\Admin\ExpertiseController::class, 'create'])->name('expertise.create');
+Route::post('expertise', [App\Http\Controllers\Admin\ExpertiseController::class, 'store'])->name('expertise.store');
+Route::get('expertise/{id}', [App\Http\Controllers\Admin\ExpertiseController::class, 'show'])->name('expertise.show');
+Route::get('expertise/{id}/edit', [App\Http\Controllers\Admin\ExpertiseController::class, 'edit'])->name('expertise.edit');
+Route::put('expertise/{id}', [App\Http\Controllers\Admin\ExpertiseController::class, 'update'])->name('expertise.update');
+Route::delete('expertise/{id}', [App\Http\Controllers\Admin\ExpertiseController::class, 'destroy'])->name('expertise.destroy');
 });
 
 // Public route to show program description
