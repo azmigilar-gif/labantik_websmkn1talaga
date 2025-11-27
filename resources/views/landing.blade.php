@@ -22,11 +22,22 @@
         <div class="bg-custom-500 absolute left-0 top-0 z-10 size-64 opacity-10 blur-3xl"></div>
         <div class="absolute bottom-0 right-0 z-10 size-64 bg-purple-500/10 blur-3xl"></div>
         @php
+            // Prefer an uploaded background file saved to public/assets/images/background.*
             $heroImage = null;
-            if (!empty($heroProfile->photo)) {
+            $foundAssetBackground = null;
+            // glob will look for any extension (jpg, png, webp, etc.)
+            $matches = @glob(public_path('assets/images/background.*')) ?: [];
+            if (!empty($matches)) {
+                // use the first match and build an assets-relative path
+                $foundAssetBackground = 'assets/images/' . basename($matches[0]);
+            }
+
+            if ($foundAssetBackground) {
+                $heroImage = $foundAssetBackground;
+            } elseif (!empty($heroProfile->photo)) {
                 $heroImage = $heroProfile->photo;
             } else {
-                $heroImage = 'assets/images/smk.jpg';
+                $heroImage = 'assets/images/background.png';
             }
             // If stored as full URL or assets path, build correct url
             if (filter_var($heroImage, FILTER_VALIDATE_URL)) {

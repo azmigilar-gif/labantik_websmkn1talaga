@@ -16,6 +16,8 @@ use App\Http\Controllers\Admin\ProfileController;
 use App\Http\Controllers\Admin\VisionMissionController;
 use App\Http\Controllers\Admin\UploadController;
 use App\Http\Controllers\GalleriesController;
+use App\Http\Controllers\Admin\BackgroundController;
+
 
 Route::get('/', [LandingPageController::class, 'index'])->name('landingpage');
 
@@ -64,6 +66,10 @@ Route::middleware(['auth'])->prefix('adminkrituga')->name('admin.')->group(funct
     Route::resource('mitra', MitraController::class);
     // Approval endpoint for ekstrakulikuler (only accessible to superadmin in controller)
     Route::post('extrakulikuler/{id}/approve', [ExtrakulikulerController::class, 'approve'])->name('extrakulikuler.approve');
+    // Background management (upload/delete) - simple admin UI
+    Route::get('background', [BackgroundController::class, 'index'])->name('background.index');
+    Route::post('background', [BackgroundController::class, 'store'])->name('background.store');
+    Route::delete('background', [BackgroundController::class, 'destroy'])->name('background.destroy');
     // Mitra (partner) resource for admin CRUD
     Route::resource('mitra', MitraController::class);
     Route::resource('contacts', ContactController::class);
