@@ -10,7 +10,7 @@ File: Common Plugins Js File
 
 (function () {
     ("use strict");
-    
+
     function loadScriptIfElementsExist(selector, scriptSrc) {
         var elements = document.querySelectorAll(selector);
         if (elements.length > 0) {
@@ -355,8 +355,8 @@ File: Common Plugins Js File
         const allDrawerCloseButtons = document.querySelectorAll('[data-drawer-close]');
         const allModalButtons = document.querySelectorAll('[data-modal-target]');
         const allModalCloseButtons = document.querySelectorAll('[data-modal-close]');
-        const bodyElement = document.body;       
-        
+        const bodyElement = document.body;
+
         let openDrawerId = null;
         let openModalId = null;
         if(document.getElementById("backDropDiv")) {
