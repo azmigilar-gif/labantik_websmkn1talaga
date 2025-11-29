@@ -4,11 +4,98 @@
 <html lang="en" class="light group scroll-smooth" data-layout="vertical" data-sidebar="light" data-sidebar-size="lg"
     data-mode="light" data-topbar="light" data-skin="default" data-navbar="sticky" data-content="fluid" dir="ltr">
 @include('admin.layouts.head')
+<style>
+    #pageLoader {
+        position: fixed;
+        top: 0;
+        left: 0;
+        width: 100%;
+        height: 100%;
+        background-color: #ffffff;
+        display: flex;
+        justify-content: center;
+        align-items: center;
+        z-index: 99999;
+        transition: opacity 0.3s ease-in-out;
+    }
+
+    /* Dark mode support */
+    html.dark #pageLoader,
+    body.dark #pageLoader,
+    html[data-mode="dark"] #pageLoader,
+    body[data-mode="dark"] #pageLoader {
+        background-color: #18181b;
+    }
+
+    #pageLoader.hide {
+        opacity: 0;
+        pointer-events: none;
+    }
+
+    /* Container untuk 3 bulatan */
+    .loader-dots {
+        display: flex;
+        gap: 12px;
+        align-items: center;
+    }
+
+    /* Style untuk setiap bulatan */
+    .loader-dot {
+        width: 16px;
+        height: 16px;
+        background-color: #3b82f6;
+        border-radius: 50%;
+        animation: fadeInOut 1.4s ease-in-out infinite;
+    }
+
+    /* Dark mode untuk bulatan */
+    html.dark .loader-dot,
+    body.dark .loader-dot,
+    html[data-mode="dark"] .loader-dot,
+    body[data-mode="dark"] .loader-dot {
+        background-color: #60a5fa;
+    }
+
+    /* Delay animasi untuk setiap bulatan */
+    .loader-dot:nth-child(1) {
+        animation-delay: 0s;
+    }
+
+    .loader-dot:nth-child(2) {
+        animation-delay: 0.2s;
+    }
+
+    .loader-dot:nth-child(3) {
+        animation-delay: 0.4s;
+    }
+
+    /* Animasi fade in dan fade out */
+    @keyframes fadeInOut {
+
+        0%,
+        100% {
+            opacity: 0.2;
+            transform: scale(0.8);
+        }
+
+        50% {
+            opacity: 1;
+            transform: scale(1);
+        }
+    }
+</style>
 
 <body
     class="bg-body-bg text-body font-public dark:text-zink-100 dark:bg-zink-800 group-data-[skin=bordered]:bg-body-bordered group-data-[skin=bordered]:dark:bg-zink-700 text-base">
+    <div id="pageLoader">
+        <div class="loader-dots">
+            <div class="loader-dot"></div>
+            <div class="loader-dot"></div>
+            <div class="loader-dot"></div>
+        </div>
+    </div>
     <div class="group-data-[sidebar-size=sm]:min-h-sm group-data-[sidebar-size=sm]:relative">
-       <div id="sidebar-overlay" class="fixed inset-0 z-[1002] bg-slate-900/50 hidden"></div>
+        <div id="sidebar-overlay" class="fixed inset-0 z-[1002] hidden bg-slate-900/50"></div>
 
         @include('admin.partials.sidebar')
         @include('admin.partials.navbar')
@@ -277,6 +364,77 @@
 
         </div>
     </div>
+    <script>
+        // Fungsi untuk menyembunyikan loader
+        function hideLoader() {
+            const loader = document.getElementById('pageLoader');
+            if (loader && !loader.classList.contains('hide')) {
+                loader.classList.add('hide');
+                // Hapus elemen setelah animasi selesai
+                setTimeout(() => {
+                    loader.style.display = 'none';
+                }, 300);
+            }
+        }
+
+        // Cek apakah semua resource sudah dimuat
+        function checkIfAllLoaded() {
+            if (document.readyState === 'complete') {
+                requestAnimationFrame(() => {
+                    requestAnimationFrame(() => {
+                        hideLoader();
+                    });
+                });
+            }
+        }
+
+        // Event listener untuk berbagai tahap loading
+        if (document.readyState === 'complete') {
+            checkIfAllLoaded();
+        } else {
+            document.addEventListener('DOMContentLoaded', function() {
+                const images = document.querySelectorAll('img');
+                let imagesLoaded = 0;
+                const totalImages = images.length;
+
+                if (totalImages === 0) {
+                    checkIfAllLoaded();
+                } else {
+                    images.forEach(img => {
+                        if (img.complete) {
+                            imagesLoaded++;
+                        } else {
+                            img.addEventListener('load', () => {
+                                imagesLoaded++;
+                                if (imagesLoaded === totalImages) {
+                                    checkIfAllLoaded();
+                                }
+                            });
+                            img.addEventListener('error', () => {
+                                imagesLoaded++;
+                                if (imagesLoaded === totalImages) {
+                                    checkIfAllLoaded();
+                                }
+                            });
+                        }
+                    });
+
+                    if (imagesLoaded === totalImages) {
+                        checkIfAllLoaded();
+                    }
+                }
+            });
+
+            window.addEventListener('load', function() {
+                checkIfAllLoaded();
+            });
+        }
+
+        // Fallback timeout
+        setTimeout(function() {
+            hideLoader();
+        }, 5000);
+    </script>
 
     @include('admin.layouts.script')
 </body>

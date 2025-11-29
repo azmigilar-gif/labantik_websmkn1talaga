@@ -31,5 +31,64 @@
 
 <!-- App js -->
 <script src="{{ asset('assets/js/app.js') }}"></script>
+<script>
+    // Force initialize dropdown setelah semua script loaded
+    window.addEventListener('load', function() {
+        console.log('Window loaded, initializing dropdowns...');
+
+        // Wait for all scripts to complete
+        setTimeout(function() {
+            const dropdownButtons = document.querySelectorAll('#scrollbar .dropdown-button');
+            console.log('Dropdown buttons found:', dropdownButtons.length);
+
+            dropdownButtons.forEach(function(button, index) {
+                const content = button.nextElementSibling;
+
+                // Remove old listeners by cloning
+                const newButton = button.cloneNode(true);
+                button.parentNode.replaceChild(newButton, button);
+
+                // Add fresh listener
+                newButton.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+
+                    console.log('Dropdown button clicked:', index);
+
+                    if (content) {
+                        const isHidden = content.classList.contains('hidden');
+
+                        // Close other dropdowns
+                        document.querySelectorAll('#scrollbar .dropdown-content')
+                            .forEach(function(otherContent) {
+                                if (otherContent !== content) {
+                                    otherContent.classList.add('hidden');
+                                    otherContent.previousElementSibling?.classList
+                                        .remove('show');
+                                }
+                            });
+
+                        // Toggle current dropdown
+                        if (isHidden) {
+                            content.classList.remove('hidden');
+                            newButton.classList.add('show');
+                        } else {
+                            content.classList.add('hidden');
+                            newButton.classList.remove('show');
+                        }
+
+                        console.log('Dropdown toggled:', !isHidden);
+                    }
+                });
+
+                // Ensure visibility
+                newButton.style.pointerEvents = 'auto';
+                newButton.style.cursor = 'pointer';
+            });
+
+            console.log('Dropdown initialization complete!');
+        }, 1000); // Wait 1 second for all scripts
+    });
+</script>
 
 @stack('scripts')
