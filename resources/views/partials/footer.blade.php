@@ -11,10 +11,10 @@
 
 
                     </div>
-                
+
                     <ul class="flex items-center gap-3">
                         <li>
-                            <a href="#!"
+                            <a href="https://www.facebook.com/smkn1tlg/ "
                                 class="hover:text-custom-500 dark:hover:text-custom-500 flex size-10 items-center justify-center rounded-full border border-slate-200 text-slate-500 transition-all duration-200 ease-linear dark:border-zinc-800 dark:text-zinc-400"><i
                                     data-lucide="facebook" class="size-4"></i></a>
                         </li>

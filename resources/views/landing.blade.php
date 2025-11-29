@@ -455,7 +455,7 @@
                         @foreach ($extrakurikulers as $item)
                             <div class="swiper-slide">
                                 <div class="p-5 text-center" data-aos="fade-up" data-aos-easing="linear">
-                                    <div class="bg-custom-500/10 mx-auto">
+                                    <div class="mx-auto w-28 flex items-center justify-center">
                                         @if (!empty($item->photo))
                                             @php
                                                 $p = $item->photo;
@@ -504,7 +504,7 @@
                         @foreach ($mitras as $item)
                             <div class="swiper-slide">
                                 <div class="p-5 text-center" data-aos="fade-up" data-aos-easing="linear">
-                                    <div class="bg-custom-500/10 mx-auto">
+                                    <div class="mx-auto w-28 flex items-center justify-center">
                                         @if (!empty($item->photo))
                                             @php
                                                 $p = $item->photo;
@@ -521,11 +521,11 @@
                                                 }
                                             @endphp
                                             <img src="{{ $imgUrl }}" alt="{{ $item->name }}"
-                                                class="object-cover"
+                                                class="max-w-full max-h-full object-contain"
                                                 onerror="this.src='{{ asset('assets/images/default-extrakurikuler.png') }}'">
                                         @else
                                             <img src="{{ asset('assets/images/default-extrakurikuler.png') }}"
-                                                alt="{{ $item->name }}" class="size-20 object-cover">
+                                                alt="{{ $item->name }}" class="max-w-full max-h-full object-contain">
                                         @endif
                                     </div>
                                     <h6 class="mb-1 mt-4 text-3xl">{{ $item->name }}</h6>

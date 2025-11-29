@@ -23,6 +23,3 @@ yarn-error.log
 /.zed
 
 # Ignore uploaded public assets but keep .gitkeep files so folders remain tracked
-/public/assets/images/*
-!/public/assets/images/.gitkeep
-!/public/assets/images/**/.gitkeep
