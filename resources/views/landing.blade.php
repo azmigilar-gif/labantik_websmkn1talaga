@@ -128,7 +128,8 @@
         $profileMenu = $menus->firstWhere('slug', 'section-profil');
         $programMenu = $menus->firstWhere('slug', 'section-konsentrasi');
         $newsMenu = $menus->firstWhere('slug', 'section-berita');
-        $extrakurikulerMenu = $menus->firstWhere('slug', 'section-galeri');
+        $extrakurikulerMenu = $menus->firstWhere('slug', 'section-ekskul');
+        $galleryMenu = $menus->firstWhere('slug', 'section-gallery');
 
     @endphp
 
@@ -541,7 +542,17 @@
 
     {{-- =============== Galleries (Galeri) =============== --}}
     @if (!empty($galleries) && $galleries->count() > 0)
-        <section id="section-galleries" class="dark:bg-zink-800/20 relative bg-white py-24 pb-16 xl:py-32 xl:pb-20">
+        @if ($galleryMenu)
+            @php
+                $sectionId = $galleryMenu->slug ?? 'section-gallery';
+            @endphp
+        @else
+            @php
+                $sectionId = 'section-gallery';
+            @endphp
+        @endif
+
+        <section id="{{ $sectionId }}" class="dark:bg-zink-800/20 relative bg-white py-24 pb-16 xl:py-32 xl:pb-20">
             <div class="container mx-auto px-4 2xl:max-w-[87.5rem]">
                 <div class="mx-auto mb-8 text-center xl:max-w-3xl">
                     <h2 class="text-gradient mb-0 capitalize leading-normal">Galeri</h2>
@@ -665,6 +676,9 @@
                         @endforeach
                     </div>
                 </div><!--end grid-->
+            </div>
+        </section>
+    <!--end grid-->
 
                 <!-- Tombol Lihat Semua Galeri -->
                 <div class="mt-8 flex justify-center">

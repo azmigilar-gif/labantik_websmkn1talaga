@@ -63,64 +63,68 @@
 
                     <div class="mb-5 grid grid-cols-1 gap-x-5 gap-y-5 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
                         @foreach ($news as $item)
-                            <a href="{{ route('news.show', $item->id) }}"
-                                class="block">
-                                <div class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300">
-                                    <!-- Image Container -->
-                                    <div class="relative">
+                            <a href="{{ route('news.show', $item->id) }}" class="block">
+                                <div
+                                    class="mb-5 flex h-[480px] flex-col overflow-hidden rounded-lg bg-white shadow-md transition-shadow duration-300 hover:shadow-lg">
+                                    <!-- Image Container - Fixed 192px -->
+                                    <div class="relative h-48 flex-shrink-0 overflow-hidden bg-gray-100">
                                         @php
                                             $firstImgSrc = null;
                                             if (!empty($item->content)) {
-                                                if (preg_match('/<img[^>]+src="([^">]+)"/i', $item->content, $matches)) {
+                                                if (
+                                                    preg_match('/<img[^>]+src="([^">]+)"/i', $item->content, $matches)
+                                                ) {
                                                     $firstImgSrc = $matches[1];
                                                 }
                                             }
                                         @endphp
 
-                                        <img
-                                            src="{{ $firstImgSrc ?? asset('assets/images/default-news.png') }}"
-                                            alt="{{ $item->title }}"
-                                            class="w-full h-48 object-cover"
-                                        />
+                                        <img src="{{ $firstImgSrc ?? asset('assets/images/default-news.png') }}"
+                                            alt="{{ $item->title }}" class="h-full w-full object-cover" loading="lazy" />
 
-                                        @if($item->category)
-                                            <span class="absolute top-3 right-3 bg-gray-800 text-white text-xs font-medium px-3 py-1 rounded">
+                                        @if ($item->category)
+                                            <span
+                                                class="absolute right-3 top-3 rounded bg-gray-800 px-3 py-1 text-xs font-medium text-white">
                                                 {{ $item->category->name }}
                                             </span>
                                         @endif
                                     </div>
 
-                                    <!-- Content Container -->
-                                    <div class="p-4">
-                                        <!-- Title -->
-                                        <h3 class="text-gray-900 font-semibold text-lg mb-3 leading-tight line-clamp-2">
-                                            {{ $item->title }}
+                                    <!-- Content Container - Remaining space with strict overflow control -->
+                                    <div class="flex min-h-0 flex-1 flex-col overflow-hidden p-4">
+                                        <!-- Title - Fixed height 56px (2 lines) -->
+                                        <h3
+                                            class="mb-3 h-14 flex-shrink-0 overflow-hidden text-lg font-semibold leading-tight text-gray-900">
+                                            <span class="line-clamp-2">{{ $item->title }}</span>
                                         </h3>
 
-                                        <!-- Meta Information -->
-                                        <table class="text-sm text-gray-600 w-full">
-                                            <tbody>
-                                                <!-- Date -->
-                                                <tr>
-                                                    <td class="text-cyan-500 pr-2 align-top w-6">📅</td>
-                                                    <td class="pb-2">{{ $item->created_at->format('l, d F Y') }}</td>
-                                                </tr>
+                                        <!-- Meta Information - Controlled height -->
+                                        <div class="min-h-0 flex-1 overflow-hidden">
+                                            <div class="flex flex-col gap-2 text-sm text-gray-600">
+                                                <!-- Date - Single line -->
+                                                <div class="flex items-start gap-2">
+                                                    <span class="flex-shrink-0 text-cyan-500">📅</span>
+                                                    <span
+                                                        class="truncate">{{ $item->created_at->format('l, d F Y') }}</span>
+                                                </div>
 
-                                                <!-- Author -->
-                                                @if($item->created_by && $item->createdBy)
-                                                <tr>
-                                                    <td class="text-cyan-500 pr-2 align-top w-6">👤</td>
-                                                    <td class="pb-2">{{ $item->createdBy->name }}</td>
-                                                </tr>
+                                                <!-- Author - Single line -->
+                                                @if ($item->created_by && $item->createdBy)
+                                                    <div class="flex items-start gap-2">
+                                                        <span class="flex-shrink-0 text-cyan-500">👤</span>
+                                                        <span class="truncate">{{ $item->createdBy->name }}</span>
+                                                    </div>
                                                 @endif
 
-                                                <!-- Preview -->
-                                                <tr>
-                                                    <td class="text-cyan-500 pr-2 align-top w-6">📄</td>
-                                                    <td class="line-clamp-2">{{ Str::limit(strip_tags($item->content), 80, '...') }}</td>
-                                                </tr>
-                                            </tbody>
-                                        </table>
+                                                <!-- Preview - Max 3 lines -->
+                                                <div class="flex items-start gap-2">
+                                                    <span class="flex-shrink-0 text-cyan-500">📄</span>
+                                                    <span class="line-clamp-3 min-w-0 flex-1">
+                                                        {{ Str::limit(strip_tags($item->content), 100, '...') }}
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        </div>
                                     </div>
                                 </div>
                             </a>

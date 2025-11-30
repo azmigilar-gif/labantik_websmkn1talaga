@@ -23,19 +23,21 @@
                     <div class="card-body">
 
 
-                    <div class="card-body flex items-center gap-4">
-                        <div class="w-40">
+                    <div class="card-body flex flex-col gap-4 md:flex-row md:items-center">
+                        <div class="w-full max-w-xs md:w-40 shrink-0">
 
                             @if ($item->embed_html)
-                                <div style="aspect-ratio:16/9;">
-                                    {!! $item->embed_html !!}
+                                <div class="aspect-video overflow-hidden rounded">
+                                    <div class="max-w-full" style="transform: scale(0.8); transform-origin: top left;">
+                                        {!! $item->embed_html !!}
+                                    </div>
                                 </div>
                             @endif
                         </div>
-                        <div class="flex-1">
-                            <h6 class="mb-1">{{ $item->title ?? '—' }}</h6>
+                        <div class="flex-1 min-w-0">
+                            <h6 class="mb-1 break-words">{{ $item->title ?? '—' }}</h6>
                         </div>
-                        <div class="flex gap-2">
+                        <div class="flex flex-wrap gap-2 shrink-0">
                             <a href="{{ route('admin.galleries.show', $item->id) }}" class="text-white btn bg-custom-500 border-custom-500 hover:text-white hover:bg-custom-600 hover:border-custom-600 focus:text-white focus:bg-custom-600 focus:border-custom-600 focus:ring focus:ring-custom-100 active:text-white active:bg-custom-600 active:border-custom-600 active:ring active:ring-custom-100 dark:ring-custom-400/20">Lihat</a>
                             <a href="{{ route('admin.galleries.edit', $item->id) }}" class="text-white bg-orange-500 border-orange-500 btn hover:text-white hover:bg-orange-600 hover:border-orange-600 focus:text-white focus:bg-orange-600 focus:border-orange-600 focus:ring focus:ring-orange-100 active:text-white active:bg-orange-600 active:border-orange-600 active:ring active:ring-orange-100 dark:ring-orange-400/10">Edit</a>
                             <form action="{{ route('admin.galleries.destroy', $item->id) }}" method="post"
