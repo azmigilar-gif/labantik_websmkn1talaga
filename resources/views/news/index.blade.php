@@ -61,55 +61,66 @@
                         </div>
                     </div>
 
-                    <div class="mb-5 grid grid-cols-1 gap-x-5 md:grid-cols-2 lg:grid-cols-5 xl:grid-cols-7">
+                    <div class="mb-5 grid grid-cols-1 gap-x-5 gap-y-5 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
                         @foreach ($news as $item)
                             <a href="{{ route('news.show', $item->id) }}"
-                                class="card cursor-pointer transition-shadow duration-300 hover:shadow-lg">
-                                <div class="card-body">
-                                    <div class="group/gallery relative overflow-hidden rounded-md">
+                                class="block">
+                                <div class="bg-white rounded-lg shadow-md overflow-hidden hover:shadow-lg transition-shadow duration-300">
+                                    <!-- Image Container -->
+                                    <div class="relative">
                                         @php
                                             $firstImgSrc = null;
-
                                             if (!empty($item->content)) {
-                                                if (
-                                                    preg_match('/<img[^>]+src="([^">]+)"/i', $item->content, $matches)
-                                                ) {
-                                                    $firstImgSrc = $matches[1]; // hanya ambil URL src
+                                                if (preg_match('/<img[^>]+src="([^">]+)"/i', $item->content, $matches)) {
+                                                    $firstImgSrc = $matches[1];
                                                 }
                                             }
                                         @endphp
 
-                                        <img src="{{ $firstImgSrc ?? asset('assets/images/default-news.png') }}"
-                                            alt="news-image" class="h-48 w-full rounded-md object-cover">
+                                        <img
+                                            src="{{ $firstImgSrc ?? asset('assets/images/default-news.png') }}"
+                                            alt="{{ $item->title }}"
+                                            class="w-full h-48 object-cover"
+                                        />
 
-                                        <div
-                                            class="absolute inset-0 bg-gradient-to-t from-gray-900 to-transparent opacity-0 transition-all duration-300 ease-linear group-hover/gallery:opacity-50">
-                                        </div>
-                                        <div
-                                            class="absolute bottom-0 left-3 right-3 opacity-0 transition-all duration-300 ease-linear group-hover/gallery:bottom-3 group-hover/gallery:opacity-100">
-                                            <h5 class="font-normal text-white">{{ $item->title }}</h5>
-                                        </div>
+                                        @if($item->category)
+                                            <span class="absolute top-3 right-3 bg-gray-800 text-white text-xs font-medium px-3 py-1 rounded">
+                                                {{ $item->category->name }}
+                                            </span>
+                                        @endif
                                     </div>
 
-                                    <div class="mt-4">
-                                        <!-- Header: Created at (kiri) dan Name (kanan) -->
-                                        <div
-                                            class="dark:text-zink-200 mb-2 flex items-start justify-between text-xs text-slate-500">
-                                            <p>{{ $item->created_at->diffForHumans() }}</p>
-                                            <p>
-                                                @if ($item->created_by)
-                                                    {{ '@' . $item->createdBy->name }}
-                                                @endif
-                                            </p>
-                                        </div>
+                                    <!-- Content Container -->
+                                    <div class="p-4">
+                                        <!-- Title -->
+                                        <h3 class="text-gray-900 font-semibold text-lg mb-3 leading-tight line-clamp-2">
+                                            {{ $item->title }}
+                                        </h3>
 
-                                        <!-- Description di tengah -->
-                                        <div class="px-4">
-                                            <p
-                                                class="dark:text-zink-300 mb-3 text-justify text-sm leading-relaxed text-slate-600">
-                                                {{ Str::limit(strip_tags($item->content), 100, '...') }}
-                                            </p>
-                                        </div>
+                                        <!-- Meta Information -->
+                                        <table class="text-sm text-gray-600 w-full">
+                                            <tbody>
+                                                <!-- Date -->
+                                                <tr>
+                                                    <td class="text-cyan-500 pr-2 align-top w-6">📅</td>
+                                                    <td class="pb-2">{{ $item->created_at->format('l, d F Y') }}</td>
+                                                </tr>
+
+                                                <!-- Author -->
+                                                @if($item->created_by && $item->createdBy)
+                                                <tr>
+                                                    <td class="text-cyan-500 pr-2 align-top w-6">👤</td>
+                                                    <td class="pb-2">{{ $item->createdBy->name }}</td>
+                                                </tr>
+                                                @endif
+
+                                                <!-- Preview -->
+                                                <tr>
+                                                    <td class="text-cyan-500 pr-2 align-top w-6">📄</td>
+                                                    <td class="line-clamp-2">{{ Str::limit(strip_tags($item->content), 80, '...') }}</td>
+                                                </tr>
+                                            </tbody>
+                                        </table>
                                     </div>
                                 </div>
                             </a>

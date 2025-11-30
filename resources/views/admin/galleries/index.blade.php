@@ -13,16 +13,19 @@
         @endif
 
         <div class="grid grid-cols-1 gap-4">
-            @foreach ($items as $item)
-                <div class="card">
-                    <div class="card-body">
 
-                    <div class="mb-4 flex items-center justify-end gap-2">
+                <div class="card">
+                    <div class="mb-4 flex items-center justify-end gap-2 px-4 pt-4">
                 <a href="{{ route('admin.galleries.create') }}" class="btn bg-custom-500 border-custom-500 hover:bg-custom-600 hover:border-custom-600 focus:bg-custom-600 focus:border-custom-600 focus:ring-custom-100 active:bg-custom-600 active:border-custom-600 active:ring-custom-100 dark:ring-custom-400/20 add-employee text-white hover:text-white focus:text-white focus:ring active:text-white active:ring">Tambah</a>
 
             </div>
+            @foreach ($items as $item)
+                    <div class="card-body">
+
+
                     <div class="card-body flex items-center gap-4">
                         <div class="w-40">
+
                             @if ($item->embed_html)
                                 <div style="aspect-ratio:16/9;">
                                     {!! $item->embed_html !!}

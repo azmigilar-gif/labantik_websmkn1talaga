@@ -26,8 +26,8 @@
                         taken from the embedded post.</p>
                 </div>
                 <div>
-                    <button class="btn btn-primary" type="submit">Simpan</button>
-                    <a href="{{ route('admin.galleries.index') }}" class="btn btn-ghost">Batal</a>
+                    <button class="text-white btn bg-custom-500 border-custom-500 hover:text-white hover:bg-custom-600 hover:border-custom-600 focus:text-white focus:bg-custom-600 focus:border-custom-600 focus:ring focus:ring-custom-100 active:text-white active:bg-custom-600 active:border-custom-600 active:ring active:ring-custom-100 dark:ring-custom-400/20" type="submit">Simpan</button>
+                    <a href="{{ route('admin.galleries.index') }}" class="text-white bg-red-500 border-red-500 btn hover:text-white hover:bg-red-600 hover:border-red-600 focus:text-white focus:bg-red-600 focus:border-red-600 focus:ring focus:ring-red-100 active:text-white active:bg-red-600 active:border-red-600 active:ring active:ring-red-100 dark:ring-custom-400/20">Batal</a>
                 </div>
             </div>
         </form>

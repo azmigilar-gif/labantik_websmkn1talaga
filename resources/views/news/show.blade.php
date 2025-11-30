@@ -19,36 +19,25 @@
 
                 <h1 class="dark:text-zink-100 mb-6 text-3xl font-bold text-slate-800">{{ $news->title }}</h1>
 
-                @php
-                    $firstImg = null;
-                if (isset($news->content) && preg_match('/<img.+@endphp/i', $news->content, $matches)) {
-    $firstImg = $matches[0];
-
-    // Sanitize extracted <img> so inline width/height/style don't break layout
-    libxml_use_internal_errors(true);
-    $doc = new \DOMDocument();
-    $doc->loadHTML(mb_convert_encoding($firstImg, 'HTML-ENTITIES', 'UTF-8'));
-    $imgTag = $doc->getElementsByTagName('img')->item(0);
-    if ($imgTag) {
-        // remove width/height attributes
-        $imgTag->removeAttribute('width');
-        $imgTag->removeAttribute('height');
-
-        // clean style attribute (remove width/height declarations)
-        $style = $imgTag->getAttribute('style');
-        $style = preg_replace('/(width|height)\s*:\s*[^;]+;?/i', '', $style);
-        $style = trim($style);
-        if ($style === '') {
-            $imgTag->removeAttribute('style');
-        } else {
-            $imgTag->setAttribute('style', $style);
-        }
-
-        $firstImg = $doc->saveHTML($imgTag);
-    }
-    libxml_clear_errors();
-}
-?>
+                @if (!empty($news->photo))
+                    @php
+                        $p = $news->photo;
+                        if (filter_var($p, FILTER_VALIDATE_URL)) {
+                            $imgUrl = $p;
+                        } elseif (
+                            preg_match('#^assets/#', $p) ||
+                            preg_match('#^public/assets/#', $p)
+                        ) {
+                            $imgUrl = asset(preg_replace('#^public/#', '', $p));
+                        } else {
+                            $rel = preg_replace('#^storage/#', '', $p);
+                            $imgUrl = route('public.files', ['path' => $rel]);
+                        }
+                    @endphp
+                    <div class="mb-6">
+                        <img src="{{ $imgUrl }}" alt="{{ $news->title }}" class="w-full rounded" onerror="this.src='{{ asset('assets/images/default-news.png') }}'">
+                    </div>
+                @endif
 
                 <div class="prose dark:text-zink-200 max-w-none text-slate-700">
                     {!! $news->content !!}
