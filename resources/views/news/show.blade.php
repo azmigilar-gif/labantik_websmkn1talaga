@@ -24,10 +24,7 @@
                         $p = $news->photo;
                         if (filter_var($p, FILTER_VALIDATE_URL)) {
                             $imgUrl = $p;
-                        } elseif (
-                            preg_match('#^assets/#', $p) ||
-                            preg_match('#^public/assets/#', $p)
-                        ) {
+                        } elseif (preg_match('#^assets/#', $p) || preg_match('#^public/assets/#', $p)) {
                             $imgUrl = asset(preg_replace('#^public/#', '', $p));
                         } else {
                             $rel = preg_replace('#^storage/#', '', $p);
@@ -35,7 +32,8 @@
                         }
                     @endphp
                     <div class="mb-6">
-                        <img src="{{ $imgUrl }}" alt="{{ $news->title }}" class="w-full rounded" onerror="this.src='{{ asset('assets/images/default-news.png') }}'">
+                        <img src="{{ $imgUrl }}" alt="{{ $news->title }}" class="w-full rounded"
+                            onerror="this.src='{{ asset('assets/images/default-news.png') }}'">
                     </div>
                 @endif
 
@@ -43,18 +41,13 @@
                     {!! $news->content !!}
                 </div>
 
-<div class="flex justify-end mt-4">
-    <a href="{{ $backUrl ?? route('news.index') }}"
-       class="inline-flex items-center gap-2 px-4 py-2 rounded border border-slate-500
-              bg-white text-slate-500
-              hover:bg-slate-600 hover:text-white hover:border-slate-600
-              focus:bg-slate-600 focus:text-white focus:border-slate-600 focus:ring focus:ring-slate-100
-              active:bg-slate-600 active:text-white active:border-slate-600 active:ring active:ring-slate-100
-              dark:bg-zink-700 dark:hover:bg-slate-500 dark:ring-slate-400/20 dark:focus:bg-slate-500">
-        <span>Berita Lainnya</span>
-        <i data-lucide="arrow-right" class="w-4 h-4"></i>
-    </a>
-</div>
+                <div class="mt-4 flex justify-end">
+                    <a href="{{ $backUrl ?? route('news.index') }}"
+                        class="dark:bg-zink-700 inline-flex items-center gap-2 rounded border border-slate-500 bg-white px-4 py-2 text-slate-500 hover:border-slate-600 hover:bg-slate-600 hover:text-white focus:border-slate-600 focus:bg-slate-600 focus:text-white focus:ring focus:ring-slate-100 active:border-slate-600 active:bg-slate-600 active:text-white active:ring active:ring-slate-100 dark:ring-slate-400/20 dark:hover:bg-slate-500 dark:focus:bg-slate-500">
+                        <span>Berita Lainnya</span>
+                        <i data-lucide="arrow-right" class="h-4 w-4"></i>
+                    </a>
+                </div>
             </div>
         </div>
     </section>
