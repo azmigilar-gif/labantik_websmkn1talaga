@@ -67,7 +67,7 @@
 
                                         <div id="editProfileModal{{ $p->id }}" modal-center=""
                                             class="fixed flex flex-col hidden transition-all duration-300 ease-in-out left-2/4 z-drawer -translate-x-2/4 -translate-y-2/4 show">
-                                            <div class="w-screen md:w-[30rem] bg-white shadow rounded-md dark:bg-zink-600">
+                                            <div class="w-screen md:w-[40rem] bg-white shadow rounded-md dark:bg-zink-600">
                                                 <div
                                                     class="flex items-center justify-between p-4 border-b dark:border-zink-500">
                                                     <h5 class="text-16 font-medium" id="editVisiMisiLabel">Edit Profile
@@ -109,7 +109,7 @@
                                                                 class="inline-block mb-2 text-base font-medium">Profile
                                                                 Sekolah</label>
                                                             <textarea rows="5" id="edit_content" name="content"
-                                                                class="form-input border-slate-200 dark:border-zink-500 focus:outline-none focus:border-custom-500
+                                                                class="ckeditor-classic form-input border-slate-200 dark:border-zink-500 focus:outline-none focus:border-custom-500
                         disabled:bg-slate-100 dark:disabled:bg-zink-600 disabled:border-slate-300
                         dark:disabled:border-zink-500 dark:disabled:text-zink-200 disabled:text-slate-500
                         dark:text-zink-100 dark:bg-zink-700 dark:focus:border-custom-800
@@ -166,7 +166,8 @@
                                                         </div>
                                                     </div>
                                                 </div>
-                                            </div>
+                                                                </div>
+
                                         </div>
                                         <!--end delete modal-->
                                     @endforeach
@@ -196,7 +197,7 @@
                 </div><!--end card-->
                 <div id="addProfileModal" modal-center=""
                     class="fixed flex flex-col hidden transition-all duration-300 ease-in-out left-2/4 z-drawer -translate-x-2/4 -translate-y-2/4 show ">
-                    <div class="w-screen md:w-[30rem] bg-white shadow rounded-md dark:bg-zink-600">
+                    <div class="w-screen md:w-[40rem] bg-white shadow rounded-md dark:bg-zink-800">
                         <div class="flex items-center justify-beSTEen p-4 border-b dark:border-zink-500">
                             <h5 class="text-16" id="addEmployeeLabel">Tambah Profile Sekolah</h5>
                         </div>
@@ -224,9 +225,39 @@
                                 <div class="xl:col-span-6">
                                     <label for="slugInput" class="inline-block mb-2 text-base font-medium">Profile
                                         Sekolah</label>
-                                    <textarea rows="5" id="contentInput" name="content"
-                                        class="form-input border-slate-200 dark:border-zink-500 focus:outline-none focus:border-custom-500 disabled:bg-slate-100 dark:disabled:bg-zink-600 disabled:border-slate-300 dark:disabled:border-zink-500 dark:disabled:text-zink-200 disabled:text-slate-500 dark:text-zink-100 dark:bg-zink-700 dark:focus:border-custom-800 placeholder:text-slate-400 dark:placeholder:text-zink-200"
-                                        placeholder="Masukkan Profile Sekolah" required></textarea>
+                                    <textarea id="editor"  name="content"
+                                class="ckeditor-classic block min-h-[300px] w-full rounded border border-gray-200 p-4 text-slate-800"
+                                placeholder="Mulai tulis di sini..."><h3>Menjadi Generasi Unggul Bersama SMKN 1 Talaga</h3>
+<p><br data-cke-filler="true"></p>
+
+<p>SMKN 1 Talaga adalah tempat di mana ilmu, karakter, dan kreativitas bertemu. Di sekolah
+    ini, setiap siswa tidak hanyaaa
+    diajarkan untuk memahami teori, tetapi juga untuk menerapkannya dalam dunia nyata
+    melalui berbagai kegiatan praktik dan
+    proyek nyata.</p>
+<p><br data-cke-filler="true"></p>
+
+<h4>Pendidikan yang Berkarakter dan Berdaya Saing</h4>
+<p>SMKN 1 Talaga berkomitmen membentuk peserta didik yang tidak hanya cerdas secara
+    akademik, tetapi juga memiliki
+    kepribadian yang kuat, disiplin, dan berjiwa wirausaha. Melalui program keahlian yang
+    beragam, siswa dilatih untuk siap
+    menghadapi dunia industri maupun berwirausaha mandiri.</p>
+<p><br data-cke-filler="true"></p>
+
+<h4>Kolaborasi dan Kreativitas</h4>
+<p>Setiap kegiatan di SMKN 1 Talaga mendorong kolaborasi dan kreativitas siswa, baik dalam
+    bidang teknologi, seni, maupun
+    kewirausahaan. Dengan semangat gotong royong dan inovasi, siswa belajar bagaimana
+    menjadi bagian dari solusi di era
+    digital ini.</p>
+<p><br data-cke-filler="true"></p>
+
+<ul>
+    <li>Menumbuhkan semangat belajar dan berkarya</li>
+    <li>Meningkatkan keterampilan sesuai bidang keahlian</li>
+    <li>Mempersiapkan lulusan yang siap kerja dan berkarakter</li>
+</ul></textarea>
                                 </div>
                                 <div class="flex justify-end gap-2 mt-4">
                                     <button type="reset" id="close-modal" data-modal-close="addProfileModal"
@@ -241,5 +272,46 @@
                 </div><!--end add Employee-->
             </div>
         </div>
-    </div>
+    </div>@push('scripts')
+                                                                    <script>
+                                                                        (function() {
+                                                                            function initEditors() {
+                                                                                document.querySelectorAll('.ckeditor-classic').forEach(function(el) {
+                                                                                    try {
+                                                                                        if (el.dataset.ckeditorInitialized) return;
+                                                                                        if (window.ClassicEditor) {
+                                                                                            ClassicEditor.create(el).then(function(editor) {
+                                                                                                el.dataset.ckeditorInitialized = '1';
+                                                                                                el._ckeditor = editor;
+                                                                                            }).catch(function(err) { console.error('CKEditor init error', err); });
+                                                                                        }
+                                                                                    } catch (e) {
+                                                                                        console.error(e);
+                                                                                    }
+                                                                                });
+                                                                            }
+
+                                                                            function loadCkEditorThenInit() {
+                                                                                if (window.ClassicEditor) { initEditors(); return; }
+                                                                                var s = document.createElement('script');
+                                                                                s.src = 'https://cdn.ckeditor.com/ckeditor5/39.0.0/classic/ckeditor.js';
+                                                                                s.onload = initEditors;
+                                                                                s.onerror = function() { console.error('Failed to load CKEditor from CDN'); };
+                                                                                document.head.appendChild(s);
+                                                                            }
+
+                                                                            document.addEventListener('DOMContentLoaded', function() {
+                                                                                loadCkEditorThenInit();
+
+                                                                                // Re-init editors shortly after a modal open trigger (data-modal-target)
+                                                                                document.body.addEventListener('click', function(e) {
+                                                                                    var trigger = e.target.closest('[data-modal-target]');
+                                                                                    if (trigger) {
+                                                                                        setTimeout(initEditors, 250);
+                                                                                    }
+                                                                                });
+                                                                            });
+                                                                        })();
+                                                                    </script>
+                                                                @endpush
 @endsection
