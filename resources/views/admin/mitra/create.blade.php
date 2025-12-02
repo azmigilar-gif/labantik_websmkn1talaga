@@ -29,7 +29,7 @@
                         </div>
 
                         <div class="col-span-12 mt-4 text-right">
-                                                        <button type="submit" class="text-white btn bg-custom-500 border-custom-500 hover:text-white hover:bg-custom-600 hover:border-custom-600 focus:text-white focus:bg-custom-600 focus:border-custom-600 focus:ring focus:ring-custom-100 active:text-white active:bg-custom-600 active:border-custom-600 active:ring active:ring-custom-100 dark:ring-custom-400/20 add-employee">Simpan</button>
+                                                        <button type="submit" class="btn bg-custom-500 border-custom-500 hover:bg-custom-600 hover:border-custom-600 focus:bg-custom-600 focus:border-custom-600 focus:ring-custom-100 active:bg-custom-600 active:border-custom-600 active:ring-custom-100 dark:ring-custom-400/20 text-white hover:text-white focus:text-white focus:ring active:text-white active:ring">Simpan</button>
 
                             <a href="{{ route('admin.mitra.index') }}"
                                 class="ml-2 inline-block rounded border px-4 py-2">Batal</a>

@@ -454,58 +454,9 @@
                 <div class="swiper feedback-slider pb-6">
                     <div class="swiper-wrapper">
                         @foreach ($extrakurikulers as $item)
-                            <div class="swiper-slide">
-                                <div class="p-5 text-center" data-aos="fade-up" data-aos-easing="linear">
-                                    <div class="mx-auto w-28 flex items-center justify-center">
-                                        @if (!empty($item->photo))
-                                            @php
-                                                $p = $item->photo;
-                                                if (filter_var($p, FILTER_VALIDATE_URL)) {
-                                                    $imgUrl = $p;
-                                                } elseif (
-                                                    preg_match('#^assets/#', $p) ||
-                                                    preg_match('#^public/assets/#', $p)
-                                                ) {
-                                                    $imgUrl = asset(preg_replace('#^public/#', '', $p));
-                                                } else {
-                                                    $rel = preg_replace('#^storage/#', '', $p);
-                                                    $imgUrl = route('public.files', ['path' => $rel]);
-                                                }
-                                            @endphp
-                                            <img src="{{ $imgUrl }}" alt="{{ $item->name }}"
-                                                class="object-cover"
-                                                onerror="this.src='{{ asset('assets/images/default-extrakurikuler.png') }}'">
-                                        @else
-                                            <img src="{{ asset('assets/images/default-extrakurikuler.png') }}"
-                                                alt="{{ $item->name }}" class="size-20 object-cover">
-                                        @endif
-                                    </div>
-                                    <p class="text-16 mt-6">"{{ $item->description }}"</p>
-                                    <h6 class="mb-1 mt-4 text-3xl">{{ $item->name }}</h6>
-                                </div>
-                            </div>
-                        @endforeach
-                    </div>
-                    <div class="swiper-pagination"></div>
-                </div>
-            </div><!--end container-->
-        </section><!--end -->
-    @endif
-
-    {{-- =============== Mitra Industri =============== --}}
-    @if (!empty($mitras) && $mitras->count() > 0)
-        <section class="relative py-24 xl:py-32" id="section-mitra">
-            <div class="container mx-auto px-4 2xl:max-w-[87.5rem]">
-                <div class="mx-auto mb-8 text-center xl:max-w-3xl">
-                    <h1 class="mb-0 capitalize leading-normal">Mitra Industri</h1>
-                </div>
-                <!-- Swiper (reuse same classes as ekstrakurikuler for horizontal auto animation) -->
-                <div class="swiper mitra-slider pb-6">
-                    <div class="swiper-wrapper">
-                        @foreach ($mitras as $item)
-                            <div class="swiper-slide">
-                                <div class="p-5 text-center" data-aos="fade-up" data-aos-easing="linear">
-                                    <div class="mx-auto w-28 flex items-center justify-center">
+                            <div class="swiper-slide flex flex-col">
+                                <div class="p-5 text-center flex-1 flex flex-col" data-aos="fade-up" data-aos-easing="linear">
+                                    <div class="mx-auto w-28 h-28 flex items-center justify-center mb-4">
                                         @if (!empty($item->photo))
                                             @php
                                                 $p = $item->photo;
@@ -530,6 +481,8 @@
                                         @endif
                                     </div>
                                     <h6 class="mb-1 mt-4 text-3xl">{{ $item->name }}</h6>
+                                    <p class="text-16 mt-2">"{{ $item->description }}"</p>
+
                                 </div>
                             </div>
                         @endforeach
@@ -538,6 +491,54 @@
                 </div>
             </div><!--end container-->
         </section><!--end -->
+    @endif
+
+    {{-- =============== Mitra Industri =============== --}}
+    @if (!empty($mitras) && $mitras->count() > 0)
+        <section class="relative py-24 xl:py-32" id="section-mitra">
+            <div class="container mx-auto px-4 2xl:max-w-[87.5rem]">
+                <div class="mx-auto mb-8 text-center xl:max-w-3xl">
+                    <h1 class="mb-0 capitalize leading-normal">Mitra Industri</h1>
+                </div>
+                <!-- Swiper (reuse same classes as ekstrakurikuler for horizontal auto animation) -->
+                <div class="swiper mitra-slider pb-6">
+                    <div class="swiper-wrapper">
+                        @foreach ($mitras as $item)
+                            <div class="swiper-slide flex flex-col">
+                                <div class="p-5 text-center flex-1 flex flex-col" data-aos="fade-up" data-aos-easing="linear">
+                                    <div class="mx-auto w-28 h-28 flex items-center justify-center mb-4">
+                                        @if (!empty($item->photo))
+                                            @php
+                                                $p = $item->photo;
+                                                if (filter_var($p, FILTER_VALIDATE_URL)) {
+                                                    $imgUrl = $p;
+                                                } elseif (
+                                                    preg_match('#^assets/#', $p) ||
+                                                    preg_match('#^public/assets/#', $p)
+                                                ) {
+                                                    $imgUrl = asset(preg_replace('#^public/#', '', $p));
+                                                } else {
+                                                    $rel = preg_replace('#^storage/#', '', $p);
+                                                    $imgUrl = route('public.files', ['path' => $rel]);
+                                                }
+                                            @endphp
+                                            <img src="{{ $imgUrl }}" alt="{{ $item->name }}"
+                                                class="max-w-full max-h-full object-contain"
+                                                onerror="this.src='{{ asset('assets/images/default-extrakurikuler.png') }}'">
+                                        @else
+                                            <img src="{{ asset('assets/images/default-extrakurikuler.png') }}"
+                                                alt="{{ $item->name }}" class="max-w-full max-h-full object-contain">
+                                        @endif
+                                    </div>
+                                    <h6 class="mb-1 text-3xl">{{ $item->name }}</h6>
+                                </div>
+                            </div>
+                        @endforeach
+                    </div>
+                    <div class="swiper-pagination"></div>
+                </div>
+            </div><!--end container-->
+        </section>
     @endif
 
     {{-- =============== Galleries (Galeri) =============== --}}
@@ -558,14 +559,10 @@
                     <h2 class="text-gradient mb-0 capitalize leading-normal">Galeri</h2>
                 </div>
 
-                <div class="mb-4 grid grid-cols-1 gap-4 md:grid-cols-2">
-                    <div class="text-center font-semibold">Foto</div>
-                    <div class="text-center font-semibold">Video</div>
-                </div>
-
                 <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
                     {{-- Photos column (left) --}}
                     <div class="space-y-4">
+                        <div class="text-center font-semibold mb-4">Foto</div>
                         @php $photos = $galleries->where('type', 'photo')->take(3); @endphp
                         @if ($photos->count() === 0)
                             <div class="text-slate-500">Belum ada foto.</div>
@@ -622,6 +619,7 @@
 
                     {{-- Videos column (right) --}}
                     <div class="space-y-4">
+                        <div class="text-center font-semibold mb-4">Video</div>
                         @php $videos = $galleries->where('type', 'video')->take(3); @endphp
                         @if ($videos->count() === 0)
                             <div class="text-slate-500">Belum ada video.</div>
