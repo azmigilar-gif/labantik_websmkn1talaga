@@ -15,7 +15,7 @@ class ExtrakulikulerController extends Controller
     public function index()
     {
         // sort waiting (pending approval) first, then newest within each group
-        $extracurriculars = S_Extrakulikuler::with('menu')
+        $extracurriculars = S_Extrakulikuler::where('created_by', Auth::id())->with('menu')
             ->orderByRaw("FIELD(approve, 'waiting', 'approve') ASC")
             ->orderBy('created_at', 'desc')
             ->simplePaginate(15);

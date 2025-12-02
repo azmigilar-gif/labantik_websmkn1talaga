@@ -85,7 +85,7 @@ class NewsAdminController extends Controller
     {
         // get news, ensure waiting (pending approval) items appear first, then approved ones,
         // and within each group order by newest first.
-        $news = S_News::with('category')
+        $news = S_News::where('created_by', Auth::id())->with('category')
             ->orderByRaw("FIELD(approve, 'waiting', 'approve') ASC")
             ->orderBy('created_at', 'desc')
             ->simplePaginate(15);
