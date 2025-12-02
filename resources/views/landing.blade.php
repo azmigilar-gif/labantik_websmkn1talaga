@@ -215,109 +215,80 @@
         <section id="{{ $newsMenu->slug }}" class="dark:bg-zink-700/40 relative bg-slate-50 py-24 pb-16 xl:py-32 xl:pb-20">
             <div class="container mx-auto px-4 2xl:max-w-[87.5rem]">
                 <div class="mx-auto mb-8 text-center xl:max-w-3xl">
-                    <h2 class="text-gradient mb-0 capitalize leading-normal">{{ $newsMenu->name ?? 'Berita Sekolah' }}</h2>
+                    <h2 class="text-gradient mb-0 capitalize leading-normal">{{ $newsMenu->name ?? 'Berita Sekolah' }}
+                    </h2>
                 </div>
 
-                <div class="grid grid-cols-3 gap-6">
-                    @foreach ($news as $item)
-                        <div class="card dark:bg-zink-600 transition-all duration-300 ease-linear hover:-translate-y-2"
-                            data-aos="fade-up" data-aos-easing="linear">
-                            <div class="flex gap-4 p-4">
-                                <div class="shrink-0">
-                                    <div
-                                        class="group/gallery card relative mb-0 overflow-hidden rounded-md transition-all duration-300 ease-linear hover:-translate-y-2">
+                <div class="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
+                    @foreach ($news as $index => $item)
+                        <div class="{{ $index >= 6 ? 'hidden md:block' : '' }}">
+                            <a href="{{ route('news.show', $item->id) }}" class="block">
+                                <div class="flex h-[480px] flex-col overflow-hidden rounded-lg bg-white shadow-md transition-all duration-300 ease-linear hover:-translate-y-2 hover:shadow-lg dark:bg-zink-600"
+                                    data-aos="fade-up" data-aos-easing="linear">
+
+                                    <!-- Image Container - Fixed 192px -->
+                                    <div class="relative h-48 flex-shrink-0 overflow-hidden bg-gray-100">
                                         @php
-                                            $firstImg = null;
-                                            if (
-                                                isset($item->content) &&
-                                                preg_match('/<img[^>]+>/i', $item->content, $matches)
-                                            ) {
-                                                $firstImg = $matches[0];
-
-                                                // Sanitize extracted <img> so inline width/height/style don't break layout
-    libxml_use_internal_errors(true);
-    $doc = new \DOMDocument();
-    // Ensure proper encoding
-    $doc->loadHTML(
-        mb_convert_encoding($firstImg, 'HTML-ENTITIES', 'UTF-8'),
-    );
-    $imgTag = $doc->getElementsByTagName('img')->item(0);
-    if ($imgTag) {
-        // remove width/height attributes
-        $imgTag->removeAttribute('width');
-        $imgTag->removeAttribute('height');
-
-        // clean style attribute (remove width/height declarations)
-        $style = $imgTag->getAttribute('style');
-        $style = preg_replace(
-            '/(width|height)\s*:\s*[^;]+;?/i',
-            '',
-            $style,
-        );
-        $style = trim($style);
-        if ($style === '') {
-            $imgTag->removeAttribute('style');
-        } else {
-            $imgTag->setAttribute('style', $style);
-                                                    }
-
-                                                    $firstImg = $doc->saveHTML($imgTag);
+                                            $firstImgSrc = null;
+                                            if (!empty($item->content)) {
+                                                if (
+                                                    preg_match('/<img[^>]+src="([^">]+)"/i', $item->content, $matches)
+                                                ) {
+                                                    $firstImgSrc = $matches[1];
                                                 }
-                                                libxml_clear_errors();
                                             }
                                         @endphp
 
-                                        <div class="group/gallery relative overflow-hidden rounded-md">
-                                            <div
-                                                style="width:150px; height:150px; display:flex; align-items:center; justify-content:center; overflow:hidden;">
-                                                @if ($firstImg)
-                                                    <div
-                                                        style="max-width:100%; max-height:100%; display:flex; align-items:center; justify-content:center;">
-                                                        {!! $firstImg !!}
-                                                    </div>
-                                                @else
-                                                    <img src="{{ asset('assets/images/default-news.png') }}" alt=""
-                                                        style="max-width:100%; max-height:100%; object-fit:contain;"
-                                                        class="rounded-md">
-                                                @endif
-                                            </div>
+                                        <img src="{{ $firstImgSrc ?? asset('assets/images/default-news.png') }}"
+                                            alt="{{ $item->title }}" class="h-full w-full object-cover" loading="lazy" />
 
-                                            <div
-                                                class="absolute inset-0 bg-gradient-to-t from-gray-900 to-transparent opacity-0 transition-all duration-300 ease-linear group-hover/gallery:opacity-50">
-                                            </div>
-                                            <div
-                                                class="absolute bottom-0 left-3 right-3 opacity-0 transition-all duration-300 ease-linear group-hover/gallery:bottom-3 group-hover/gallery:opacity-100">
-                                                <h5 class="font-normal text-white"><a
-                                                        href="{{ route('news.show', $item->id) }}">{{ $item->title }}</a>
-                                                </h5>
-                                            </div>
-                                        </div>
-
-                                    </div>
-                                </div>
-                                <div class="grow">
-                                    <a href="{{ route('news.show', $item->id) }}"
-                                        class="dark:text-zink-50 hover:text-custom-500 text-slate-800">
                                         @if ($item->categories)
                                             <span
-                                                class="mb-2 inline-block rounded border border-sky-200 bg-sky-100 px-2.5 py-0.5 text-xs font-medium text-sky-500 dark:border-sky-500/20 dark:bg-sky-500/20">
-                                                {{ $item->categories->name ?? 'Tanpa Kategori' }}
+                                                class="absolute right-3 top-3 rounded bg-gray-800 px-3 py-1 text-xs font-medium text-white">
+                                                {{ $item->categories->name }}
                                             </span>
                                         @endif
-                                        <h6 class="mb-2 text-lg font-semibold">
-                                            {{ $item->title }}
+                                    </div>
 
-                                        </h6>
-                                        <p class="dark:text-zink-200 mb-2 text-sm text-slate-500">
-                                            {{ Str::limit(strip_tags($item->content), 150) }}
-                                        </p>
-                                        <p class="dark:text-zink-300 text-xs text-slate-400">
-                                            {{ $item->created_at->diffForHumans() }}
-                                        </p>
-                                    </a>
+                                    <!-- Content Container - Remaining space with strict overflow control -->
+                                    <div class="flex min-h-0 flex-1 flex-col overflow-hidden p-4">
+                                        <!-- Title - Fixed height 56px (2 lines) -->
+                                        <h3
+                                            class="mb-3 h-14 flex-shrink-0 overflow-hidden text-lg font-semibold leading-tight text-gray-900 dark:text-zink-50">
+                                            <span class="line-clamp-2">{{ $item->title }}</span>
+                                        </h3>
+
+                                        <!-- Meta Information - Controlled height -->
+                                        <div class="min-h-0 flex-1 overflow-hidden">
+                                            <div class="flex flex-col gap-2 text-sm text-gray-600 dark:text-zink-200">
+                                                <!-- Date - Single line -->
+                                                <div class="flex items-start gap-2">
+                                                    <span class="flex-shrink-0 text-cyan-500">📅</span>
+                                                    <span
+                                                        class="truncate">{{ $item->created_at->format('l, d F Y') }}</span>
+                                                </div>
+
+                                                <!-- Author - Single line -->
+                                                @if ($item->created_by && $item->createdBy)
+                                                    <div class="flex items-start gap-2">
+                                                        <span class="flex-shrink-0 text-cyan-500">👤</span>
+                                                        <span class="truncate">{{ $item->createdBy->name }}</span>
+                                                    </div>
+                                                @endif
+
+                                                <!-- Preview - Max 3 lines -->
+                                                <div class="flex items-start gap-2">
+                                                    <span class="flex-shrink-0 text-cyan-500">📄</span>
+                                                    <span class="line-clamp-3 min-w-0 flex-1">
+                                                        {{ Str::limit(strip_tags($item->content), 100, '...') }}
+                                                    </span>
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
                                 </div>
-                            </div>
-                        </div><!--end col-->
+                            </a>
+                        </div>
                     @endforeach
                 </div><!--end grid-->
 
@@ -455,7 +426,8 @@
                     <div class="swiper-wrapper">
                         @foreach ($extrakurikulers as $item)
                             <div class="swiper-slide flex flex-col">
-                                <div class="p-5 text-center flex-1 flex flex-col" data-aos="fade-up" data-aos-easing="linear">
+                                <div class="p-5 text-center flex-1 flex flex-col" data-aos="fade-up"
+                                    data-aos-easing="linear">
                                     <div class="mx-auto w-28 h-28 flex items-center justify-center mb-4">
                                         @if (!empty($item->photo))
                                             @php
@@ -505,7 +477,8 @@
                     <div class="swiper-wrapper">
                         @foreach ($mitras as $item)
                             <div class="swiper-slide flex flex-col">
-                                <div class="p-5 text-center flex-1 flex flex-col" data-aos="fade-up" data-aos-easing="linear">
+                                <div class="p-5 text-center flex-1 flex flex-col" data-aos="fade-up"
+                                    data-aos-easing="linear">
                                     <div class="mx-auto w-28 h-28 flex items-center justify-center mb-4">
                                         @if (!empty($item->photo))
                                             @php
