@@ -426,36 +426,40 @@
                     <div class="swiper-wrapper">
                         @foreach ($extrakurikulers as $item)
                             <div class="swiper-slide flex flex-col">
-                                <div class="p-5 text-center flex-1 flex flex-col" data-aos="fade-up"
-                                    data-aos-easing="linear">
-                                    <div class="mx-auto w-28 h-28 flex items-center justify-center mb-4">
-                                        @if (!empty($item->photo))
-                                            @php
-                                                $p = $item->photo;
-                                                if (filter_var($p, FILTER_VALIDATE_URL)) {
-                                                    $imgUrl = $p;
-                                                } elseif (
-                                                    preg_match('#^assets/#', $p) ||
-                                                    preg_match('#^public/assets/#', $p)
-                                                ) {
-                                                    $imgUrl = asset(preg_replace('#^public/#', '', $p));
-                                                } else {
-                                                    $rel = preg_replace('#^storage/#', '', $p);
-                                                    $imgUrl = route('public.files', ['path' => $rel]);
-                                                }
-                                            @endphp
-                                            <img src="{{ $imgUrl }}" alt="{{ $item->name }}"
-                                                class="max-w-full max-h-full object-contain"
-                                                onerror="this.src='{{ asset('assets/images/default-extrakurikuler.png') }}'">
-                                        @else
-                                            <img src="{{ asset('assets/images/default-extrakurikuler.png') }}"
-                                                alt="{{ $item->name }}" class="max-w-full max-h-full object-contain">
-                                        @endif
-                                    </div>
-                                    <h6 class="mb-1 mt-4 text-3xl">{{ $item->name }}</h6>
-                                    <p class="text-16 mt-2">"{{ $item->description }}"</p>
+                                <a href="{{ route('ekstrakurikulers.show', $item->id) }}">
 
-                                </div>
+                                    <div class="p-5 text-center flex-1 flex flex-col" data-aos="fade-up"
+                                        data-aos-easing="linear">
+                                        <div class="mx-auto w-28 h-28 flex items-center justify-center mb-4">
+                                            @if (!empty($item->photo))
+                                                @php
+                                                    $p = $item->photo;
+                                                    if (filter_var($p, FILTER_VALIDATE_URL)) {
+                                                        $imgUrl = $p;
+                                                    } elseif (
+                                                        preg_match('#^assets/#', $p) ||
+                                                        preg_match('#^public/assets/#', $p)
+                                                    ) {
+                                                        $imgUrl = asset(preg_replace('#^public/#', '', $p));
+                                                    } else {
+                                                        $rel = preg_replace('#^storage/#', '', $p);
+                                                        $imgUrl = route('public.files', ['path' => $rel]);
+                                                    }
+                                                @endphp
+                                                <img src="{{ $imgUrl }}" alt="{{ $item->name }}"
+                                                    class="max-w-full max-h-full object-contain"
+                                                    onerror="this.src='{{ asset('assets/images/default-extrakurikuler.png') }}'">
+                                            @else
+                                                <img src="{{ asset('assets/images/default-extrakurikuler.png') }}"
+                                                    alt="{{ $item->name }}"
+                                                    class="max-w-full max-h-full object-contain">
+                                            @endif
+                                        </div>
+                                        <h6 class="mb-1 mt-4 text-3xl">{{ $item->name }}</h6>
+                                        <p class="text-16 mt-2">"{{ $item->description }}"</p>
+
+                                    </div>
+                                </a>
                             </div>
                         @endforeach
                     </div>
