@@ -3,9 +3,12 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
+use App\Models\Gallery;
 use App\Models\S_Extrakulikuler;
 use App\Models\S_Menu;
+use App\Models\S_News;
 use Illuminate\Http\Request;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
 
 class MenuController extends Controller
@@ -52,12 +55,23 @@ class MenuController extends Controller
 
     public function destroy($id)
     {
-        $menu = S_Menu::findOrFail($id);
+        try {
+            DB::beginTransaction();
 
-        S_Extrakulikuler::where('s_menu_id', $menu->id)->update(['s_menu_id' => null]);
+            $menu = S_Menu::findOrFail($id);
 
-        $menu->delete();
+            // Hapus semua data terkait
+            S_Extrakulikuler::where('s_menu_id', $menu->id)->delete();
+            S_News::where('s_menu_id', $menu->id)->delete();
 
-        return redirect()->route('admin.menus.index')->with('success', 'Menu Berhasil Dihapus!');
+            $menu->delete();
+
+            DB::commit();
+
+            return redirect()->route('admin.menus.index')->with('success', 'Menu Berhasil Dihapus!');
+        } catch (\Exception $e) {
+            DB::rollBack();
+            return redirect()->route('admin.menus.index')->with('error', 'Gagal menghapus menu: ' . $e->getMessage());
+        }
     }
 }

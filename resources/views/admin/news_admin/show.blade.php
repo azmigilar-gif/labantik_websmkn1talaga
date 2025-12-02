@@ -25,29 +25,6 @@
 
                     <div class="flex items-center gap-3">
                         <div class="text-sm text-gray-600">Dibuat oleh: {{ $news->createdBy?->name ?? '-' }}</div>
-
-                        @auth
-                            @if (auth()->user()->email === 'superadmin@smkn1talaga.sch.id')
-                                <form method="POST" action="{{ route('admin.news.approve', $news->id) }}"
-                                    class="flex items-center gap-2">
-                                    @csrf
-                                    <select name="status" class="rounded border px-2 py-1 text-sm">
-                                        <option value="waiting"
-                                            {{ ($news->approve ?? 'waiting') === 'waiting' ? 'selected' : '' }}>Menunggu
-                                        </option>
-                                        <option value="approve"
-                                            {{ ($news->approve ?? 'waiting') === 'approve' ? 'selected' : '' }}>Setujui</option>
-                                    </select>
-                                    <button type="submit" class="bg-custom-500 rounded px-3 py-1 text-sm text-white">Ubah
-                                        Status</button>
-                                </form>
-                            @else
-                                @if (($news->approve ?? 'waiting') !== 'approve')
-                                    <span class="rounded bg-yellow-100 px-3 py-1 text-sm text-yellow-800">Menunggu
-                                        Persetujuan</span>
-                                @endif
-                            @endif
-                        @endauth
                     </div>
                 </div>
             </div>

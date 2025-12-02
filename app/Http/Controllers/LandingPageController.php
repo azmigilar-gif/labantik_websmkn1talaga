@@ -20,8 +20,8 @@ class LandingPageController extends Controller
 
         $visionmissions = S_VisionMission::with('menu')->get();
         $profiles = S_Profile::with('menu')->get();
-    // Only fetch news that have been approved for public display
-    $news = S_News::with('categories')->where('approve', 'approve')->latest()->paginate(5);
+        // Only fetch news that have been approved for public display
+        $news = S_News::with('categories')->where('approve', 'approve')->latest()->paginate(9);
         $expertiseConcentrations = CoreExpertiseConcentration::all();
 
         $expertiseConcentrations->each(function ($item) {

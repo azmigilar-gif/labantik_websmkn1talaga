@@ -273,6 +273,7 @@ class NewsAdminController extends Controller
     /**
      * Approve or set status for a news item. Only superadmin may change the status.
      */
+
     public function approve(Request $request, $id)
     {
         $news = S_News::findOrFail($id);
@@ -280,17 +281,21 @@ class NewsAdminController extends Controller
         // Simple guard: only allow superadmin email to change approval status
         $user = Auth::user();
         if (!$user || $user->email !== 'superadmin@smkn1talaga.sch.id') {
-            abort(403, 'Unauthorized');
+            return redirect()->back()->with('error', 'Anda tidak memiliki akses untuk mengubah status approval.');
         }
 
         $data = $request->validate([
-            'status' => 'required|in:waiting,approve',
+            'approve' => 'required|in:waiting,approve', // Ganti 'approved' jadi 'approve'
         ]);
 
-        $news->approve = $data['status'];
+        $news->approve = $data['approve'];
         $news->updated_by = Auth::id();
         $news->save();
 
-        return redirect()->back()->with('success', 'Status berita berhasil diperbarui.');
+        $message = $data['approve'] == 'approve'
+            ? 'Berita berhasil di-approve!'
+            : 'Status berhasil diubah menjadi waiting!';
+
+        return redirect()->back()->with('success', $message);
     }
 }

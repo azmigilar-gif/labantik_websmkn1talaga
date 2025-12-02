@@ -218,7 +218,7 @@
                     <h2 class="text-gradient mb-0 capitalize leading-normal">{{ $newsMenu->name ?? 'Berita Sekolah' }}</h2>
                 </div>
 
-                <div class="grid grid-cols-1 gap-6">
+                <div class="grid grid-cols-3 gap-6">
                     @foreach ($news as $item)
                         <div class="card dark:bg-zink-600 transition-all duration-300 ease-linear hover:-translate-y-2"
                             data-aos="fade-up" data-aos-easing="linear">
@@ -678,19 +678,19 @@
                 </div><!--end grid-->
             </div>
         </section>
-    <!--end grid-->
+        <!--end grid-->
 
-                <!-- Tombol Lihat Semua Galeri -->
-                <div class="mt-8 flex justify-center">
-                    @if (Route::has('galleries.index'))
-                        <a href="{{ route('galleries.index') }}"
-                            class="bg-custom-500 border-custom-500 hover:bg-custom-600 hover:border-custom-600 focus:bg-custom-600 focus:border-custom-600 inline-flex items-center gap-2 rounded border px-6 py-3 text-base font-medium text-white transition-all duration-200 ease-linear">
-                            Lihat Semua Galeri
-                            <i data-lucide="arrow-right" class="size-4"></i>
-                        </a>
-                    @endif
-                </div>
-            </div>
+        <!-- Tombol Lihat Semua Galeri -->
+        <div class="mt-8 flex justify-center">
+            @if (Route::has('galleries.index'))
+                <a href="{{ route('galleries.index') }}"
+                    class="bg-custom-500 border-custom-500 hover:bg-custom-600 hover:border-custom-600 focus:bg-custom-600 focus:border-custom-600 inline-flex items-center gap-2 rounded border px-6 py-3 text-base font-medium text-white transition-all duration-200 ease-linear">
+                    Lihat Semua Galeri
+                    <i data-lucide="arrow-right" class="size-4"></i>
+                </a>
+            @endif
+        </div>
+        </div>
         </section><!--end -->
     @endif
     @push('scripts')

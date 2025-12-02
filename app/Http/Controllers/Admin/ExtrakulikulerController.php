@@ -60,9 +60,9 @@ class ExtrakulikulerController extends Controller
         $ex->name = $data['name'];
         $ex->photo = $photoPath;
         $ex->description = $data['description'] ?? null;
-    $ex->s_menu_id = $menuId;
-    // use created_by to match the migration and model (created_by / updated_by)
-    $ex->created_by = Auth::id();
+        $ex->s_menu_id = $menuId;
+        // use created_by to match the migration and model (created_by / updated_by)
+        $ex->created_by = Auth::id();
         $ex->save();
 
         return redirect()->route('admin.extrakulikuler.index')->with('success', 'Ekstrakulikuler berhasil dibuat.');
@@ -108,11 +108,11 @@ class ExtrakulikulerController extends Controller
             $ex->photo = $dirPath . '/' . $filename;
         }
 
-    $ex->name = $data['name'];
-    $ex->description = $data['description'] ?? null;
-    // set updated_by when editing
-    $ex->updated_by = Auth::id();
-    $ex->save();
+        $ex->name = $data['name'];
+        $ex->description = $data['description'] ?? null;
+        // set updated_by when editing
+        $ex->updated_by = Auth::id();
+        $ex->save();
 
         return redirect()->route('admin.extrakulikuler.index')->with('success', 'Ekstrakulikuler berhasil diperbarui.');
     }
@@ -153,17 +153,21 @@ class ExtrakulikulerController extends Controller
         // Simple guard: only allow superadmin email to change approval status
         $user = Auth::user();
         if (!$user || $user->email !== 'superadmin@smkn1talaga.sch.id') {
-            abort(403, 'Unauthorized');
+            return redirect()->back()->with('error', 'Anda tidak memiliki akses untuk mengubah status approval.');
         }
 
         $data = $request->validate([
-            'status' => 'required|in:waiting,approve',
+            'approve' => 'required|in:waiting,approve', // Ganti 'approved' jadi 'approve'
         ]);
 
-        $ex->approve = $data['status'];
+        $ex->approve = $data['approve'];
         $ex->updated_by = Auth::id();
         $ex->save();
 
-        return redirect()->back()->with('success', 'Status ekstrakulikuler berhasil diperbarui.');
+        $message = $data['approve'] == 'approve'
+            ? 'Ekstrakurikuler berhasil di-approve!'
+            : 'Status berhasil diubah menjadi waiting!';
+
+        return redirect()->back()->with('success', $message);
     }
 }
