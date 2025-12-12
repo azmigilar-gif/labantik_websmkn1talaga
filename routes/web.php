@@ -20,6 +20,7 @@ use App\Http\Controllers\GalleriesController;
 use App\Http\Controllers\Admin\BackgroundController;
 use App\Http\Controllers\Admin\TagsController;
 use App\Http\Controllers\ExtracuricullarsController;
+use App\Http\controllers\ReportController;
 
 Route::get('/', [LandingPageController::class, 'index'])->name('landingpage');
 
@@ -107,3 +108,5 @@ Route::get('/program/{slug}', [ExpertiseController::class, 'show'])->name('exper
 Route::get('/files/{path}', [PublicFileController::class, 'serveFromStorage'])
     ->where('path', '.*')
     ->name('public.files');
+
+Route::get('/reports', [ReportController::class,'index'])->name('reports.index');

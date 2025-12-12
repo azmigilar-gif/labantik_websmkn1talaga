@@ -44,8 +44,11 @@
 
     <!-- App js -->
     <script src="{{ asset('assets/js/app.js') }}"></script>
+    <script src="{{ asset('assets/libs/apexcharts/apexcharts.min.js') }}"></script>
 
     <script src="{{ asset('assets/js/pages/landing-product.init.js') }}"></script>
+    <script src="{{ asset('assets/js/pages/report-chart.js') }}"></>
+
     <!-- Page-specific scripts pushed from views -->
     @stack('scripts')
 </body>
