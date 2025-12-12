@@ -109,4 +109,6 @@ Route::get('/files/{path}', [PublicFileController::class, 'serveFromStorage'])
     ->where('path', '.*')
     ->name('public.files');
 
-Route::get('/reports', [ReportController::class,'index'])->name('reports.index');
+Route::get('/reports', [ReportController::class, 'index'])->name('reports.index');
+// API endpoint: return tag name and number of distinct news using that tag
+Route::get('/reports/tag-counts', [App\Http\controllers\ReportController::class, 'tagCounts'])->name('report.tag-counts');

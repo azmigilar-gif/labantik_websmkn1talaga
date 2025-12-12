@@ -31,7 +31,7 @@ class S_NewsLogs extends Model
 
     // Relasi ke Tag
     public function tag()
-    {
-        return $this->belongsTo(S_Tags::class, 's_tags_id');
-    }
+{
+    return $this->belongsTo(S_Tags::class, 's_tags_id');
+}
 }
