@@ -7,8 +7,11 @@ use Illuminate\Http\Request;
 use App\Models\S_News;
 use App\Models\S_Categories as Category;
 use App\Models\S_Menu as Menu;
+use App\Models\S_Tags as Tag;
+use App\Models\S_NewsLogs as NewsLog;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Facades\Log;
 use Illuminate\Support\Facades\Storage;
 
@@ -92,15 +95,16 @@ class NewsAdminController extends Controller
 
         // get categories for the modal table
         $categories = Category::with('createdBy')->orderBy('name')->get();
-
-        return view('admin.news_admin.index', compact('news', 'categories'));
+        $tags = Tag::all();
+        return view('admin.news_admin.index', compact('tags', 'news', 'categories'));
     }
     public function create()
     {
-        // load categories so the form can submit the category id (uuid)
+        // load categories, menus, and tags for the form
         $categories = Category::orderBy('name')->get();
         $menus = Menu::orderBy('name')->get();
-        return view('admin.news_admin.create', compact('categories', 'menus'));
+        $tags = Tag::orderBy('name')->get();
+        return view('admin.news_admin.create', compact('categories', 'menus', 'tags'));
     }
 
     /**
@@ -108,80 +112,164 @@ class NewsAdminController extends Controller
      */
     public function store(Request $request)
     {
-        // require category/menu (migration enforces FK non-null)
+        // Validate request data
+
         $data = $request->validate([
             'title' => 'required|string|max:255',
             'content' => 'nullable|string',
-            // accept either an id (uuid) or a name - we'll resolve or create below
+            's_tag_id' => 'required|array|min:1',
+            's_tag_id.*' => 'string|exists:s_tags,id',
             's_category_id' => 'required|string|max:255',
             's_menu_id' => 'required|string|max:255',
             'is_published' => 'nullable|boolean',
         ]);
 
-        // Log the raw input for debugging if something is sent strangely from the client
-        Log::debug('news.store input', $request->all());
 
-        // Resolve or create category/menu so FK constraints are satisfied
-        $categoryId = null;
-        if (!empty($data['s_category_id'])) {
-            $catInput = trim($data['s_category_id']);
-            if (preg_match('/^[0-9a-fA-F\-]{36}$/', $catInput) && Category::where('id', $catInput)->exists()) {
-                $categoryId = $catInput;
-            } else {
-                // find by name case-insensitive or create
-                $cat = Category::whereRaw('LOWER(name) = ?', [strtolower($catInput)])->first();
-                if (!$cat) {
-                    $cat = new Category();
-                    $cat->id = (string) Str::uuid();
-                    $cat->name = $catInput;
-                    $cat->user_id = Auth::id() ?? null;
-                    $cat->save();
+        try {
+            // TAMBAH: Convert comma-separated string to array
+            if ($request->has('s_tag_id')) {
+                $tags = $request->input('s_tag_id');
+
+                // Jika s_tag_id adalah string (bukan array), split by comma
+                if (is_string($tags)) {
+                    $tags = array_map('trim', explode(',', $tags));
+                    $request->merge(['s_tag_id' => array_filter($tags)]);
+                } elseif (is_array($tags)) {
+                    // Jika sudah array, pastikan tidak ada yang kosong
+                    $tags = array_filter(array_map('trim', $tags));
+                    $request->merge(['s_tag_id' => $tags]);
                 }
-                $categoryId = $cat->id;
             }
-        }
 
-        // ensure content is a string (DB requires not-null)
-        $content = trim(string: $data['content'] ?? '');
+            // ===== TAMBAH LOGGING DI SINI =====
+            Log::info('=== DEBUG TAGS INPUT ===');
+            Log::info('Original Input:', ['input' => $request->input('s_tag_id')]);
+            Log::info('Is Array?', ['is_array' => is_array($request->input('s_tag_id'))]);
+            Log::info('Count:', ['count' => is_array($request->input('s_tag_id')) ? count($request->input('s_tag_id')) : 0]);
+            Log::info('Values:', ['values' => $request->input('s_tag_id')]);
+            // ===== END LOGGING =====
 
-        $news = new S_News();
-        $news->id = (string) Str::uuid();
-        $news->title = $data['title'];
-        $news->content = $content;
 
-        // resolve or create menu similar to category
-        if (!empty($data['s_menu_id'])) {
-            $menuInput = trim($data['s_menu_id']);
-            if (preg_match('/^[0-9a-fA-F\-]{36}$/', $menuInput) && Menu::where('id', $menuInput)->exists()) {
-                $news->s_menu_id = $menuInput;
-            } else {
-                $m = Menu::whereRaw('LOWER(name) = ?', [strtolower($menuInput)])->first();
-                if (!$m) {
-                    $m = new Menu();
-                    $m->id = (string) Str::uuid();
-                    $m->name = $menuInput;
-                    $m->user_id = Auth::id() ?? null;
-                    $m->save();
+
+            // ===== TAMBAH LOGGING SETELAH VALIDASI =====
+            Log::info('=== AFTER VALIDATION ===');
+            Log::info('Validated Tags:', ['tags' => $data['s_tag_id']]);
+            Log::info('Count:', ['count' => count($data['s_tag_id'])]);
+
+            Log::debug('news.store input', $request->all());
+
+            // Start database transaction
+            DB::beginTransaction();
+
+            // Resolve or create category
+            $categoryId = null;
+            if (!empty($data['s_category_id'])) {
+                $catInput = trim($data['s_category_id']);
+                if (preg_match('/^[0-9a-fA-F\-]{36}$/', $catInput) && Category::where('id', $catInput)->exists()) {
+                    $categoryId = $catInput;
+                } else {
+                    $cat = Category::whereRaw('LOWER(name) = ?', [strtolower($catInput)])->first();
+                    if (!$cat) {
+                        $cat = new Category();
+                        $cat->id = (string) Str::uuid();
+                        $cat->name = $catInput;
+                        $cat->user_id = Auth::id();
+                        $cat->save();
+                    }
+                    $categoryId = $cat->id;
                 }
-                $news->s_menu_id = $m->id;
             }
+
+            // Resolve or create menu
+            $menuId = null;
+            if (!empty($data['s_menu_id'])) {
+                $menuInput = trim($data['s_menu_id']);
+                if (preg_match('/^[0-9a-fA-F\-]{36}$/', $menuInput) && Menu::where('id', $menuInput)->exists()) {
+                    $menuId = $menuInput;
+                } else {
+                    $menu = Menu::whereRaw('LOWER(name) = ?', [strtolower($menuInput)])->first();
+                    if (!$menu) {
+                        $menu = new Menu();
+                        $menu->id = (string) Str::uuid();
+                        $menu->name = $menuInput;
+                        $menu->user_id = Auth::id();
+                        $menu->save();
+                    }
+                    $menuId = $menu->id;
+                }
+            }
+
+            // Create news record
+            $newsId = (string) Str::uuid();
+            $content = trim($data['content'] ?? '');
+
+            $news = new S_News();
+            $news->id = $newsId;
+            $news->title = $data['title'];
+            $news->content = $content;
+            $news->s_category_id = $categoryId;
+            $news->s_menu_id = $menuId;
+            $news->created_by = Auth::id();
+            $news->is_published = $request->boolean('is_published');
+            $news->save();
+
+            // Process tags and create news_logs entries - loop setiap tag
+            if (!empty($request->s_tag_id) && is_array($request->s_tag_id)) {
+                foreach ($request->s_tag_id as $tagInput) {
+                    $tagInput = trim($tagInput);
+
+                    if (empty($tagInput)) {
+                        continue;
+                    }
+
+                    // Check if tag exists by ID
+                    if (preg_match('/^[0-9a-fA-F\-]{36}$/', $tagInput)) {
+                        $tag = Tag::where('id', $tagInput)->first();
+                        if (!$tag) {
+                            throw new \Exception("Tag dengan ID {$tagInput} tidak ditemukan");
+                        }
+                        $tagId = $tagInput;
+                    } else {
+                        // Find by name case-insensitive or create jika belum exist
+                        $tag = Tag::whereRaw('LOWER(name) = ?', [strtolower($tagInput)])->first();
+                        if (!$tag) {
+                            // CREATE tag baru
+                            $tag = new Tag();
+                            $tag->id = (string) Str::uuid();
+                            $tag->name = $tagInput;
+                            $tag->save();
+                        }
+                        $tagId = $tag->id;
+                    }
+
+                    // CREATE news_log entry (PERBAIKAN DI SINI)
+                    $newsLog = new NewsLog();
+                    $newsLog->id = (string) Str::uuid();
+                    $newsLog->s_news_id = $newsId;  // ← UBAH: Link ke news yang baru dibuat
+                    $newsLog->s_tags_id = $tagId;
+                    $newsLog->save();
+                }
+            }
+
+            // Commit transaction
+            DB::commit();
+
+            return redirect()->route('admin.news.index')->with('success', 'Berita berhasil dibuat.');
+        } catch (\Exception $e) {
+            // Rollback transaction on error
+            DB::rollBack();
+            Log::error('news.store failed', ['message' => $e->getMessage(), 'trace' => $e->getTraceAsString()]);
+            return redirect()->back()->with('error', 'Gagal membuat berita: ' . $e->getMessage())->withInput();
         }
-
-        $news->s_category_id = $categoryId;
-        // set created_by (migration uses created_by/updated_by)
-        $news->created_by = Auth::id();
-        $news->is_published = $request->boolean('is_published');
-        $news->save();
-
-        return redirect()->route('admin.news.index')->with('success', 'Berita berhasil dibuat.');
     }
     public function edit($id)
     {
         $news = S_News::findOrFail($id);
-        // load categories and menus for the form
+        // load categories, menus, and tags for the form
         $categories = Category::orderBy('name')->get();
         $menus = Menu::orderBy('name')->get();
-        return view('admin.news_admin.edit', compact('news', 'categories', 'menus'));
+        $tags = Tag::orderBy('name')->get();
+        return view('admin.news_admin.edit', compact('news', 'categories', 'menus', 'tags'));
     }
 
     /**
@@ -189,60 +277,120 @@ class NewsAdminController extends Controller
      */
     public function update(Request $request, $id)
     {
-        $news = S_News::findOrFail($id);
+        try {
+            $data = $request->validate([
+                'title' => 'required|string|max:255',
+                'content' => 'nullable|string',
+                's_category_id' => 'required|string|max:255',
+                's_menu_id' => 'required|string|max:255',
+                's_tag_id' => 'required|array|min:1',
+                's_tag_id.*' => 'string|max:255',
+                'is_published' => 'sometimes|boolean',
+            ]);
 
-        $data = $request->validate([
-            'title' => 'required|string|max:255',
-            'content' => 'nullable|string',
-            // keep required to satisfy FK constraints when present
-            's_category_id' => 'required|string|max:255',
-            's_menu_id' => 'required|string|max:255',
-            'is_published' => 'sometimes|boolean',
-        ]);
+            // Start database transaction
+            DB::beginTransaction();
 
-        $news->title = $data['title'];
-        $news->content = $data['content'] ?? null;
-        // resolve/create category
-        if (!empty($data['s_category_id'])) {
-            $catInput = trim($data['s_category_id']);
-            if (preg_match('/^[0-9a-fA-F\-]{36}$/', $catInput) && Category::where('id', $catInput)->exists()) {
-                $news->s_category_id = $catInput;
-            } else {
-                $cat = Category::whereRaw('LOWER(name) = ?', [strtolower($catInput)])->first();
-                if (!$cat) {
-                    $cat = new Category();
-                    $cat->id = (string) Str::uuid();
-                    $cat->name = $catInput;
-                    $cat->user_id = Auth::id() ?? null;
-                    $cat->save();
+            $news = S_News::findOrFail($id);
+
+            // Resolve or create category
+            $categoryId = null;
+            if (!empty($data['s_category_id'])) {
+                $catInput = trim($data['s_category_id']);
+                if (preg_match('/^[0-9a-fA-F\-]{36}$/', $catInput) && Category::where('id', $catInput)->exists()) {
+                    $categoryId = $catInput;
+                } else {
+                    $cat = Category::whereRaw('LOWER(name) = ?', [strtolower($catInput)])->first();
+                    if (!$cat) {
+                        $cat = new Category();
+                        $cat->id = (string) Str::uuid();
+                        $cat->name = $catInput;
+                        $cat->user_id = Auth::id();
+                        $cat->save();
+                    }
+                    $categoryId = $cat->id;
                 }
-                $news->s_category_id = $cat->id;
             }
-        }
-        // resolve/create menu
-        if (!empty($data['s_menu_id'])) {
-            $menuInput = trim($data['s_menu_id']);
-            if (preg_match('/^[0-9a-fA-F\-]{36}$/', $menuInput) && Menu::where('id', $menuInput)->exists()) {
-                $news->s_menu_id = $menuInput;
-            } else {
-                $m = Menu::whereRaw('LOWER(name) = ?', [strtolower($menuInput)])->first();
-                if (!$m) {
-                    $m = new Menu();
-                    $m->id = (string) Str::uuid();
-                    $m->name = $menuInput;
-                    $m->user_id = Auth::id() ?? null;
-                    $m->save();
+
+            // Resolve or create menu
+            $menuId = null;
+            if (!empty($data['s_menu_id'])) {
+                $menuInput = trim($data['s_menu_id']);
+                if (preg_match('/^[0-9a-fA-F\-]{36}$/', $menuInput) && Menu::where('id', $menuInput)->exists()) {
+                    $menuId = $menuInput;
+                } else {
+                    $menu = Menu::whereRaw('LOWER(name) = ?', [strtolower($menuInput)])->first();
+                    if (!$menu) {
+                        $menu = new Menu();
+                        $menu->id = (string) Str::uuid();
+                        $menu->name = $menuInput;
+                        $menu->user_id = Auth::id();
+                        $menu->save();
+                    }
+                    $menuId = $menu->id;
                 }
-                $news->s_menu_id = $m->id;
             }
+
+            // Update news record
+            $news->title = $data['title'];
+            $news->content = $data['content'] ?? null;
+            $news->s_category_id = $categoryId;
+            $news->s_menu_id = $menuId;
+            $news->is_published = $request->has('is_published') && $request->boolean('is_published');
+            $news->updated_by = Auth::id();
+            $news->save();
+
+            // Delete old news_logs entries for this news
+            NewsLog::where('s_menu_id', $menuId)->delete();
+
+            // Process tags and create news_logs entries - loop setiap tag
+            if (!empty($data['s_tag_id']) && is_array($data['s_tag_id'])) {
+                foreach ($data['s_tag_id'] as $tagInput) {
+                    $tagInput = trim($tagInput);
+
+                    if (empty($tagInput)) {
+                        continue;
+                    }
+
+                    // Check if tag exists by ID
+                    if (preg_match('/^[0-9a-fA-F\-]{36}$/', $tagInput)) {
+                        $tag = Tag::where('id', $tagInput)->first();
+                        if (!$tag) {
+                            throw new \Exception("Tag dengan ID {$tagInput} tidak ditemukan");
+                        }
+                        $tagId = $tagInput;
+                    } else {
+                        // Find by name case-insensitive or create jika belum exist
+                        $tag = Tag::whereRaw('LOWER(name) = ?', [strtolower($tagInput)])->first();
+                        if (!$tag) {
+                            // CREATE tag baru
+                            $tag = new Tag();
+                            $tag->id = (string) Str::uuid();
+                            $tag->name = $tagInput;
+                            $tag->save();
+                        }
+                        $tagId = $tag->id;
+                    }
+
+                    // CREATE news_log entry dengan tag_id hasil dari create/resolve
+                    $newsLog = new NewsLog();
+                    $newsLog->id = (string) Str::uuid();
+                    $newsLog->s_menu_id = $menuId;
+                    $newsLog->s_tags_id = $tagId;
+                    $newsLog->save();
+                }
+            }
+
+            // Commit transaction
+            DB::commit();
+
+            return redirect()->route('admin.news.index')->with('success', 'Berita berhasil diperbarui.');
+        } catch (\Exception $e) {
+            // Rollback transaction on error
+            DB::rollBack();
+            Log::error('news.update failed', ['id' => $id, 'message' => $e->getMessage(), 'trace' => $e->getTraceAsString()]);
+            return redirect()->back()->with('error', 'Gagal memperbarui berita: ' . $e->getMessage())->withInput();
         }
-
-        $news->is_published = $request->has('is_published') && $request->boolean('is_published');
-        // set updated_by
-        $news->updated_by = Auth::id();
-        $news->save();
-
-        return redirect()->route('admin.news.index')->with('success', 'Berita berhasil diperbarui.');
     }
 
     /**
@@ -297,5 +445,27 @@ class NewsAdminController extends Controller
             : 'Status berhasil diubah menjadi waiting!';
 
         return redirect()->back()->with('success', $message);
+    }
+
+    /**
+     * Fetch tags for autocomplete (API endpoint)
+     */
+    public function fetchTags(Request $request)
+    {
+        $search = $request->input('search', '');
+
+        $tags = Tag::where('name', 'LIKE', "%{$search}%")
+            ->orderBy('name')
+            ->limit(10)
+            ->get()
+            ->map(function ($tag) {
+                return [
+                    'id' => $tag->id,
+                    'value' => $tag->id,
+                    'label' => $tag->name,
+                ];
+            });
+
+        return response()->json($tags);
     }
 }

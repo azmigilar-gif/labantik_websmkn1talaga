@@ -7,6 +7,7 @@ use Illuminate\Http\Request;
 use App\Models\S_Categories;
 use Illuminate\Support\Str;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\DB;
 
 class CategoriesController extends Controller
 {
@@ -47,5 +48,30 @@ class CategoriesController extends Controller
         $cat->save();
 
         return redirect()->back()->with('success', 'Kategori berhasil diupdate.');
+    }
+
+    public function destroy($id)
+    {
+        try {
+            $cat = S_Categories::findOrFail($id);
+
+            // Cek apakah kategori sedang digunakan oleh berita
+            $newsCount = DB::table('s_news')
+                ->where('s_category_id', $id)
+                ->count();
+
+            if ($newsCount > 0) {
+                return redirect()->back()->with(
+                    'error',
+                    "Kategori tidak dapat dihapus karena masih digunakan oleh {$newsCount} berita. Silakan hapus atau pindahkan berita tersebut terlebih dahulu."
+                );
+            }
+
+            $cat->delete();
+
+            return redirect()->back()->with('success', 'Kategori berhasil dihapus.');
+        } catch (\Exception $e) {
+            return redirect()->back()->with('error', 'Terjadi kesalahan saat menghapus kategori.');
+        }
     }
 }

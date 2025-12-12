@@ -5,19 +5,6 @@
         class="group-data-[sidebar-size=lg]:ltr:md:ml-vertical-menu group-data-[sidebar-size=lg]:rtl:md:mr-vertical-menu group-data-[sidebar-size=md]:ltr:ml-vertical-menu-md group-data-[sidebar-size=md]:rtl:mr-vertical-menu-md group-data-[sidebar-size=sm]:ltr:ml-vertical-menu-sm group-data-[sidebar-size=sm]:rtl:mr-vertical-menu-sm pt-[calc(theme('spacing.header')_*_1)] pb-[calc(theme('spacing.header')_*_0.8)] px-4 group-data-[navbar=bordered]:pt-[calc(theme('spacing.header')_*_1.3)] group-data-[navbar=hidden]:pt-0 group-data-[layout=horizontal]:mx-auto group-data-[layout=horizontal]:max-w-screen-2xl group-data-[layout=horizontal]:px-0 group-data-[layout=horizontal]:group-data-[sidebar-size=lg]:ltr:md:ml-auto group-data-[layout=horizontal]:group-data-[sidebar-size=lg]:rtl:md:mr-auto group-data-[layout=horizontal]:md:pt-[calc(theme('spacing.header')_*_1.6)] group-data-[layout=horizontal]:px-3 group-data-[layout=horizontal]:group-data-[navbar=hidden]:pt-[calc(theme('spacing.header')_*_0.9)]">
 
         <div class="container-fluid group-data-[content=boxed]:max-w-boxed mx-auto">
-            @if (session('success'))
-                <div
-                    class="mt-5 rounded-md bg-green-50 p-4 text-sm text-green-700 border border-green-200 flex items-center justify-between">
-                    <div class="flex items-center">
-                        <i data-lucide="check-circle" class="mr-2 h-5 w-5 flex-shrink-0 text-green-400"></i>
-                        <p>{{ session('success') }}</p>
-                    </div>
-                    <button onclick="this.parentElement.style.display='none';"
-                        class="ml-4 rounded-md bg-green-100 p-1 text-green-500 hover:bg-green-200 focus:outline-none focus:ring-2 focus:ring-green-500">
-                        <i data-lucide="x" class="h-4 w-4"></i>
-                    </button>
-                </div>
-            @endif
             <div class="flex flex-col gap-2 py-4 md:flex-row md:items-center print:hidden">
                 <div class="grow">
                     <h5 class="text-16">Dashboard</h5>
@@ -27,91 +14,27 @@
                         class="relative before:content-['\ea54'] before:font-remix ltr:before:-right-1 rtl:before:-left-1  before:absolute before:text-[18px] before:-top-[3px] ltr:pr-4 rtl:pl-4 before:text-slate-400 dark:text-zink-200">
                         <a href="#!" class="text-slate-400 dark:text-zink-200">Dashboard</a>
                     </li>
+                    <li
+                        class="relative before:content-['\ea54'] before:font-remix ltr:before:-right-1 rtl:before:-left-1  before:absolute before:text-[18px] before:-top-[3px] ltr:pr-4 rtl:pl-4 before:text-slate-400 dark:text-zink-200">
+                        <a href="{{ route('admin.menus.index') }}" class="text-slate-400 dark:text-zink-200">Menu</a>
+                    </li>
                     <li class="text-slate-700 dark:text-zink-100">
-                        Menu
+                        Detail Sub Menu
                     </li>
                 </ul>
-            </div>
-
-
-            {{-- 🟢 TEKS DI ATAS NAVBAR --}}
-            <div class="text-center mt-5 mb-3">
-                <h2 class="text-2xl font-semibold text-slate-800 dark:text-zink-100">
-                    Preview Menu
-                </h2>
-                <p class="text-gray-500 dark:text-zink-300 text-sm">
-                    Berikut tampilan navigasi utama website sekolah.
-                </p>
-            </div>
-
-            <div class="bg-white dark:bg-zink-700 border-b border-slate-200 dark:border-zink-500 shadow-md">
-                <nav class="container mx-auto flex items-center justify-between h-20 px-10" id="navbar">
-                    <div class="container 2xl:max-w-[87.5rem] px-4 mx-auto flex items-center self-center w-full">
-                        <div class="shrink-0">
-                            <a href="#!">
-                                <img src="{{ asset('assets/images/logosmk.png') }}" alt=""
-                                    class="block h-12 dark:hidden">
-                                <img src="{{ asset('assets/images/logosmk.png') }}" alt=""
-                                    class="hidden h-12 dark:block">
-                            </a>
-                        </div>
-                        <div class="mx-auto">
-                            <ul id="navbar7"
-                                class="absolute inset-x-0 z-20 items-center hidden py-3 bg-white shadow-lg dark:bg-zink-600 dark:md:bg-transparent md:z-0 navbar-menu rounded-b-md md:shadow-none md:flex top-full ltr:ml-auto rtl:mr-auto md:relative md:bg-transparent md:rounded-none md:top-auto md:py-0">
-                                @foreach ($menus as $menu)
-                                    <li class="dropdown relative">
-                                        @if ($menu->submenus && $menu->submenus->count() > 0)
-                                            <!-- Menu dengan Submenu (Dropdown Split Button) -->
-                                            <div class="flex items-center">
-                                                <a href="#{{ $menu->slug }}"
-                                                    class="ltr:rounded-r-none rtl:rounded-l-none block md:inline-block px-4 md:px-3 py-2.5 md:py-0.5 text-15 font-medium text-slate-800 transition-all duration-300 ease-linear hover:text-custom-500 dark:text-zink-100 dark:hover:text-custom-500">
-                                                    {{ $menu->name }}
-                                                </a>
-                                                <button type="button" data-bs-toggle="dropdown" aria-expanded="false"
-                                                    class="dropdown-toggle ltr:rounded-l-none rtl:rounded-r-none flex items-center justify-center size-[37.5px] p-0 text-slate-800 hover:text-custom-500 dark:text-zink-100 dark:hover:text-custom-500 transition-all duration-300">
-                                                    <i data-lucide="chevron-down" class="inline-block size-4"></i>
-                                                </button>
-                                            </div>
-
-                                            <!-- Dropdown Menu -->
-                                            <ul
-                                                class="dropdown-menu absolute left-0 z-[1000] py-2 mt-2 text-left list-none bg-white rounded-md shadow-lg dark:bg-zink-600 min-w-[10rem] hidden">
-                                                @foreach ($menu->submenus as $submenu)
-                                                    <li>
-                                                        <a href="#{{ $submenu->url }}"
-                                                            class="block px-4 py-2 font-normal text-slate-600 bg-transparent dropdown-item whitespace-nowrap hover:bg-slate-100 hover:text-custom-500 dark:text-zink-100 dark:hover:bg-zink-500 dark:hover:text-custom-500">
-                                                            {{ $submenu->name }}
-                                                        </a>
-                                                    </li>
-                                                @endforeach
-                                            </ul>
-                                        @else
-                                            <!-- Menu Biasa (Tanpa Submenu) -->
-                                            <a href="#{{ $menu->slug }}"
-                                                class="block md:inline-block px-4 md:px-3 py-2.5 md:py-0.5 text-15 font-medium text-slate-800 transition-all duration-300 ease-linear hover:text-custom-500 active dark:text-zink-100 dark:hover:text-custom-500">
-                                                {{ $menu->name }}
-                                            </a>
-                                        @endif
-                                    </li>
-                                @endforeach
-                            </ul>
-                        </div>
-                    </div>
-                </nav>
             </div>
 
             <div class="card mt-5">
                 <div class="card">
                     <div class="card-body">
                         <div class="flex items-center justify-between mb-4">
-                            <a href="#!" data-modal-target="addMenuModal" type="button"
-                                class="text-white btn bg-custom-500 border-custom-500 hover:text-white hover:bg-custom-600 hover:border-custom-600 focus:text-white focus:bg-custom-600 focus:border-custom-600 focus:ring focus:ring-custom-100 active:text-white active:bg-custom-600 active:border-custom-600 active:ring active:ring-custom-100 dark:ring-custom-400/20 add-employee"><i
-                                    data-lucide="plus" class="inline-block size-4"></i> <span class="align-middle">Tambah
-                                    Menu</span></a>
+                            <a href="{{ route('admin.menus.index') }}" type="button"
+                                class="text-white btn bg-slate-500 border-slate-500 hover:text-white hover:bg-slate-600 hover:border-slate-600 focus:text-white focus:bg-slate-600 focus:border-slate-600 focus:ring focus:ring-slate-100 active:text-white active:bg-slate-600 active:border-slate-600 active:ring active:ring-slate-100 dark:ring-slate-400/20 add-employee"><i
+                                    data-lucide="arrow-left-from-line" class="inline-block size-4"></i> <span
+                                    class="align-middle">Kembali</span></a>
                         </div>
 
-
-                        @if (isset($menus) && $menus->count())
+                        @if (isset($submenus) && $submenus->count())
                             <table id="rowBorder" class="w-full">
                                 <thead>
                                     <tr>
@@ -122,7 +45,7 @@
                                     </tr>
                                 </thead>
                                 <tbody class="divide-y divide-slate-200 dark:divide-zink-500">
-                                    @foreach ($menus as $m)
+                                    @foreach ($submenus as $m)
                                         <tr>
                                             <td class="p-2">{{ $loop->iteration }}</td>
                                             <td class="p-2">{{ $m->name ?? '-' }}</td>
@@ -131,18 +54,8 @@
                                             </td>
                                             <td class="p-2">
                                                 <div class="flex gap-2">
-                                                    @if ($m->submenus && $m->submenus->count() > 0)
-                                                        <a href="{{ route('admin.submenus.show', $m->id) }}"
-                                                            class="flex items-center justify-center transition-all duration-200 ease-linear rounded-md size-8 edit-item-btn bg-slate-100 text-slate-500 hover:text-custom-500 hover:bg-custom-100 dark:bg-zink-600 dark:text-zink-200 dark:hover:bg-custom-500/20 dark:hover:text-custom-500"><i
-                                                                data-lucide="eye" class="size-4"></i>
-                                                        </a>
-                                                    @endif
-
                                                     <a href="#!"
-                                                        data-modal-target="addSubmenuModal{{ $m->id }}"
-                                                        class="flex items-center justify-center transition-all duration-200 ease-linear rounded-md size-8 edit-item-btn bg-slate-100 text-slate-500 hover:text-custom-500 hover:bg-custom-100 dark:bg-zink-600 dark:text-zink-200 dark:hover:bg-custom-500/20 dark:hover:text-custom-500"><i
-                                                            data-lucide="plus" class="size-4"></i></a>
-                                                    <a href="#!" data-modal-target="editMenuModal{{ $m->id }}"
+                                                        data-modal-target="editSubmenusModal{{ $m->id }}"
                                                         class="flex items-center justify-center transition-all duration-200 ease-linear rounded-md size-8 edit-item-btn bg-slate-100 text-slate-500 hover:text-custom-500 hover:bg-custom-100 dark:bg-zink-600 dark:text-zink-200 dark:hover:bg-custom-500/20 dark:hover:text-custom-500"><i
                                                             data-lucide="pencil" class="size-4"></i></a>
                                                     <a href="#!" data-modal-target="deleteModal{{ $m->id }}"
@@ -151,7 +64,7 @@
 
                                             </td>
                                         </tr>
-                                        <div id="addSubmenuModal{{ $m->id }}" modal-center=""
+                                        <div id="addsubmenusModal{{ $m->id }}" modal-center=""
                                             class="fixed flex flex-col hidden transition-all duration-300 ease-in-out left-2/4 z-drawer -translate-x-2/4 -translate-y-2/4 show ">
                                             <div class="w-screen md:w-[30rem] bg-white shadow rounded-md dark:bg-zink-600">
                                                 <div
@@ -160,11 +73,10 @@
                                                 </div>
                                                 <div
                                                     class="max-h-[calc(theme('height.screen')_-_180px)] p-4 overflow-y-auto">
-                                                    <form class="update-form"
-                                                        action="{{ route('admin.submenus.store') }}" method="POST">
+                                                    <form class="update-form" action="{{ route('admin.submenus.store') }}"
+                                                        method="POST">
                                                         @csrf
-                                                        <input type="hidden" name="s_menu_id"
-                                                            value="{{ $m->id }}">
+                                                        <input type="hidden" name="s_menu_id" value="{{ $m->id }}">
                                                         <div>
                                                             <label for="phoneNumberInput"
                                                                 class="inline-block mb-2 text-base font-medium">Nama
@@ -175,7 +87,7 @@
                                                         </div>
                                                         <div class="flex justify-end gap-2 mt-4">
                                                             <button type="reset" id="close-modal"
-                                                                data-modal-close="addSubmenuModal{{ $m->id }}"
+                                                                data-modal-close="addsubmenusModal{{ $m->id }}"
                                                                 class="text-red-500 bg-white btn hover:text-red-500 hover:bg-red-100 focus:text-red-500 focus:bg-red-100 active:text-red-500 active:bg-red-100 dark:bg-zink-600 dark:hover:bg-red-500/10 dark:focus:bg-red-500/10 dark:active:bg-red-500/10">Cancel</button>
                                                             <button type="submit" id="addNew"
                                                                 class="text-white btn bg-custom-500 border-custom-500 hover:text-white hover:bg-custom-600 hover:border-custom-600 focus:text-white focus:bg-custom-600 focus:border-custom-600 focus:ring focus:ring-custom-100 active:text-white active:bg-custom-600 active:border-custom-600 active:ring active:ring-custom-100 dark:ring-custom-400/20 ">Simpan
@@ -186,7 +98,7 @@
                                             </div>
                                         </div><!--end add Employee-->
 
-                                        <div id="editMenuModal{{ $m->id }}" modal-center=""
+                                        <div id="editSubmenusModal{{ $m->id }}" modal-center=""
                                             class="fixed flex flex-col hidden transition-all duration-300 ease-in-out left-2/4 z-drawer -translate-x-2/4 -translate-y-2/4 show ">
                                             <div class="w-screen md:w-[30rem] bg-white shadow rounded-md dark:bg-zink-600">
                                                 <div
@@ -196,36 +108,27 @@
                                                 <div
                                                     class="max-h-[calc(theme('height.screen')_-_180px)] p-4 overflow-y-auto">
                                                     <form class="update-form"
-                                                        action="{{ route('admin.menus.update', $m->id) }}"
+                                                        action="{{ route('admin.submenus.update', $m->id) }}"
                                                         method="POST">
-                                                        @method('PUT')
                                                         @csrf
-                                                        <div class="grid grid-cols-1 gap-4 xl:grid-cols-12">
-                                                            <div class="xl:col-span-6">
-                                                                <label for="phoneNumberInput"
-                                                                    class="inline-block mb-2 text-base font-medium">Nama
-                                                                    Menu</label>
-                                                                <input type="text" id="nameInput{{ $m->id }}"
-                                                                    name="name" value="{{ old('name', $m->name) }}"
-                                                                    class="form-input border-slate-200 dark:border-zink-500 focus:outline-none focus:border-custom-500 disabled:bg-slate-100 dark:disabled:bg-zink-600 disabled:border-slate-300 dark:disabled:border-zink-500 dark:disabled:text-zink-200 disabled:text-slate-500 dark:text-zink-100 dark:bg-zink-700 dark:focus:border-custom-800 placeholder:text-slate-400 dark:placeholder:text-zink-200"
-                                                                    placeholder="Masukkan Nama Menu" required="">
-                                                            </div>
-                                                            <div class="xl:col-span-6">
-                                                                <label for="slugInput"
-                                                                    class="inline-block mb-2 text-base font-medium">Slug</label>
-                                                                <input type="text" id="slugInput{{ $m->id }}"
-                                                                    name="slug" value="{{ old('slug', $m->slug) }}"
-                                                                    class="form-input border-slate-200 dark:border-zink-500 focus:outline-none focus:border-custom-500 disabled:bg-slate-100 dark:disabled:bg-zink-600 disabled:border-slate-300 dark:disabled:border-zink-500 dark:disabled:text-zink-200 disabled:text-slate-500 dark:text-zink-100 dark:bg-zink-700 dark:focus:border-custom-800 placeholder:text-slate-400 dark:placeholder:text-zink-200"
-                                                                    placeholder="Masukkan Slug" required>
-                                                            </div>
+                                                        @method('PUT')
+                                                        <input type="hidden" name="s_menu_id" value="{{ $m->id }}">
+                                                        <div>
+                                                            <label for="phoneNumberInput"
+                                                                class="inline-block mb-2 text-base font-medium">Nama
+                                                                Sub Menu</label>
+                                                            <input type="text" name="name"
+                                                                value="{{ $m->name }}"
+                                                                class="form-input border-slate-200 dark:border-zink-500 focus:outline-none focus:border-custom-500 disabled:bg-slate-100 dark:disabled:bg-zink-600 disabled:border-slate-300 dark:disabled:border-zink-500 dark:disabled:text-zink-200 disabled:text-slate-500 dark:text-zink-100 dark:bg-zink-700 dark:focus:border-custom-800 placeholder:text-slate-400 dark:placeholder:text-zink-200"
+                                                                placeholder="Masukkan Nama Sub Menu" required="">
                                                         </div>
                                                         <div class="flex justify-end gap-2 mt-4">
                                                             <button type="reset" id="close-modal"
-                                                                data-modal-close="editMenuModal{{ $m->id }}"
+                                                                data-modal-close="editSubmenusModal{{ $m->id }}"
                                                                 class="text-red-500 bg-white btn hover:text-red-500 hover:bg-red-100 focus:text-red-500 focus:bg-red-100 active:text-red-500 active:bg-red-100 dark:bg-zink-600 dark:hover:bg-red-500/10 dark:focus:bg-red-500/10 dark:active:bg-red-500/10">Cancel</button>
                                                             <button type="submit" id="addNew"
-                                                                class="text-white btn bg-custom-500 border-custom-500 hover:text-white hover:bg-custom-600 hover:border-custom-600 focus:text-white focus:bg-custom-600 focus:border-custom-600 focus:ring focus:ring-custom-100 active:text-white active:bg-custom-600 active:border-custom-600 active:ring active:ring-custom-100 dark:ring-custom-400/20 ">Update
-                                                                Menu</button>
+                                                                class="text-white btn bg-custom-500 border-custom-500 hover:text-white hover:bg-custom-600 hover:border-custom-600 focus:text-white focus:bg-custom-600 focus:border-custom-600 focus:ring focus:ring-custom-100 active:text-white active:bg-custom-600 active:border-custom-600 active:ring active:ring-custom-100 dark:ring-custom-400/20 ">Simpan
+                                                                Sub Menu</button>
                                                         </div>
                                                     </form>
                                                 </div>
@@ -245,7 +148,7 @@
                                                             want to delete this menu ({{ $m->name }})?</p>
                                                         <div class="flex justify-center gap-2 mt-6">
                                                             <form class="delete-form"
-                                                                action="{{ route('admin.menus.destroy', $m->id) }}"
+                                                                action="{{ route('admin.submenus.destroy', $m->id) }}"
                                                                 method="post">
                                                                 @method('DELETE')
                                                                 @csrf
@@ -265,10 +168,6 @@
                                     @endforeach
                                 </tbody>
                             </table>
-
-                            <div class="mt-4">
-                                {{ $menus->links() }}
-                            </div>
                         @else
                             <!-- Empty state -->
                             <div class="py-12 text-center">
@@ -293,7 +192,7 @@
                             <h5 class="text-16" id="addEmployeeLabel">Tambah Menu</h5>
                         </div>
                         <div class="max-h-[calc(theme('height.screen')_-_180px)] p-4 overflow-y-auto">
-                            <form class="create-form" id="create-form" action="{{ route('admin.menus.store') }}"
+                            <form class="create-form" id="create-form" action="{{ route('admin.submenus.store') }}"
                                 method="POST">
                                 @csrf
                                 <div class="grid grid-cols-1 gap-4 xl:grid-cols-12">
@@ -325,32 +224,5 @@
                 </div><!--end add Employee-->
             </div>
         </div>
-
     </div>
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const slugInput = document.getElementById('slugInput');
-
-            // Tambahkan prefix Section-
-            const cleave = new Cleave(slugInput, {
-                prefix: 'section-',
-                delimiter: '',
-                blocks: [8, 999], // "Section-" = 8 karakter
-                uppercase: false,
-                lowercase: true,
-                numericOnly: false,
-                onValueChanged: function(e) {
-                    // Ganti spasi jadi -
-                    const cleaned = e.target.value
-                        .replace(/^section-/, '') // hapus prefix sementara
-                        .replace(/\s+/g, '-') // ubah spasi jadi -
-                        .replace(/[^a-zA-Z0-9-]/g, '') // hapus karakter aneh
-                        .toLowerCase();
-
-                    cleave.setRawValue('section-' + cleaned);
-                }
-            });
-        });
-    </script>
-
 @endsection

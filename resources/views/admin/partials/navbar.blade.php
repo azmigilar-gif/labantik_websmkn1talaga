@@ -8,7 +8,6 @@
                 <!-- LOGO -->
                 <div
                     class="h-header group-data-[layout=horizontal]:ltr::pl-0 hidden items-center justify-center px-5 text-center group-data-[layout=horizontal]:md:flex group-data-[layout=horizontal]:rtl:pr-0">
-
                     <a href="index.html">
                         <span class="hidden">
                             <img src="assets/images/logo.png" alt="" class="mx-auto h-6">
@@ -26,6 +25,8 @@
                         </span>
                     </a>
                 </div>
+
+                <!-- Hamburger Button -->
                 <button type="button"
                     class="text-topbar-item bg-topbar btn group-data-[topbar=dark]:bg-topbar-dark group-data-[topbar=dark]:border-topbar-dark group-data-[topbar=dark]:text-topbar-item-dark group-data-[topbar=dark]:hover:bg-topbar-item-bg-hover-dark group-data-[topbar=dark]:hover:text-topbar-item-hover-dark group-data-[topbar=brand]:bg-topbar-brand group-data-[topbar=brand]:border-topbar-brand group-data-[topbar=brand]:text-topbar-item-brand group-data-[topbar=brand]:hover:bg-topbar-item-bg-hover-brand group-data-[topbar=brand]:hover:text-topbar-item-hover-brand group-data-[topbar=dark]:dark:bg-zink-700 group-data-[topbar=dark]:dark:text-zink-200 group-data-[topbar=dark]:dark:border-zink-700 group-data-[topbar=dark]:dark:hover:bg-zink-600 group-data-[topbar=dark]:dark:hover:text-zink-50 hamburger-icon relative inline-flex h-[37.5px] w-[37.5px] items-center justify-center rounded-md p-0 transition-all duration-75 ease-linear hover:bg-slate-100 group-data-[layout=horizontal]:flex group-data-[layout=horizontal]:md:hidden"
                     id="topnav-hamburger-icon">
@@ -33,18 +34,26 @@
                     <i data-lucide="chevrons-right" class="hidden h-5 w-5 group-data-[sidebar-size=sm]:block"></i>
                 </button>
 
-                <div class="ms-auto flex gap-3">
-
-                    <div class="dropdown h-header relative flex items-center">
+                <!-- Right Side Items -->
+                <div class="ms-auto flex items-center gap-4">
+                    <!-- Tombol Kembali Ke Landing Page -->
+                    <a href="{{ url('/') }}"
+                        class="inline-flex items-center gap-2 h-[37.5px] px-3 text-sm font-medium text-custom-500 bg-custom-50 border border-custom-200 rounded-md hover:bg-custom-100 hover:border-custom-300 focus:bg-custom-100 focus:border-custom-300 focus:ring focus:ring-custom-100 active:bg-custom-100 active:border-custom-300 transition-all duration-200 dark:text-custom-400 dark:bg-custom-950 dark:border-custom-800 dark:hover:bg-custom-900 dark:hover:border-custom-700 dark:ring-custom-400/20">
+                        <i data-lucide="arrow-left-from-line" class="size-4"></i>
+                        <span>Kembali Ke Landing Page</span>
+                    </a>
+                    <!-- User Profile Dropdown -->
+                    <div class="dropdown relative">
                         <button type="button"
-                            class="bg-topbar text-topbar-item dropdown-toggle btn hover:bg-topbar-item-bg-hover hover:text-topbar-item-hover group-data-[topbar=dark]:text-topbar-item-dark group-data-[topbar=dark]:bg-topbar-dark group-data-[topbar=dark]:hover:bg-topbar-item-bg-hover-dark group-data-[topbar=dark]:hover:text-topbar-item-hover-dark group-data-[topbar=brand]:bg-topbar-brand group-data-[topbar=brand]:hover:bg-topbar-item-bg-hover-brand group-data-[topbar=brand]:hover:text-topbar-item-hover-brand group-data-[topbar=dark]:dark:bg-zink-700 group-data-[topbar=dark]:dark:hover:bg-zink-600 group-data-[topbar=brand]:text-topbar-item-brand group-data-[topbar=dark]:dark:hover:text-zink-50 group-data-[topbar=dark]:dark:text-zink-200 inline-block rounded-full p-0 transition-all duration-200 ease-linear"
+                            class="bg-topbar text-topbar-item dropdown-toggle hover:bg-topbar-item-bg-hover hover:text-topbar-item-hover group-data-[topbar=dark]:text-topbar-item-dark group-data-[topbar=dark]:bg-topbar-dark group-data-[topbar=dark]:hover:bg-topbar-item-bg-hover-dark group-data-[topbar=dark]:hover:text-topbar-item-hover-dark group-data-[topbar=brand]:bg-topbar-brand group-data-[topbar=brand]:hover:bg-topbar-item-bg-hover-brand group-data-[topbar=brand]:hover:text-topbar-item-hover-brand group-data-[topbar=dark]:dark:bg-zink-700 group-data-[topbar=dark]:dark:hover:bg-zink-600 group-data-[topbar=brand]:text-topbar-item-brand group-data-[topbar=dark]:dark:hover:text-zink-50 group-data-[topbar=dark]:dark:text-zink-200 inline-block rounded-full p-0 transition-all duration-200 ease-linear"
                             id="dropdownMenuButton" data-bs-toggle="dropdown">
                             <div class="rounded-full bg-pink-100">
                                 <img src="{{ asset('assets/images/user_icon.png') }}" alt=""
                                     class="h-[37.5px] w-[37.5px] rounded-full">
                             </div>
                         </button>
-                        <div class="dropdown-menu dark:bg-zink-600 absolute !top-4 z-50 hidden min-w-[14rem] rounded-md bg-white p-4 shadow-md ltr:text-left rtl:text-right"
+
+                        <div class="dropdown-menu dark:bg-zink-600 absolute !top-4 ltr:right-0 rtl:left-0 z-50 hidden min-w-[14rem] rounded-md bg-white p-4 shadow-md ltr:text-left rtl:text-right"
                             aria-labelledby="dropdownMenuButton">
                             <h6 class="dark:text-zink-300 mb-2 text-sm font-normal text-slate-500">
                                 Welcome to Web Pengelola Website Sekolah
@@ -63,7 +72,6 @@
                                     <p class="text-slate-500 dark:text-zinc-300">
                                         {{ Auth::user()->roles->first()->name }}
                                     </p>
-
                                 </div>
                             </a>
                             <ul>
@@ -77,6 +85,7 @@
                                         </button>
                                     </form>
                                 </li>
+                            </ul>
                         </div>
                     </div>
                 </div>

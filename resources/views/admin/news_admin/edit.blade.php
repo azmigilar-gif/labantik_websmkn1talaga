@@ -7,13 +7,47 @@
         <div class="container mx-auto p-6">
             <div class="mx-auto max-w-4xl rounded bg-white p-6 shadow-sm">
                 <h2 class="mb-6 text-2xl font-semibold">Edit Berita</h2>
+
                 @if ($errors->any())
-                    <div class="alert alert-danger">
-                        <ul>
-                            @foreach ($errors->all() as $error)
-                                <li>{{ $error }}</li>
-                            @endforeach
-                        </ul>
+                    <div class="mb-6 rounded-lg border border-red-200 bg-red-50 p-4">
+                        <div class="flex items-start">
+                            <div class="flex-shrink-0">
+                                <svg class="h-5 w-5 text-red-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"
+                                    fill="currentColor">
+                                    <path fill-rule="evenodd"
+                                        d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
+                                        clip-rule="evenodd" />
+                                </svg>
+                            </div>
+                            <div class="ml-3">
+                                <h3 class="text-sm font-medium text-red-800">Terjadi kesalahan validasi</h3>
+                                <div class="mt-2 text-sm text-red-700">
+                                    <ul class="list-inside list-disc space-y-1">
+                                        @foreach ($errors->all() as $error)
+                                            <li>{{ $error }}</li>
+                                        @endforeach
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                @endif
+
+                @if (session('error'))
+                    <div class="mb-6 rounded-lg border border-red-200 bg-red-50 p-4">
+                        <div class="flex items-start">
+                            <div class="flex-shrink-0">
+                                <svg class="h-5 w-5 text-red-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"
+                                    fill="currentColor">
+                                    <path fill-rule="evenodd"
+                                        d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
+                                        clip-rule="evenodd" />
+                                </svg>
+                            </div>
+                            <div class="ml-3">
+                                <p class="text-sm font-medium text-red-800">{{ session('error') }}</p>
+                            </div>
+                        </div>
                     </div>
                 @endif
                 <form action="{{ route('admin.news.update', $news->id) }}" method="POST" enctype="multipart/form-data">
@@ -23,7 +57,8 @@
                         <div class="col-span-12 md:col-span-4">
                             <label class="mb-2 block text-sm font-medium text-gray-700">Kategori</label>
 
-                            <select name="s_category_id" class="block w-full rounded border-gray-200 p-3 shadow-sm">
+                            <select name="s_category_id"
+                                class="block w-full rounded {{ $errors->has('s_category_id') ? 'border-red-500' : 'border-gray-200' }} p-3 shadow-sm">
                                 <option value="">Pilih Kategori</option>
                                 @if (!empty($categories))
                                     @foreach ($categories as $cat)
@@ -35,11 +70,15 @@
                                     <option value="">(Tidak ada kategori)</option>
                                 @endif
                             </select>
+                            @error('s_category_id')
+                                <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                            @enderror
                         </div>
 
                         <div class="col-span-12 md:col-span-4">
                             <label class="mb-2 block text-sm font-medium text-gray-700">Menu</label>
-                            <select name="s_menu_id" class="block w-full rounded border-gray-200 p-3 shadow-sm">
+                            <select name="s_menu_id"
+                                class="block w-full rounded {{ $errors->has('s_menu_id') ? 'border-red-500' : 'border-gray-200' }} p-3 shadow-sm">
                                 <option value="">Pilih Menu</option>
                                 @if (!empty($menus))
                                     @foreach ($menus as $m)
@@ -51,20 +90,41 @@
                                     <option value="">(Tidak ada menu)</option>
                                 @endif
                             </select>
+                            @error('s_menu_id')
+                                <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                            @enderror
+                        </div>
+
+                        <div class="col-span-12 md:col-span-4">
+                            <label class="mb-2 block text-sm font-medium text-gray-700">Tag</label>
+                            <input
+                                class="form-input border-slate-200 focus:outline-none focus:border-custom-500 disabled:bg-slate-100 disabled:border-slate-300 disabled:text-slate-500 dark:text-zink-100 dark:bg-zink-700 dark:border-zink-500 dark:focus:border-custom-800 dark:disabled:bg-zink-600 dark:disabled:border-zink-500 dark:disabled:text-zink-200 placeholder:text-slate-400 dark:placeholder:text-zink-200 {{ $errors->has('s_tag_id') ? 'border-red-500' : '' }}"
+                                id="tag-input" name="s_tag_id[]" data-choices="" data-choices-text-unique-true=""
+                                type="text" placeholder="Ketik nama tag..."
+                                value="{{ old('s_tag_id', $news->tag ? $news->tag->id : '') }}">
+                            @error('s_tag_id')
+                                <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                            @enderror
                         </div>
 
                         <div class="col-span-12 md:col-span-8">
                             <label class="mb-2 block text-sm font-medium text-gray-700">Judul</label>
                             <input type="text" name="title" value="{{ old('title', $news->title) }}"
-                                class="block w-full rounded border-gray-200 p-3 shadow-sm"
+                                class="block w-full rounded {{ $errors->has('title') ? 'border-red-500' : 'border-gray-200' }} p-3 shadow-sm"
                                 placeholder="Tentukan judul di sini">
+                            @error('title')
+                                <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                            @enderror
                         </div>
 
                         <div class="col-span-12">
                             <label class="mb-2 block text-sm font-medium text-gray-700">Konten</label>
                             <textarea id="editor" name="content"
-                                class="ckeditor-classic block min-h-[300px] w-full rounded border border-gray-200 p-4 text-slate-800"
+                                class="ckeditor-classic block min-h-[300px] w-full rounded {{ $errors->has('content') ? 'border-red-500' : 'border-gray-200' }} border p-4 text-slate-800"
                                 placeholder="Mulai tulis di sini...">{{ old('content', $news->content) }}</textarea>
+                            @error('content')
+                                <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                            @enderror
                         </div>
 
                     </div>
@@ -72,7 +132,8 @@
                     <div class="col-span-12 mt-4 text-right">
                         <button class="inline-block rounded bg-blue-600 px-4 py-2 text-white" type="submit"
                             style="background: rgb(110, 110, 255); color:white;">Simpan</button>
-                        <a href="{{ route('admin.news.index') }}" class="ml-2 inline-block rounded border px-4 py-2">Batal</a>
+                        <a href="{{ route('admin.news.index') }}"
+                            class="ml-2 inline-block rounded border px-4 py-2">Batal</a>
                     </div>
                 </form>
             </div>
@@ -83,11 +144,85 @@
 @endsection
 
 @push('scripts')
+    <!-- Choices.js library for tag input -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/choices.js/public/assets/styles/choices.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
+
     <!-- Quill editor (free, no jQuery). Custom image upload handler that posts to your news.upload.image route -->
     <link href="https://cdn.quilljs.com/1.3.7/quill.snow.css" rel="stylesheet">
     <script src="https://cdn.quilljs.com/1.3.7/quill.min.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
+            // Initialize Choices.js for tag input - MULTIPLE mode
+            const tagInput = document.getElementById('tag-input');
+            let choicesInstance = new Choices(tagInput, {
+                removeItemButton: true,
+                addItems: true,
+                addItemFilter: function(value) {
+                    // Allow adding new items
+                    return value.trim().length > 0;
+                },
+                delimiter: ',', // Gunakan koma sebagai delimiter
+                paste: false, // Jangan allow paste untuk avoid confusion
+                duplicateItemsAllowed: false, // Tidak boleh duplicate
+                classNames: {
+                    containerOuter: 'choices',
+                    containerInner: 'choices__inner',
+                    input: 'choices__input',
+                    inputCloned: 'choices__input--cloned',
+                    list: 'choices__list',
+                    listItems: 'choices__list--multiple',
+                    listSingle: 'choices__list--single',
+                    listDropdown: 'choices__list--dropdown',
+                    item: 'choices__item',
+                    itemSelectable: 'choices__item--selectable',
+                    itemDeletable: 'choices__item--deletable',
+                    itemChoice: 'choices__item--choice',
+                    placeholder: 'choices__placeholder',
+                    group: 'choices__group',
+                    groupHeading: 'choices__heading',
+                    button: 'choices__button',
+                    activeState: 'is-active',
+                    focusState: 'is-focused',
+                    disabledState: 'is-disabled',
+                    highlightedState: 'is-highlighted',
+                    selectedState: 'is-selected',
+                    flippedState: 'is-flipped',
+                    loadingState: 'is-loading',
+                    noResults: 'has-no-results',
+                    noChoices: 'has-no-choices'
+                }
+            });
+
+            // Fetch tags from server when user types
+            let searchTimeout;
+            tagInput.addEventListener('search', function(e) {
+                clearTimeout(searchTimeout);
+                const searchText = e.detail.value;
+
+                if (searchText.length > 0) {
+                    searchTimeout = setTimeout(function() {
+                        fetch('{{ route('admin.news.fetch-tags') }}?search=' + encodeURIComponent(
+                                searchText))
+                            .then(response => response.json())
+                            .then(data => {
+                                // Clear existing items except selected ones
+                                choicesInstance.clearChoices();
+
+                                // Add fetched tags as choices
+                                data.forEach(tag => {
+                                    choicesInstance.setChoices([{
+                                        value: tag.id,
+                                        label: tag.label,
+                                        selected: false
+                                    }], 'value', 'label', true);
+                                });
+                            })
+                            .catch(err => console.error('Error fetching tags:', err));
+                    }, 300);
+                }
+            });
+
             // Create editor container and hide original textarea visually
             var textarea = document.getElementById('editor');
             // create a div to host quill and insert it before textarea

@@ -19,4 +19,9 @@ class S_Menu extends Model
     {
         return $this->hasMany(S_Extrakulikuler::class, 's_menu_id');
     }
+
+    public function submenus()
+    {
+        return $this->hasMany(S_Submenu::class, 's_menu_id', 'id');
+    }
 }

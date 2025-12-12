@@ -1,5 +1,6 @@
 <?php
 
+use App\Http\Controllers\Admin\SubmenuController;
 use App\Http\Controllers\NewsController;
 use Illuminate\Support\Facades\Route;
 use App\Http\Controllers\LandingPageController;
@@ -17,6 +18,7 @@ use App\Http\Controllers\Admin\VisionMissionController;
 use App\Http\Controllers\Admin\UploadController;
 use App\Http\Controllers\GalleriesController;
 use App\Http\Controllers\Admin\BackgroundController;
+use App\Http\Controllers\Admin\TagsController;
 use App\Http\Controllers\ExtracuricullarsController;
 
 Route::get('/', [LandingPageController::class, 'index'])->name('landingpage');
@@ -56,6 +58,7 @@ Route::middleware(['auth'])->prefix('adminkrituga')->name('admin.')->group(funct
     Route::post('/upload-image', [UploadController::class, 'upload'])->name('upload.image');
     // news-specific upload endpoint used by the editor
     Route::post('news/upload-image', [NewsAdminController::class, 'uploadImage'])->name('news.upload.image');
+    Route::get('news/fetch-tags', [NewsAdminController::class, 'fetchTags'])->name('news.fetch-tags');
     Route::resource('news', NewsAdminController::class);
     // Backwards-compatible route name expected by some controller redirects and views
     // Controller and views reference `admin.news_admin.*` route names, so provide an alias.
@@ -77,6 +80,8 @@ Route::middleware(['auth'])->prefix('adminkrituga')->name('admin.')->group(funct
     Route::resource('contacts', ContactController::class);
     Route::resource('categories', CategoriesController::class);
     Route::resource('menus', MenuController::class);
+    Route::resource('submenus', SubmenuController::class);
+    Route::resource('tags', TagsController::class);
     Route::resource('visionmissions', VisionMissionController::class);
     Route::resource('profiles', ProfileController::class);
     Route::resource('galleries', App\Http\Controllers\Admin\GalleryController::class);

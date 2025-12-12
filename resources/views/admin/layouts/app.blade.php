@@ -185,7 +185,8 @@
                             <label for="customDefaultSwitch"
                                 class="peer-checked/published:bg-custom-500 peer-checked/published:border-custom-500 dark:border-zink-500 dark:bg-zink-600 block h-5 cursor-pointer overflow-hidden rounded-full border border-slate-200 bg-slate-200 transition duration-300 ease-linear"></label>
                         </div>
-                        <label for="customDefaultSwitch" class="inline-block text-base font-medium">Semi Dark (Sidebar &
+                        <label for="customDefaultSwitch" class="inline-block text-base font-medium">Semi Dark (Sidebar
+                            &
                             Header)</label>
                     </div>
                 </div>

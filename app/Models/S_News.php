@@ -6,59 +6,59 @@ use Illuminate\Database\Eloquent\Model;
 
 class S_News extends Model
 {
-    /**
-     * The table associated with the model.
-     *
-     * @var string
-     */
     protected $table = 's_news';
+    public $incrementing = false;
+    protected $keyType = 'string';
 
-    /**
-     * The primary key for the model.
-     *
-     * @var string
-     */
-    public $incrementing = false; // Karena bukan auto increment
-    protected $keyType = 'string'; // UUID adalah string
-
-    /**
-     * The attributes that are mass assignable.
-     *
-     * @var array<int, string>
-     */
     protected $fillable = [
         'title',
         'content',
         's_category_id',
         's_menu_id',
         'is_published',
+        'approve',        // ← TAMBAH
         'created_by',
         'updated_by',
     ];
 
-    public function categories()
-    {
-        // kept for backward compatibility if referenced, but it's incorrect; add proper relation below
-        return $this->belongsTo(S_Categories::class, 's_category_id', 'id');
-    }
-
-    public function menu()
-    {
-        return $this->belongsTo(S_Menu::class, 's_menu_id', 'id');
-    }
-
-    /**
-     * Proper belongsTo relation for a news item's category.
-     */
+    // Relasi ke Category
     public function category()
     {
         return $this->belongsTo(S_Categories::class, 's_category_id', 'id');
     }
 
+    // Relasi ke Menu
+    public function menu()
+    {
+        return $this->belongsTo(S_Menu::class, 's_menu_id', 'id');
+    }
+
+    // Relasi Many-to-Many ke Tags (PERBAIKAN UTAMA)
+    public function tags()
+    {
+        return $this->belongsToMany(
+            S_Tags::class,       // Model yang direlasikan
+            's_news_logs',       // Nama pivot table
+            's_news_id',         // Foreign key di pivot untuk model ini (S_News)
+            's_tags_id',         // Foreign key di pivot untuk model yang direlasikan (S_Tags)
+            'id',                // Local key di S_News
+            'id'                 // Local key di S_Tags
+        );
+    }
+
+    // Relasi ke NewsLogs (untuk mengakses pivot langsung jika perlu)
+    public function newsLogs()
+    {
+        return $this->hasMany(S_NewsLogs::class, 's_news_id');
+    }
+
+    // Relasi ke User (created_by)
     public function createdBy()
     {
         return $this->belongsTo(User::class, 'created_by', 'id');
     }
+
+    // Relasi ke User (updated_by)
     public function updatedBy()
     {
         return $this->belongsTo(User::class, 'updated_by', 'id');

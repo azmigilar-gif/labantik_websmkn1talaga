@@ -7,6 +7,7 @@ use App\Models\Gallery;
 use App\Models\S_Extrakulikuler;
 use App\Models\S_Menu;
 use App\Models\S_News;
+use App\Models\S_Submenu;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
@@ -15,8 +16,9 @@ class MenuController extends Controller
 {
     public function index()
     {
-        $menus = S_Menu::latest()->paginate();
-        return view('admin.menus.index', compact('menus'));
+        $menus = S_Menu::with('submenus')->latest()->paginate();
+        $submenus = S_Submenu::all();
+        return view('admin.menus.index', compact('menus', 'submenus'));
     }
 
     public function create()

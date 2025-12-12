@@ -7,13 +7,47 @@
         <div class="container mx-auto p-6">
             <div class="mx-auto max-w-4xl rounded bg-white p-6 shadow-sm">
                 <h2 class="mb-6 text-2xl font-semibold">Tulis Artikel</h2>
+
                 @if ($errors->any())
-                    <div class="alert alert-danger">
-                        <ul>
-                            @foreach ($errors->all() as $error)
-                                <li>{{ $error }}</li>
-                            @endforeach
-                        </ul>
+                    <div class="mb-6 rounded-lg border border-red-200 bg-red-50 p-4">
+                        <div class="flex items-start">
+                            <div class="flex-shrink-0">
+                                <svg class="h-5 w-5 text-red-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"
+                                    fill="currentColor">
+                                    <path fill-rule="evenodd"
+                                        d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
+                                        clip-rule="evenodd" />
+                                </svg>
+                            </div>
+                            <div class="ml-3">
+                                <h3 class="text-sm font-medium text-red-800">Terjadi kesalahan validasi</h3>
+                                <div class="mt-2 text-sm text-red-700">
+                                    <ul class="list-inside list-disc space-y-1">
+                                        @foreach ($errors->all() as $error)
+                                            <li>{{ $error }}</li>
+                                        @endforeach
+                                    </ul>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                @endif
+
+                @if (session('error'))
+                    <div class="mb-6 rounded-lg border border-red-200 bg-red-50 p-4">
+                        <div class="flex items-start">
+                            <div class="flex-shrink-0">
+                                <svg class="h-5 w-5 text-red-400" xmlns="http://www.w3.org/2000/svg" viewBox="0 0 20 20"
+                                    fill="currentColor">
+                                    <path fill-rule="evenodd"
+                                        d="M10 18a8 8 0 100-16 8 8 0 000 16zM8.707 7.293a1 1 0 00-1.414 1.414L8.586 10l-1.293 1.293a1 1 0 101.414 1.414L10 11.414l1.293 1.293a1 1 0 001.414-1.414L11.414 10l1.293-1.293a1 1 0 00-1.414-1.414L10 8.586 8.707 7.293z"
+                                        clip-rule="evenodd" />
+                                </svg>
+                            </div>
+                            <div class="ml-3">
+                                <p class="text-sm font-medium text-red-800">{{ session('error') }}</p>
+                            </div>
+                        </div>
                     </div>
                 @endif
                 <form action="{{ route('admin.news.store') }}" method="POST" enctype="multipart/form-data">
@@ -22,7 +56,8 @@
                         <div class="col-span-12 md:col-span-4">
                             <label class="mb-2 block text-sm font-medium text-gray-700">Kategori</label>
 
-                            <select name="s_category_id" class="block w-full rounded border-gray-200 p-3 shadow-sm">
+                            <select name="s_category_id"
+                                class="block w-full rounded {{ $errors->has('s_category_id') ? 'border-red-500' : 'border-gray-200' }} p-3 shadow-sm">
                                 <option value="">Pilih Kategori</option>
                                 @if (!empty($categories))
                                     @foreach ($categories as $cat)
@@ -34,27 +69,53 @@
                                     <option value="">(Tidak ada kategori)</option>
                                 @endif
                             </select>
+                            @error('s_category_id')
+                                <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                            @enderror
                         </div>
 
                         <div class="col-span-12 md:col-span-4">
                             <label class="mb-2 block text-sm font-medium text-gray-700">Menu</label>
-                            <select name="s_menu_id" class="block w-full rounded border-gray-200 p-3 shadow-sm">
+                            <select name="s_menu_id"
+                                class="block w-full rounded {{ $errors->has('s_menu_id') ? 'border-red-500' : 'border-gray-200' }} p-3 shadow-sm">
                                 <option value="">Pilih Menu</option>
                                 @if (!empty($menus))
                                     @foreach ($menus as $m)
                                         <option value="{{ $m->id }}"
-                                            {{ old('s_menu_id') == $m->id ? 'selected' : '' }}>{{ $m->name }}</option>
+                                            {{ old('s_menu_id') == $m->id ? 'selected' : '' }}>{{ $m->name }}
+                                        </option>
                                     @endforeach
                                 @else
                                     <option value="">(Tidak ada menu)</option>
                                 @endif
                             </select>
+                            @error('s_menu_id')
+                                <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                            @enderror
+                        </div>
+
+                        <div class="col-span-12 md:col-span-4">
+                            <label class="mb-2 block text-sm font-medium text-gray-700">Tags</label>
+
+                            <select
+                                class="form-input border-slate-200 dark:border-zink-500 focus:outline-none focus:border-custom-500 disabled:bg-slate-100 dark:disabled:bg-zink-600 disabled:border-slate-300 dark:disabled:border-zink-500 dark:disabled:text-zink-200 disabled:text-slate-500 dark:text-zink-100 dark:bg-zink-700 dark:focus:border-custom-800 placeholder:text-slate-400 dark:placeholder:text-zink-200"
+                                id="choices-multiple-default" data-choices="" name="s_tag_id[]" multiple="">
+                                @foreach ($tags as $item)
+                                    <option value="{{ $item->id }}"
+                                        {{ collect(old('s_tag_id'))->contains($item->id) ? 'selected' : '' }}>
+                                        {{ $item->name }}</option>
+                                @endforeach
+                            </select>
                         </div>
 
                         <div class="col-span-12 md:col-span-8">
                             <label class="mb-2 block text-sm font-medium text-gray-700">Judul</label>
-                            <input type="text" name="title" class="block w-full rounded border-gray-200 p-3 shadow-sm"
+                            <input type="text" name="title" value="{{ old('title') }}"
+                                class="block w-full rounded {{ $errors->has('title') ? 'border-red-500' : 'border-gray-200' }} p-3 shadow-sm"
                                 placeholder="Tentukan judul di sini">
+                            @error('title')
+                                <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                            @enderror
                         </div>
 
                         <div class="col-span-12">
@@ -101,7 +162,8 @@
                         <button class="inline-block rounded bg-blue-600 px-4 py-2 text-white" type="submit"
                             style="background: rgb(110, 110, 255);
                     color:white;">Simpan</button>
-                        <a href="{{ route('admin.news.index') }}" class="ml-2 inline-block rounded border px-4 py-2">Batal</a>
+                        <a href="{{ route('admin.news.index') }}"
+                            class="ml-2 inline-block rounded border px-4 py-2">Batal</a>
                     </div>
                 </form>
             </div>
