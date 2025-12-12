@@ -22,7 +22,7 @@ class S_News extends Model
     ];
 
     // Relasi ke Category
-    public function categories()
+    public function category()
     {
         return $this->belongsTo(S_Categories::class, 's_category_id', 'id');
     }
