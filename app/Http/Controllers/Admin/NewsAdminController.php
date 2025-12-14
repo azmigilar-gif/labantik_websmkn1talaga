@@ -87,11 +87,17 @@ class NewsAdminController extends Controller
     public function index()
     {
         // get news, ensure waiting (pending approval) items appear first, then approved ones,
-        // and within each group order by newest first.
-        $news = S_News::where('created_by', Auth::id())->with('category')
+        // Query news dengan kondisi role
+        $query = S_News::with('category')
             ->orderByRaw("FIELD(approve, 'waiting', 'approve') ASC")
-            ->orderBy('created_at', 'desc')
-            ->simplePaginate(15);
+            ->orderBy('created_at', 'desc');
+
+        // Jika bukan superadmin, hanya tampilkan news miliknya sendiri
+        if (Auth::user()->email !== 'superadmin@smkn1talaga.sch.id') {
+            $query->where('created_by', Auth::id());
+        }
+
+        $news = $query->simplePaginate(15);
 
         // get categories for the modal table
         $categories = Category::with('createdBy')->orderBy('name')->get();

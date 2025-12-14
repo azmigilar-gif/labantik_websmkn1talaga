@@ -6,8 +6,11 @@ use App\Http\Controllers\Controller;
 use App\Models\Gallery;
 use App\Models\S_Extrakulikuler;
 use App\Models\S_Menu;
+use App\Models\S_ModelKey;
 use App\Models\S_News;
+use App\Models\S_Redirect;
 use App\Models\S_Submenu;
+use App\Models\S_ViewName;
 use Illuminate\Http\Request;
 use Illuminate\Support\Facades\DB;
 use Illuminate\Support\Str;
@@ -17,8 +20,11 @@ class MenuController extends Controller
     public function index()
     {
         $menus = S_Menu::with('submenus')->latest()->paginate();
+        $viewName = S_ViewName::all();
+        $modelKey = S_ModelKey::all();
+        $redirectTo = S_Redirect::all();
         $submenus = S_Submenu::all();
-        return view('admin.menus.index', compact('menus', 'submenus'));
+        return view('admin.menus.index', compact('menus', 'submenus', 'viewName', 'modelKey', 'redirectTo'));
     }
 
     public function create()

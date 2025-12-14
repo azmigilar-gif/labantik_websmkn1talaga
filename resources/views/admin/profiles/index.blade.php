@@ -102,8 +102,8 @@
                                                             <label for="edit_content"
                                                                 class="mb-2 inline-block text-base font-medium">Profile
                                                                 Sekolah</label>
-                                                            <textarea rows="5" id="edit_content" name="content"
-                                                                class="ckeditor-classic form-input dark:border-zink-500 focus:border-custom-500 dark:disabled:bg-zink-600 dark:disabled:border-zink-500 dark:disabled:text-zink-200 dark:text-zink-100 dark:bg-zink-700 dark:focus:border-custom-800 dark:placeholder:text-zink-200 border-slate-200 placeholder:text-slate-400 focus:outline-none disabled:border-slate-300 disabled:bg-slate-100 disabled:text-slate-500"
+                                                            <textarea rows="5" id="editor" name="content"
+                                                                class="block min-h-[300px] w-full rounded border border-gray-200 p-4 text-slate-800"
                                                                 placeholder="Masukkan Profile Sekolah" required>{{ old('content', $p->content) }}</textarea>
                                                         </div>
 
@@ -210,7 +210,7 @@
                                     <label for="slugInput" class="mb-2 inline-block text-base font-medium">Profile
                                         Sekolah</label>
                                     <textarea id="editor" name="content"
-                                        class="ckeditor-classic block min-h-[300px] w-full rounded border border-gray-200 p-4 text-slate-800"
+                                        class="block min-h-[300px] w-full rounded border border-gray-200 p-4 text-slate-800"
                                         placeholder="Mulai tulis di sini..."><h3>Menjadi Generasi Unggul Bersama SMKN 1 Talaga</h3>
 <p><br data-cke-filler="true"></p>
 
@@ -258,6 +258,135 @@
         </div>
     </div>
     @push('scripts')
+        <!-- Quill editor (free, no jQuery). Custom image upload handler that posts to your news.upload.image route -->
+        <link href="https://cdn.quilljs.com/1.3.7/quill.snow.css" rel="stylesheet">
+        <script src="https://cdn.quilljs.com/1.3.7/quill.min.js"></script>
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                // Create editor container and hide original textarea visually
+                var textarea = document.getElementById('editor');
+                if (textarea) {
+                    var quillContainer = document.createElement('div');
+                    quillContainer.id = 'quill-editor';
+                    quillContainer.style.height = '500px';
+                    textarea.parentNode.insertBefore(quillContainer, textarea);
+                    textarea.style.display = 'none';
+
+                    var toolbarOptions = [
+                        ['bold', 'italic', 'underline', 'strike'],
+                        [{
+                            'header': 1
+                        }, {
+                            'header': 2
+                        }],
+                        [{
+                            'list': 'ordered'
+                        }, {
+                            'list': 'bullet'
+                        }],
+                        [{
+                            'align': []
+                        }],
+                        ['link', 'image'],
+                        ['clean']
+                    ];
+
+                    var quill = new Quill('#quill-editor', {
+                        modules: {
+                            toolbar: {
+                                container: toolbarOptions,
+                                handlers: {}
+                            }
+                        },
+                        theme: 'snow'
+                    });
+
+                    // If textarea already has content, load into quill
+                    if (textarea.value) {
+                        quill.root.innerHTML = textarea.value;
+                    }
+
+                    // Image handler: open file input, upload to server, insert image URL
+                    function imageHandler() {
+                        var input = document.createElement('input');
+                        input.setAttribute('type', 'file');
+                        input.setAttribute('accept', 'image/*');
+                        input.click();
+
+                        input.onchange = function() {
+                            var file = input.files[0];
+                            if (!file) return;
+
+                            var formData = new FormData();
+                            formData.append('upload', file);
+
+                            var xhr = new XMLHttpRequest();
+                            var url = '{{ route('admin.news.upload.image') }}';
+                            xhr.open('POST', url, true);
+                            xhr.setRequestHeader('X-CSRF-TOKEN', '{{ csrf_token() }}');
+
+                            xhr.onreadystatechange = function() {
+                                if (xhr.readyState === 4) {
+                                    if (xhr.status >= 200 && xhr.status < 300) {
+                                        try {
+                                            var resp = JSON.parse(xhr.responseText);
+                                            if (resp && resp.url) {
+                                                var width = prompt(
+                                                    'Masukkan lebar gambar (pixel):\n\nContoh: 300, 400, 500',
+                                                    '300');
+
+                                                if (width !== null && width.trim() !== '') {
+                                                    width = parseInt(width);
+                                                    if (!isNaN(width) && width > 0) {
+                                                        var range = quill.getSelection(true);
+                                                        quill.insertEmbed(range.index, 'image', resp.url);
+                                                        var imgElement = quill.root.querySelector('img[src="' +
+                                                            resp.url + '"]');
+                                                        if (imgElement) {
+                                                            imgElement.style.width = width + 'px';
+                                                            imgElement.style.maxWidth = '100%';
+                                                            imgElement.style.height = 'auto';
+                                                        }
+                                                        quill.setSelection(range.index + 1);
+                                                    } else {
+                                                        alert('Lebar harus berupa angka positif!');
+                                                    }
+                                                }
+                                            } else {
+                                                alert('Upload failed: invalid response');
+                                            }
+                                        } catch (e) {
+                                            alert('Upload failed: ' + e.message);
+                                        }
+                                    } else if (xhr.status === 401 || xhr.status === 403) {
+                                        alert('Upload failed: authentication error');
+                                    } else {
+                                        alert('Upload failed: ' + xhr.status);
+                                    }
+                                }
+                            };
+
+                            xhr.onerror = function() {
+                                alert('Upload failed due to network error');
+                            };
+                            xhr.send(formData);
+                        };
+                    }
+
+                    // Attach the image handler to the toolbar
+                    quill.getModule('toolbar').addHandler('image', imageHandler);
+
+                    // On form submit, copy quill HTML to textarea so it's submitted
+                    var form = textarea.closest('form');
+                    if (form) {
+                        form.addEventListener('submit', function(e) {
+                            textarea.value = quill.root.innerHTML;
+                        });
+                    }
+                }
+            });
+        </script>
+
         <script>
             (function() {
                 function initEditors() {

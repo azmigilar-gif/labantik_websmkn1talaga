@@ -15,7 +15,7 @@ class GalleryController extends Controller
     public function index(Request $request)
     {
         $type = $request->query('type');
-        $query = Gallery::where('created_by', Auth::id())->query()->latest();
+        $query = Gallery::where('created_by', Auth::id())->latest();
         if ($type && in_array($type, [Gallery::TYPE_PHOTO, Gallery::TYPE_VIDEO])) {
             $query->where('type', $type);
         }

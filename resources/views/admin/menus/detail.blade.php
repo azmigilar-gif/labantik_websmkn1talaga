@@ -97,13 +97,12 @@
                                                 </div>
                                             </div>
                                         </div><!--end add Employee-->
-
                                         <div id="editSubmenusModal{{ $m->id }}" modal-center=""
-                                            class="fixed flex flex-col hidden transition-all duration-300 ease-in-out left-2/4 z-drawer -translate-x-2/4 -translate-y-2/4 show ">
+                                            class="fixed flex flex-col hidden transition-all duration-300 ease-in-out left-2/4 z-drawer -translate-x-2/4 -translate-y-2/4 show">
                                             <div class="w-screen md:w-[30rem] bg-white shadow rounded-md dark:bg-zink-600">
                                                 <div
-                                                    class="flex items-center justify-beSTEen p-4 border-b dark:border-zink-500">
-                                                    <h5 class="text-16" id="addEmployeeLabel">Tambah Menu</h5>
+                                                    class="flex items-center justify-between p-4 border-b dark:border-zink-500">
+                                                    <h5 class="text-16" id="addEmployeeLabel">Edit Sub Menu</h5>
                                                 </div>
                                                 <div
                                                     class="max-h-[calc(theme('height.screen')_-_180px)] p-4 overflow-y-auto">
@@ -112,28 +111,84 @@
                                                         method="POST">
                                                         @csrf
                                                         @method('PUT')
-                                                        <input type="hidden" name="s_menu_id" value="{{ $m->id }}">
+                                                        <input type="hidden" name="s_menu_id" value="{{ $m->s_menu_id }}">
+
                                                         <div>
                                                             <label for="phoneNumberInput"
-                                                                class="inline-block mb-2 text-base font-medium">Nama
-                                                                Sub Menu</label>
+                                                                class="inline-block mb-2 text-base font-medium">Nama Sub
+                                                                Menu</label>
                                                             <input type="text" name="name"
                                                                 value="{{ $m->name }}"
                                                                 class="form-input border-slate-200 dark:border-zink-500 focus:outline-none focus:border-custom-500 disabled:bg-slate-100 dark:disabled:bg-zink-600 disabled:border-slate-300 dark:disabled:border-zink-500 dark:disabled:text-zink-200 disabled:text-slate-500 dark:text-zink-100 dark:bg-zink-700 dark:focus:border-custom-800 placeholder:text-slate-400 dark:placeholder:text-zink-200"
                                                                 placeholder="Masukkan Nama Sub Menu" required="">
                                                         </div>
+
+                                                        <div class="mt-3">
+                                                            <label for="edit-model-key-{{ $m->id }}"
+                                                                class="inline-block mb-2 text-base font-medium">Nama Model
+                                                                Key</label>
+                                                            <select
+                                                                class="form-select border-slate-200 dark:border-zink-500 focus:outline-none focus:border-custom-500 disabled:bg-slate-100 dark:disabled:bg-zink-600 disabled:border-slate-300 dark:disabled:border-zink-500 dark:disabled:text-zink-200 disabled:text-slate-500 dark:text-zink-100 dark:bg-zink-700 dark:focus:border-custom-800 placeholder:text-slate-400 dark:placeholder:text-zink-200"
+                                                                name="s_model_key_id"
+                                                                id="edit-model-key-{{ $m->id }}" required>
+                                                                <option value="">Pilih Nama Model Key</option>
+                                                                @foreach ($modelKey as $model)
+                                                                    <option value="{{ $model->id }}"
+                                                                        {{ $m->s_model_key_id == $model->id ? 'selected' : '' }}>
+                                                                        {{ $model->name }}
+                                                                    </option>
+                                                                @endforeach
+                                                            </select>
+                                                        </div>
+
+                                                        <div class="mt-3">
+                                                            <label for="edit-view-name-{{ $m->id }}"
+                                                                class="inline-block mb-2 text-base font-medium">Nama
+                                                                View</label>
+                                                            <select
+                                                                class="form-select border-slate-200 dark:border-zink-500 focus:outline-none focus:border-custom-500 disabled:bg-slate-100 dark:disabled:bg-zink-600 disabled:border-slate-300 dark:disabled:border-zink-500 dark:disabled:text-zink-200 disabled:text-slate-500 dark:text-zink-100 dark:bg-zink-700 dark:focus:border-custom-800 placeholder:text-slate-400 dark:placeholder:text-zink-200"
+                                                                name="s_view_name_id"
+                                                                id="edit-view-name-{{ $m->id }}">
+                                                                <option value="">Pilih Nama View</option>
+                                                                @foreach ($viewName as $view)
+                                                                    <option value="{{ $view->id }}"
+                                                                        {{ $m->s_view_name_id == $view->id ? 'selected' : '' }}>
+                                                                        {{ $view->name }}
+                                                                    </option>
+                                                                @endforeach
+                                                            </select>
+                                                        </div>
+
+                                                        <div class="mt-3">
+                                                            <label for="edit-redirect-to-{{ $m->id }}"
+                                                                class="inline-block mb-2 text-base font-medium">Nama
+                                                                Redirect Ke</label>
+                                                            <select
+                                                                class="form-select border-slate-200 dark:border-zink-500 focus:outline-none focus:border-custom-500 disabled:bg-slate-100 dark:disabled:bg-zink-600 disabled:border-slate-300 dark:disabled:border-zink-500 dark:disabled:text-zink-200 disabled:text-slate-500 dark:text-zink-100 dark:bg-zink-700 dark:focus:border-custom-800 placeholder:text-slate-400 dark:placeholder:text-zink-200"
+                                                                name="s_redirect_to_id"
+                                                                id="edit-redirect-to-{{ $m->id }}">
+                                                                <option value="">Pilih Nama Redirect Ke</option>
+                                                                @foreach ($redirectTo as $red)
+                                                                    <option value="{{ $red->id }}"
+                                                                        {{ $m->s_redirect_to_id == $red->id ? 'selected' : '' }}>
+                                                                        {{ $red->name }}
+                                                                    </option>
+                                                                @endforeach
+                                                            </select>
+                                                        </div>
+
                                                         <div class="flex justify-end gap-2 mt-4">
                                                             <button type="reset" id="close-modal"
                                                                 data-modal-close="editSubmenusModal{{ $m->id }}"
                                                                 class="text-red-500 bg-white btn hover:text-red-500 hover:bg-red-100 focus:text-red-500 focus:bg-red-100 active:text-red-500 active:bg-red-100 dark:bg-zink-600 dark:hover:bg-red-500/10 dark:focus:bg-red-500/10 dark:active:bg-red-500/10">Cancel</button>
                                                             <button type="submit" id="addNew"
-                                                                class="text-white btn bg-custom-500 border-custom-500 hover:text-white hover:bg-custom-600 hover:border-custom-600 focus:text-white focus:bg-custom-600 focus:border-custom-600 focus:ring focus:ring-custom-100 active:text-white active:bg-custom-600 active:border-custom-600 active:ring active:ring-custom-100 dark:ring-custom-400/20 ">Simpan
+                                                                class="text-white btn bg-custom-500 border-custom-500 hover:text-white hover:bg-custom-600 hover:border-custom-600 focus:text-white focus:bg-custom-600 focus:border-custom-600 focus:ring focus:ring-custom-100 active:text-white active:bg-custom-600 active:border-custom-600 active:ring active:ring-custom-100 dark:ring-custom-400/20">Update
                                                                 Sub Menu</button>
                                                         </div>
                                                     </form>
                                                 </div>
                                             </div>
-                                        </div><!--end add Employee-->
+                                        </div><!--end edit Employee-->
 
                                         <div id="deleteModal{{ $m->id }}" modal-center=""
                                             class="fixed flex flex-col hidden transition-all duration-300 ease-in-out left-2/4 z-drawer -translate-x-2/4 -translate-y-2/4 show">

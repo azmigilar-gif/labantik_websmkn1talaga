@@ -12,30 +12,30 @@
             <ul id="navbar7"
                 class="navbar-menu absolute inset-x-0 top-full z-20 mt-px hidden items-center rounded-b-md bg-white py-3 shadow-lg md:relative md:top-auto md:z-0 md:mt-0 md:flex md:rounded-none md:bg-transparent md:py-0 md:shadow-none ltr:ml-auto rtl:mr-auto dark:bg-zinc-800 dark:md:bg-transparent">
                 <li>
-                    <a href="#home"
+                    <a href="{{ url('/#home') }}"
                         class="nav-link text-15 hover:text-custom-500 [&.active]:text-custom-500 dark:hover:text-custom-500 dark:[&.active]:text-custom-500 block px-4 py-2.5 font-medium text-slate-800 transition-all duration-300 ease-linear md:inline-block md:px-3 md:py-0.5 dark:text-zinc-200">Home</a>
                 </li>
                 @foreach ($menus as $m)
                     <li class="dropdown relative">
                         @if ($m->submenus && $m->submenus->count() > 0)
-                            <!-- Menu dengan Submenu (Split Dropdown Button) -->
+                            <!-- Menu dengan Submenu (Split Dropdown Button) - MENGGUNAKAN CLASS CUSTOM -->
                             <div class="flex items-center justify-between md:justify-start md:gap-0">
-                                <a href="#{{ $m->slug }}"
+                                <a href="{{ url('/#' . $m->slug) }}"
                                     class="nav-link text-15 hover:text-custom-500 [&.active]:text-custom-500 dark:hover:text-custom-500 dark:[&.active]:text-custom-500 block px-4 py-2.5 font-medium text-slate-800 transition-all duration-300 ease-linear md:inline-block md:px-3 md:py-0.5 dark:text-zinc-200">
                                     {{ $m->name }}
                                 </a>
-                                <button type="button" data-bs-toggle="dropdown" aria-expanded="false"
-                                    class="dropdown-toggle flex items-center justify-center mr-2 md:px-0 md:h-auto md:py-0.5 p-0 text-slate-800 hover:text-custom-500 dark:text-zinc-200 dark:hover:text-custom-500 transition-all duration-300">
+                                <button type="button"
+                                    class="dropdown-toggle-custom flex items-center justify-center mr-2 md:px-0 md:h-auto md:py-0.5 p-0 text-slate-800 hover:text-custom-500 dark:text-zinc-200 dark:hover:text-custom-500 transition-all duration-300">
                                     <i data-lucide="chevron-down" class="inline-block size-4"></i>
                                 </button>
                             </div>
 
-                            <!-- Dropdown Menu -->
+                            <!-- Dropdown Menu - MENGGUNAKAN CLASS CUSTOM -->
                             <ul
-                                class="dropdown-menu absolute left-0 z-[1000] py-2 mt-2 text-left list-none bg-white rounded-md shadow-lg dark:bg-zinc-600 min-w-[10rem] hidden">
+                                class="dropdown-menu-custom absolute z-[1000] py-2 mt-2 text-left list-none bg-white rounded-md shadow-lg dark:bg-zinc-600 min-w-[10rem] hidden">
                                 @foreach ($m->submenus as $submenu)
                                     <li>
-                                        <a href="#{{ $submenu->url }}"
+                                        <a href="{{ url('sub/' . $submenu->url) }}"
                                             class="block px-4 py-2 font-normal text-slate-600 bg-transparent dropdown-item whitespace-nowrap hover:bg-slate-100 hover:text-custom-500 dark:text-zinc-100 dark:hover:bg-zinc-500 dark:hover:text-custom-500">
                                             {{ $submenu->name }}
                                         </a>
@@ -44,7 +44,7 @@
                             </ul>
                         @else
                             <!-- Menu Biasa (Tanpa Submenu) -->
-                            <a href="#{{ $m->slug }}"
+                            <a href="{{ url('/#' . $m->slug) }}"
                                 class="nav-link text-15 hover:text-custom-500 [&.active]:text-custom-500 dark:hover:text-custom-500 dark:[&.active]:text-custom-500 block px-4 py-2.5 font-medium text-slate-800 transition-all duration-300 ease-linear md:inline-block md:px-3 md:py-0.5 dark:text-zinc-200">
                                 {{ $m->name }}
                             </a>
@@ -64,6 +64,51 @@
 
 <script>
     document.addEventListener('DOMContentLoaded', function() {
+        // ========================================
+        // CUSTOM DROPDOWN HANDLER UNTUK MUNCUL KE KIRI
+        // ========================================
+        const dropdowns = document.querySelectorAll('.dropdown');
+
+        dropdowns.forEach(dropdown => {
+            const toggle = dropdown.querySelector('.dropdown-toggle-custom');
+            const menu = dropdown.querySelector('.dropdown-menu-custom');
+
+            if (toggle && menu) {
+                toggle.addEventListener('click', function(e) {
+                    e.preventDefault();
+                    e.stopPropagation();
+
+                    // Close dropdown lain
+                    document.querySelectorAll('.dropdown-menu-custom').forEach(m => {
+                        if (m !== menu) {
+                            m.classList.add('hidden');
+                        }
+                    });
+
+                    // Toggle current dropdown
+                    const isHidden = menu.classList.contains('hidden');
+                    menu.classList.toggle('hidden');
+
+                    // PAKSA POSISI KE KIRI
+                    if (isHidden) {
+                        // Reset positioning
+                        menu.style.left = 'auto';
+                        menu.style.right = '0';
+                        menu.style.transform = 'none';
+                    }
+                });
+            }
+        });
+
+        // Close dropdown saat klik di luar
+        document.addEventListener('click', function(e) {
+            if (!e.target.closest('.dropdown')) {
+                document.querySelectorAll('.dropdown-menu-custom').forEach(menu => {
+                    menu.classList.add('hidden');
+                });
+            }
+        });
+
         // Fungsi untuk update active state
         function updateActiveMenu() {
             const sections = document.querySelectorAll('section[id]');

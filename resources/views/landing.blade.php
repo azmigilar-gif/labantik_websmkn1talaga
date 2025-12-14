@@ -306,114 +306,191 @@
 
     {{-- =============== Program Keahlian =============== --}}
 
-    @if ($programMenu)
-        @php
-            // load programs and concentrations from DB (use facade with global alias)
-            $programs = \DB::table('core_expertise_programs')->orderBy('name')->get();
-            $concs = \DB::table('core_expertise_concentrations')->orderBy('name')->get();
+@if ($programMenu)
+    @php
+        // load programs and concentrations from DB (use facade with global alias)
+        $programs = \DB::table('core_expertise_programs')->orderBy('name')->get();
+        $concs = \DB::table('core_expertise_concentrations')->orderBy('name')->get();
 
-            // manual mapping: ensure Otomotif groups TKR & TSM
-            // and map Bisnis Ritel (BR) to Pemasaran (PN)
-            $manualMap = [
-                'teknik-otomotif-to' => ['teknik-kendaraan-ringan-tkr', 'teknik-sepeda-motor-tsm'],
-                'pemasaran-pn' => ['bisnis-ritel-br'],
-            ];
+        // manual mapping: ensure Otomotif groups TKR & TSM
+        // and map Bisnis Ritel (BR) to Pemasaran (PN)
+        $manualMap = [
+            'teknik-otomotif-to' => ['teknik-kendaraan-ringan-tkr', 'teknik-sepeda-motor-tsm'],
+            'pemasaran-pn' => ['bisnis-ritel-br'],
+        ];
 
-            // prepare containers
-            $assigned = [];
-            $groups = [];
+        // prepare containers
+        $assigned = [];
+        $groups = [];
+        foreach ($programs as $p) {
+            $groups[$p->slug] = ['program' => $p, 'subs' => []];
+        }
+
+        // apply manual mapping first
+        foreach ($manualMap as $progSlug => $concSlugs) {
+            foreach ($concSlugs as $cslug) {
+                $found = $concs->firstWhere('slug', $cslug);
+                if ($found) {
+                    if (isset($groups[$progSlug])) {
+                        $groups[$progSlug]['subs'][] = $found;
+                        $assigned[$found->slug] = true;
+                    }
+                }
+            }
+        }
+
+        // assign remaining concentrations by token similarity
+        foreach ($concs as $c) {
+            if (isset($assigned[$c->slug])) {
+                continue;
+            }
+
+            $bestProg = null;
+            $bestScore = -1;
+            $cTokens = explode('-', $c->slug);
             foreach ($programs as $p) {
-                $groups[$p->slug] = ['program' => $p, 'subs' => []];
-            }
-
-            // apply manual mapping first
-            foreach ($manualMap as $progSlug => $concSlugs) {
-                foreach ($concSlugs as $cslug) {
-                    $found = $concs->firstWhere('slug', $cslug);
-                    if ($found) {
-                        if (isset($groups[$progSlug])) {
-                            $groups[$progSlug]['subs'][] = $found;
-                            $assigned[$found->slug] = true;
-                        }
-                    }
+                $pTokens = explode('-', $p->slug);
+                $score = count(array_intersect($cTokens, $pTokens));
+                if ($score > $bestScore) {
+                    $bestScore = $score;
+                    $bestProg = $p;
                 }
             }
 
-            // assign remaining concentrations by token similarity
-            foreach ($concs as $c) {
-                if (isset($assigned[$c->slug])) {
-                    continue;
-                }
-
-                $bestProg = null;
-                $bestScore = -1;
-                $cTokens = explode('-', $c->slug);
-                foreach ($programs as $p) {
-                    $pTokens = explode('-', $p->slug);
-                    $score = count(array_intersect($cTokens, $pTokens));
-                    if ($score > $bestScore) {
-                        $bestScore = $score;
-                        $bestProg = $p;
-                    }
-                }
-
-                // fallback: if no shared tokens, put into first program
-                if (!$bestProg) {
-                    $bestProg = $programs->first();
-                }
-
-                $groups[$bestProg->slug]['subs'][] = $c;
-                $assigned[$c->slug] = true;
+            // fallback: if no shared tokens, put into first program
+            if (!$bestProg) {
+                $bestProg = $programs->first();
             }
-        @endphp
 
-        <section id="{{ $programMenu->slug }}"
-            class="dark:from-zink-700/40 dark:to-zink-600/40 relative bg-gradient-to-r from-slate-50 to-slate-100 py-24 pb-16 xl:py-32 xl:pb-20">
-            <div class="container mx-auto px-4 2xl:max-w-[87.5rem]">
-                <div class="mx-auto mb-14 text-center xl:max-w-3xl">
-                    <h1 class="mb-0 capitalize leading-normal">Program Keahlian</h1>
-                </div>
+            $groups[$bestProg->slug]['subs'][] = $c;
+            $assigned[$c->slug] = true;
+        }
+    @endphp
 
-                <div class="grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-3">
-                    @foreach ($groups as $g)
-                        @php
-                            $p = $g['program'];
-                            $subs = $g['subs'];
-                        @endphp
-                        <div class="dark:bg-zink-600 program-card rounded-md bg-white p-7 shadow-md transition-all duration-300 ease-linear hover:-translate-y-2"
-                            data-aos="fade-up" data-aos-easing="linear">
-                            <div class="program-header flex items-center gap-4" style="cursor:pointer">
-                                <div class="shrink-0">
-                                    <div
-                                        class="bg-custom-100 dark:bg-custom-500/20 flex h-12 w-12 items-center justify-center rounded-full">
-                                        <i data-lucide="graduation-cap" class="text-custom-500 size-6"></i>
-                                    </div>
-                                </div>
-                                <div class="grow">
-                                    <h5 class="dark:text-zink-50 text-base font-semibold text-slate-800">
-                                        {{ $p->name }}</h5>
+    <section id="{{ $programMenu->slug }}"
+        class="dark:from-zink-700/40 dark:to-zink-600/40 relative bg-gradient-to-r from-slate-50 to-slate-100 py-24 pb-16 xl:py-32 xl:pb-20">
+        <div class="container mx-auto px-4 2xl:max-w-[87.5rem]">
+            <div class="mx-auto mb-14 text-center xl:max-w-3xl">
+                <h1 class="mb-0 capitalize leading-normal">Program Keahlian</h1>
+            </div>
+
+            <div class="grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-3">
+                @foreach ($groups as $g)
+                    @php
+                        $p = $g['program'];
+                        $subs = $g['subs'];
+                    @endphp
+                    <div class="dark:bg-zink-600 program-card rounded-md bg-white p-7 shadow-md transition-all duration-300 ease-linear hover:-translate-y-2"
+                        data-aos="fade-up" data-aos-easing="linear">
+                        <div class="program-header flex items-center gap-4" style="cursor:pointer">
+                            <div class="shrink-0">
+                                <div
+                                    class="bg-custom-100 dark:bg-custom-500/20 flex h-12 w-12 items-center justify-center rounded-full">
+                                    <i data-lucide="graduation-cap" class="text-custom-500 size-6"></i>
                                 </div>
                             </div>
-
-                            <div class="program-subs mt-4"
-                                style="max-height:0; overflow:hidden; opacity:0; transition: max-height 380ms ease, opacity 280ms ease;">
-                                @if (count($subs) === 0)
-                                    <div class="text-sm text-slate-500">Belum ada konsentrasi terdaftar.</div>
-                                @else
-                                    @foreach ($subs as $index => $s)
-                                        <a href="{{ route('expertise.show', $s->slug) }}"
-                                            class="program-sub block rounded border px-3 py-2 hover:bg-slate-50"
-                                            data-index="{{ $index }}">{{ $s->name }}</a>
-                                    @endforeach
-                                @endif
+                            <div class="grow">
+                                <h5 class="dark:text-zink-50 text-base font-semibold text-slate-800">
+                                    {{ $p->name }}</h5>
                             </div>
                         </div>
-                    @endforeach
-                </div>
-            </div>
-        </section>
-    @endif
 
+                        {{-- HAPUS INLINE STYLE DI SINI --}}
+                        <div class="program-subs mt-4">
+                            @if (count($subs) === 0)
+                                <div class="text-sm text-slate-500">Belum ada konsentrasi terdaftar.</div>
+                            @else
+                                @foreach ($subs as $index => $s)
+                                    <a href="{{ route('expertise.show', $s->slug) }}"
+                                        class="program-sub block rounded border border-slate-200 px-3 py-2 mb-2 text-slate-700 hover:bg-slate-50 dark:border-zinc-500 dark:text-zinc-100 dark:hover:bg-zinc-500"
+                                        data-index="{{ $index }}">{{ $s->name }}</a>
+                                @endforeach
+                            @endif
+                        </div>
+                    </div>
+                @endforeach
+            </div>
+        </div>
+    </section>
+
+    <style>
+        .program-subs {
+            max-height: 0;
+            overflow: hidden;
+            opacity: 0;
+            transition: max-height 0.4s ease, opacity 0.3s ease;
+        }
+
+        .program-card.open .program-subs {
+            opacity: 1;
+        }
+
+        .program-sub {
+            opacity: 0;
+            transform: translateY(-6px);
+            transition: opacity 0.32s ease, transform 0.32s ease;
+        }
+
+        .program-card.open .program-sub {
+            opacity: 1;
+            transform: translateY(0);
+        }
+    </style>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            const cards = document.querySelectorAll('.program-card');
+
+            function closeCard(card) {
+                const subs = card.querySelector('.program-subs');
+                if (!subs) return;
+
+                card.classList.remove('open');
+                subs.style.maxHeight = '0';
+
+                // Reset animasi sub items
+                subs.querySelectorAll('.program-sub').forEach((el) => {
+                    el.style.transitionDelay = '0ms';
+                });
+            }
+
+            function openCard(card) {
+                const subs = card.querySelector('.program-subs');
+                if (!subs) return;
+
+                // Close cards lain (accordion behavior)
+                document.querySelectorAll('.program-card.open').forEach((c) => {
+                    if (c === card) return;
+                    closeCard(c);
+                });
+
+                card.classList.add('open');
+
+                // Set max-height ke scrollHeight untuk trigger transition
+                const fullHeight = subs.scrollHeight;
+                subs.style.maxHeight = fullHeight + 'px';
+
+                // Animasi staggered untuk sub items
+                subs.querySelectorAll('.program-sub').forEach((el, i) => {
+                    el.style.transitionDelay = (i * 60) + 'ms';
+                });
+            }
+
+            cards.forEach((card) => {
+                const header = card.querySelector('.program-header');
+                if (!header) return;
+
+                header.addEventListener('click', function() {
+                    if (card.classList.contains('open')) {
+                        closeCard(card);
+                    } else {
+                        openCard(card);
+                    }
+                });
+            });
+        });
+    </script>
+@endif
     {{-- =============== Ekstrakurikuler =============== --}}
     @if ($extrakurikulerMenu && $extrakurikulers->count() > 0)
         <section class="relative py-24 xl:py-32" id="{{ $extrakurikulerMenu->slug }}">

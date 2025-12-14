@@ -22,8 +22,8 @@ use App\Http\Controllers\Admin\TagsController;
 use App\Http\Controllers\ExtracuricullarsController;
 use App\Http\controllers\ReportController;
 
+// Route homepage/landing page
 Route::get('/', [LandingPageController::class, 'index'])->name('landingpage');
-
 
 Route::get('/news', [NewsController::class, 'index'])->name('news.index');
 Route::get('/news/{id}', [NewsController::class, 'show'])->name('news.show');
@@ -40,7 +40,7 @@ Route::get('/adminkrituga', function () {
     return redirect()->route('login');
 });
 
-Route::get('/adminkrituga/login', [AuthenticationUserController::class, 'login'])->name('login');
+Route::get('/adminkrituga/login', [AuthenticationUserController::class, 'login'])->name('login')->middleware('guest');
 Route::post('/adminkrituga/login', [AuthenticationUserController::class, 'authenticate'])->name('authenticate');
 Route::post('/adminkrituga/logout', [AuthenticationUserController::class, 'logout'])->name('logout');
 
@@ -48,7 +48,7 @@ Route::post('/adminkrituga/logout', [AuthenticationUserController::class, 'logou
 // If registration is not supported, this redirects users to the login page.
 Route::get('/register', function () {
     return redirect()->route('login');
-})->name('register');
+})->middleware('guest')->name('register');
 
 Route::get('/adminkrituga/dashboard', function () {
     return view('admin.dashboard');
@@ -90,6 +90,7 @@ Route::middleware(['auth'])->prefix('adminkrituga')->name('admin.')->group(funct
     // Route upload image HARUS di atas route {id}
     Route::post('expertise/upload/image', [App\Http\Controllers\Admin\ExpertiseController::class, 'uploadImage'])->name('expertise.upload.image');
 
+    Route::post('submenu/addConfiguration', [SubmenuController::class, 'addConfiguration'])->name('submenu.addConfiguration');
     // Route CRUD
     Route::get('expertise', [App\Http\Controllers\Admin\ExpertiseController::class, 'index'])->name('expertise.index');
     Route::get('expertise/create', [App\Http\Controllers\Admin\ExpertiseController::class, 'create'])->name('expertise.create');
@@ -109,6 +110,7 @@ Route::get('/files/{path}', [PublicFileController::class, 'serveFromStorage'])
     ->where('path', '.*')
     ->name('public.files');
 
-Route::get('/reports', [ReportController::class, 'index'])->name('reports.index');
+Route::get('sub/{url}', [LandingPageController::class, 'show']);
+// Route::get('reports/page', [ReportController::class, 'index'])->name('reports.index');
 // API endpoint: return tag name and number of distinct news using that tag
 Route::get('/reports/tag-counts', [App\Http\controllers\ReportController::class, 'tagCounts'])->name('report.tag-counts');
