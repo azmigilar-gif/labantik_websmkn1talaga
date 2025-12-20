@@ -46,8 +46,8 @@
                                     @foreach ($profiles as $p)
                                         <tr>
                                             <td class="p-2">{{ $loop->iteration }}</td>
-                                            <td class="max-w-[400px] whitespace-normal p-2 align-top">
-                                                {{ Str::limit($p->content, 500, '...') ?? '-' }}
+                                            <td class="p-2 whitespace-pre-wrap">
+                                                {{ Str::limit($p->content, 90, '...') ?? '-' }}
                                             </td>
                                             <td class="p-2">{{ $p->createdBy->name ?? '-' }}</td>
                                             <td class="p-2">{{ $p->updatedBy->name ?? '-' }}</td>
