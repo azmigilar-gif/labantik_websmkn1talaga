@@ -18,6 +18,7 @@ use App\Http\Controllers\Admin\VisionMissionController;
 use App\Http\Controllers\Admin\UploadController;
 use App\Http\Controllers\GalleriesController;
 use App\Http\Controllers\Admin\BackgroundController;
+use App\Http\Controllers\admin\DashboardController;
 use App\Http\Controllers\Admin\TagsController;
 use App\Http\Controllers\ExtracuricullarsController;
 use App\Http\controllers\ReportController;
@@ -51,10 +52,11 @@ Route::get('/register', function () {
 })->middleware('guest')->name('register');
 
 Route::get('/adminkrituga/dashboard', function () {
-    return view('admin.dashboard');
-})->middleware(['auth'])->name('dashboard');
+    return redirect()->route('admin.dashboard');
+})->middleware(['auth'])->name('admin.dashboard');
 
 Route::middleware(['auth'])->prefix('adminkrituga')->name('admin.')->group(function () {
+    Route::get('/dashboard', [DashboardController::class, 'index'])->name('dashboard');
     // legacy generic upload endpoint (calls UploadController::upload)
     Route::post('/upload-image', [UploadController::class, 'upload'])->name('upload.image');
     // news-specific upload endpoint used by the editor
