@@ -11,6 +11,7 @@ class CoreEmployee extends Model
 {
     use HasUuids;
 
+    
     /**
      * The table associated with the model.
      *
