@@ -219,77 +219,149 @@
                     </h2>
                 </div>
 
-                <div class="grid grid-cols-1 gap-6 md:grid-cols-2 lg:grid-cols-3">
-                    @foreach ($news as $index => $item)
-                        <div class="{{ $index >= 6 ? 'hidden md:block' : '' }}">
-                            <a href="{{ route('news.show', $item->id) }}" class="block">
-                                <div class="flex h-[480px] flex-col overflow-hidden rounded-lg bg-white shadow-md transition-all duration-300 ease-linear hover:-translate-y-2 hover:shadow-lg dark:bg-zink-600"
-                                    data-aos="fade-up" data-aos-easing="linear">
+                <div class="grid grid-cols-1 gap-6 lg:grid-cols-5">
+                    <!-- Left: Large Auto-Scroll Carousel (3 news) -->
+                    <div class="lg:col-span-2">
+                        <!-- 2 rows: (305px + 305px) + gap 24px = 634px -->
+                        <div class="swiper news-carousel relative" style="height: 634px;">
+                            <div class="swiper-wrapper">
+                                @foreach ($news->take(3) as $item)
+                                    <div class="swiper-slide">
+                                        <a href="{{ route('news.show', $item->id) }}" class="block h-full">
+                                            <div class="dark:bg-zink-600 relative flex h-full flex-col overflow-hidden rounded-lg bg-white shadow-md transition-all duration-300 ease-linear hover:shadow-lg"
+                                                data-aos="fade-up" data-aos-easing="linear">
+                                                <!-- Image -->
+                                                <div class="relative overflow-hidden bg-gray-100"
+                                                    style="height: 180px; flex-shrink: 0;">
+                                                    @php
+                                                        $firstImgSrc = null;
+                                                        if (!empty($item->content)) {
+                                                            if (
+                                                                preg_match(
+                                                                    '/<img[^>]+src="([^">]+)"/i',
+                                                                    $item->content,
+                                                                    $matches,
+                                                                )
+                                                            ) {
+                                                                $firstImgSrc = $matches[1];
+                                                            }
+                                                        }
+                                                    @endphp
 
-                                    <!-- Image Container - Fixed 192px -->
-                                    <div class="relative h-48 flex-shrink-0 overflow-hidden bg-gray-100">
-                                        @php
-                                            $firstImgSrc = null;
-                                            if (!empty($item->content)) {
-                                                if (
-                                                    preg_match('/<img[^>]+src="([^">]+)"/i', $item->content, $matches)
-                                                ) {
-                                                    $firstImgSrc = $matches[1];
-                                                }
-                                            }
-                                        @endphp
+                                                    <img src="{{ $firstImgSrc ?? asset('assets/images/default-news.png') }}"
+                                                        alt="{{ $item->title }}" class="h-full w-full object-cover"
+                                                        loading="lazy" />
 
-                                        <img src="{{ $firstImgSrc ?? asset('assets/images/default-news.png') }}"
-                                            alt="{{ $item->title }}" class="h-full w-full object-cover" loading="lazy" />
-
-                                        @if ($item->categories)
-                                            <span
-                                                class="absolute right-3 top-3 rounded bg-gray-800 px-3 py-1 text-xs font-medium text-white">
-                                                {{ $item->categories->name }}
-                                            </span>
-                                        @endif
-                                    </div>
-
-                                    <!-- Content Container - Remaining space with strict overflow control -->
-                                    <div class="flex min-h-0 flex-1 flex-col overflow-hidden p-4">
-                                        <!-- Title - Fixed height 56px (2 lines) -->
-                                        <h3
-                                            class="mb-3 h-14 flex-shrink-0 overflow-hidden text-lg font-semibold leading-tight text-gray-900 dark:text-zink-50">
-                                            <span class="line-clamp-2">{{ $item->title }}</span>
-                                        </h3>
-
-                                        <!-- Meta Information - Controlled height -->
-                                        <div class="min-h-0 flex-1 overflow-hidden">
-                                            <div class="flex flex-col gap-2 text-sm text-gray-600 dark:text-zink-200">
-                                                <!-- Date - Single line -->
-                                                <div class="flex items-start gap-2">
-                                                    <span class="flex-shrink-0 text-cyan-500">📅</span>
-                                                    <span
-                                                        class="truncate">{{ $item->created_at->format('l, d F Y') }}</span>
+                                                    @if ($item->categories)
+                                                        <span
+                                                            class="absolute right-2 top-2 rounded bg-gray-800 px-2 py-1 text-xs font-medium text-white">
+                                                            {{ $item->categories->name }}
+                                                        </span>
+                                                    @endif
                                                 </div>
 
-                                                <!-- Author - Single line -->
-                                                @if ($item->created_by && $item->createdBy)
-                                                    <div class="flex items-start gap-2">
-                                                        <span class="flex-shrink-0 text-cyan-500">👤</span>
-                                                        <span class="truncate">{{ $item->createdBy->name }}</span>
-                                                    </div>
-                                                @endif
+                                                <!-- Title Only -->
+                                                <div class="flex flex-1 flex-col justify-center overflow-hidden p-4">
+                                                    <h3
+                                                        class="dark:text-zink-50 line-clamp-3 text-sm font-semibold leading-tight text-gray-900">
+                                                        {{ $item->title }}
+                                                    </h3>
+                                                </div>
+                                            </div>
+                                        </a>
+                                    </div>
+                                @endforeach
+                            </div>
+                            <div class="swiper-pagination mt-2"></div>
+                            <!-- Navigation buttons -->
+                            <button
+                                class="swiper-button-prev news-carousel-prev dark:bg-zink-600/80 dark:hover:bg-zink-600 absolute left-2 top-1/2 z-10 flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-full bg-white/80 p-1.5 shadow-md transition-all duration-200 hover:bg-white">
+                                <i data-lucide="chevron-left" class="size-4 text-gray-900 dark:text-white"></i>
+                            </button>
+                            <button
+                                class="swiper-button-next news-carousel-next dark:bg-zink-600/80 dark:hover:bg-zink-600 absolute right-2 top-1/2 z-10 flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-full bg-white/80 p-1.5 shadow-md transition-all duration-200 hover:bg-white">
+                                <i data-lucide="chevron-right" class="size-4 text-gray-900 dark:text-white"></i>
+                            </button>
+                        </div>
+                    </div>
 
-                                                <!-- Preview - Max 3 lines -->
-                                                <div class="flex items-start gap-2">
-                                                    <span class="flex-shrink-0 text-cyan-500">📄</span>
-                                                    <span class="line-clamp-3 min-w-0 flex-1">
-                                                        {{ Str::limit(strip_tags($item->content), 100, '...') }}
-                                                    </span>
+                    <!-- Right: 6 News in Grid (3 columns x 2 rows) -->
+                    <div class="lg:col-span-3">
+                        <div class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+                            @foreach ($news->skip(3)->take(6) as $item)
+                                <a href="{{ route('news.show', $item->id) }}" class="block">
+                                    <div class="dark:bg-zink-600 flex flex-col overflow-hidden rounded-lg bg-white shadow-md transition-all duration-300 ease-linear hover:-translate-y-2 hover:shadow-lg"
+                                        style="height: 305px;" data-aos="fade-up" data-aos-easing="linear">
+
+                                        <!-- Image Container -->
+                                        <div class="relative overflow-hidden bg-gray-100"
+                                            style="height: 140px; flex-shrink: 0;">
+                                            @php
+                                                $firstImgSrc = null;
+                                                if (!empty($item->content)) {
+                                                    if (
+                                                        preg_match(
+                                                            '/<img[^>]+src="([^">]+)"/i',
+                                                            $item->content,
+                                                            $matches,
+                                                        )
+                                                    ) {
+                                                        $firstImgSrc = $matches[1];
+                                                    }
+                                                }
+                                            @endphp
+
+                                            @if ($firstImgSrc)
+                                                <img src="{{ $firstImgSrc }}" alt="{{ $item->title }}"
+                                                    style="height: 100%; width: 100%; object-fit: cover;"
+                                                    loading="lazy" />
+                                            @else
+                                                <img src="{{ asset('assets/images/default-news.png') }}"
+                                                    alt="{{ $item->title }}"
+                                                    style="height: 100%; width: 100%; object-fit: cover;"
+                                                    loading="lazy" />
+                                            @endif
+
+                                            @if ($item->categories)
+                                                <span
+                                                    class="absolute right-2 top-2 rounded bg-gray-800 px-2 py-1 text-xs font-medium text-white">
+                                                    {{ $item->categories->name }}
+                                                </span>
+                                            @endif
+                                        </div>
+
+                                        <!-- Content Container -->
+                                        <div class="flex flex-1 flex-col p-3" style="min-height: 0;">
+                                            <!-- Title -->
+                                            <h3
+                                                class="dark:text-zink-50 mb-2 line-clamp-2 text-sm font-semibold leading-tight text-gray-900">
+                                                {{ $item->title }}
+                                            </h3>
+
+                                            <!-- Meta & Preview -->
+                                            <div class="flex flex-1 flex-col" style="min-height: 0;">
+                                                <!-- Date & Author -->
+                                                <div class="dark:text-zink-300 mb-2 text-xs text-gray-600">
+                                                    <div>
+                                                        {{ \Carbon\Carbon::parse($item->created_at)->locale('id')->isoFormat('D MMMM YYYY') }}
+                                                    </div>
+                                                    @if ($item->created_by && $item->createdBy)
+                                                        <div class="mt-0.5">{{ $item->createdBy->name }}</div>
+                                                    @endif
+                                                </div>
+
+                                                <!-- Preview -->
+                                                <div
+                                                    class="dark:text-zink-400 line-clamp-2 text-xs leading-relaxed text-gray-700">
+                                                    {{ Str::limit(strip_tags($item->content), 80, '...') }}
                                                 </div>
                                             </div>
                                         </div>
                                     </div>
-                                </div>
-                            </a>
+                                </a>
+                            @endforeach
                         </div>
-                    @endforeach
+                    </div>
                 </div><!--end grid-->
 
                 <!-- Tombol Lihat Semua Berita -->
@@ -428,9 +500,9 @@
                             <div class="swiper-slide flex flex-col">
                                 <a href="{{ route('ekstrakurikulers.show', $item->id) }}">
 
-                                    <div class="p-5 text-center flex-1 flex flex-col" data-aos="fade-up"
+                                    <div class="flex flex-1 flex-col p-5 text-center" data-aos="fade-up"
                                         data-aos-easing="linear">
-                                        <div class="mx-auto w-28 h-28 flex items-center justify-center mb-4">
+                                        <div class="mx-auto mb-4 flex h-28 w-28 items-center justify-center">
                                             @if (!empty($item->photo))
                                                 @php
                                                     $p = $item->photo;
@@ -447,12 +519,12 @@
                                                     }
                                                 @endphp
                                                 <img src="{{ $imgUrl }}" alt="{{ $item->name }}"
-                                                    class="max-w-full max-h-full object-contain"
+                                                    class="max-h-full max-w-full object-contain"
                                                     onerror="this.src='{{ asset('assets/images/default-extrakurikuler.png') }}'">
                                             @else
                                                 <img src="{{ asset('assets/images/default-extrakurikuler.png') }}"
                                                     alt="{{ $item->name }}"
-                                                    class="max-w-full max-h-full object-contain">
+                                                    class="max-h-full max-w-full object-contain">
                                             @endif
                                         </div>
                                         <h6 class="mb-1 mt-4 text-3xl">{{ $item->name }}</h6>
@@ -481,9 +553,9 @@
                     <div class="swiper-wrapper">
                         @foreach ($mitras as $item)
                             <div class="swiper-slide flex flex-col">
-                                <div class="p-5 text-center flex-1 flex flex-col" data-aos="fade-up"
+                                <div class="flex flex-1 flex-col p-5 text-center" data-aos="fade-up"
                                     data-aos-easing="linear">
-                                    <div class="mx-auto w-28 h-28 flex items-center justify-center mb-4">
+                                    <div class="mx-auto mb-4 flex h-28 w-28 items-center justify-center">
                                         @if (!empty($item->photo))
                                             @php
                                                 $p = $item->photo;
@@ -500,11 +572,11 @@
                                                 }
                                             @endphp
                                             <img src="{{ $imgUrl }}" alt="{{ $item->name }}"
-                                                class="max-w-full max-h-full object-contain"
+                                                class="max-h-full max-w-full object-contain"
                                                 onerror="this.src='{{ asset('assets/images/default-extrakurikuler.png') }}'">
                                         @else
                                             <img src="{{ asset('assets/images/default-extrakurikuler.png') }}"
-                                                alt="{{ $item->name }}" class="max-w-full max-h-full object-contain">
+                                                alt="{{ $item->name }}" class="max-h-full max-w-full object-contain">
                                         @endif
                                     </div>
                                     <h6 class="mb-1 text-3xl">{{ $item->name }}</h6>
@@ -539,7 +611,7 @@
                 <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
                     {{-- Photos column (left) --}}
                     <div class="space-y-4">
-                        <div class="text-center font-semibold mb-4">Foto</div>
+                        <div class="mb-4 text-center font-semibold">Foto</div>
                         @php $photos = $galleries->where('type', 'photo')->take(3); @endphp
                         @if ($photos->count() === 0)
                             <div class="text-slate-500">Belum ada foto.</div>
@@ -596,7 +668,7 @@
 
                     {{-- Videos column (right) --}}
                     <div class="space-y-4">
-                        <div class="text-center font-semibold mb-4">Video</div>
+                        <div class="mb-4 text-center font-semibold">Video</div>
                         @php $videos = $galleries->where('type', 'video')->take(3); @endphp
                         @if ($videos->count() === 0)
                             <div class="text-slate-500">Belum ada video.</div>
@@ -765,6 +837,34 @@
                     }
                 } catch (e) {
                     console.error('Swiper init error', e);
+                }
+            });
+        </script>
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                // Initialize Swiper for news carousel if Swiper is available
+                try {
+                    if (typeof Swiper !== 'undefined') {
+                        new Swiper('.news-carousel', {
+                            slidesPerView: 1,
+                            spaceBetween: 10,
+                            loop: true,
+                            autoplay: {
+                                delay: 3000,
+                                disableOnInteraction: false,
+                            },
+                            pagination: {
+                                el: '.news-carousel .swiper-pagination',
+                                clickable: true,
+                            },
+                            navigation: {
+                                nextEl: '.news-carousel-next',
+                                prevEl: '.news-carousel-prev',
+                            }
+                        });
+                    }
+                } catch (e) {
+                    console.error('News carousel init error', e);
                 }
             });
         </script>
