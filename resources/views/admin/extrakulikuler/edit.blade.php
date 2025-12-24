@@ -16,7 +16,8 @@
                         </ul>
                     </div>
                 @endif
-                <form action="{{ route('admin.extrakulikuler.update', $ex->id) }}" method="POST" enctype="multipart/form-data">
+                <form action="{{ route('admin.extrakulikuler.update', $ex->id) }}" method="POST"
+                    enctype="multipart/form-data">
                     @csrf
                     @method('PUT')
                     <div class="grid grid-cols-12 gap-6">
@@ -44,8 +45,9 @@
 
                         <div class="col-span-12">
                             <label class="mb-2 block text-sm font-medium">Deskripsi</label>
-                            <textarea name="description" class="block min-h-[200px] w-full rounded border border-gray-200 p-4"
-                                placeholder="Deskripsi singkat">{{ old('description', $ex->description) }}</textarea>
+                            <textarea id="editor" name="description" class="block min-h-[200px] w-full rounded border border-gray-200 p-4"
+                                placeholder="Deskripsi singkat" style="display:none;">{{ old('description', $ex->description) }}</textarea>
+                            <div id="quill-editor" style="min-height:200px; background:#fff;"></div>
                         </div>
 
                         <div class="col-span-12 md:col-span-6">
@@ -65,3 +67,42 @@
         </div>
     </div>
 @endsection
+
+@push('scripts')
+    <link href="https://cdn.quilljs.com/1.3.7/quill.snow.css" rel="stylesheet">
+    <script src="https://cdn.quilljs.com/1.3.7/quill.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            var textarea = document.getElementById('editor');
+            if (!textarea) return;
+
+            var quill = new Quill('#quill-editor', {
+                modules: {
+                    toolbar: [
+                        ['bold', 'italic', 'underline', 'strike'],
+                        [{
+                            'header': 1
+                        }, {
+                            'header': 2
+                        }],
+                        [{
+                            'list': 'ordered'
+                        }, {
+                            'list': 'bullet'
+                        }],
+                        ['link', 'image'],
+                        ['clean']
+                    ]
+                },
+                theme: 'snow'
+            });
+
+            if (textarea.value) quill.root.innerHTML = textarea.value;
+
+            var form = textarea.closest('form');
+            if (form) form.addEventListener('submit', function() {
+                textarea.value = quill.root.innerHTML;
+            });
+        });
+    </script>
+@endpush

@@ -13,7 +13,7 @@
                             {{ $news->category->name ?? ($news->categories->name ?? 'Tanpa Kategori') }}
                         </span>
                     @endif
-                    <span class="ml-2">{{ $news->created_at->format('d M Y') }} ·
+                    <span class="ml-2">{{ $news->created_at->translatedFormat('d F Y') }} ·
                         {{ $news->created_at->diffForHumans() }} · {{ $news->createdBy?->name ?? '-' }}</span>
                 </div>
 

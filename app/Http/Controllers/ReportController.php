@@ -21,34 +21,37 @@ class ReportController extends Controller
      * Response format: [{ product: 'TagName', nomor: 12 }, ...]
      */
     public function tagCounts(Request $request)
-{
-    // Ambil data berita dengan tag berdasarkan tanggal created_at
-    $logs = NewsLog::with('tag')
-        ->select(
-            DB::raw('DATE(created_at) as date'),
-            's_tags_id',
-            DB::raw('COUNT(DISTINCT s_news_id) as cnt')
-        )
-        ->whereNotNull('s_tags_id')
-        ->groupBy(DB::raw('DATE(created_at)'), 's_tags_id')
-        ->orderBy('date', 'desc')
-        ->get();
+    {
+        // Ambil data berita dengan tag berdasarkan tanggal created_at
+        $logs = NewsLog::with('tag')
+            ->select(
+                DB::raw('DATE(created_at) as date'),
+                's_tags_id',
+                DB::raw('COUNT(DISTINCT s_news_id) as cnt')
+            )
+            ->whereHas('news', function ($query) {
+                $query->where('approve', 'approve');
+            })
+            ->whereNotNull('s_tags_id')
+            ->groupBy(DB::raw('DATE(created_at)'), 's_tags_id')
+            ->orderBy('date', 'desc')
+            ->get();
 
-    // Group by date
-    $grouped = $logs->groupBy('date')->map(function ($items, $date) {
-        $tags = $items->map(function ($item) {
+        // Group by date
+        $grouped = $logs->groupBy('date')->map(function ($items, $date) {
+            $tags = $items->map(function ($item) {
+                return [
+                    'product' => $item->tag->name ?? 'Unknown',
+                    'nomor' => (int) $item->cnt,
+                ];
+            })->values();
+
             return [
-                'product' => $item->tag->name ?? 'Unknown',
-                'nomor' => (int) $item->cnt,
+                'date' => $date,
+                'tags' => $tags,
             ];
         })->values();
 
-        return [
-            'date' => $date,
-            'tags' => $tags,
-        ];
-    })->values();
-
-    return response()->json($grouped);
-}
+        return response()->json($grouped);
+    }
 }

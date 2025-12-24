@@ -65,7 +65,7 @@
                             background-repeat: no-repeat;
                             background-position: right center;
                             background-size: cover;
-                            min-height: 100vh;
+                            min-height: 30vh;
                             display: flex;
                             align-items: center;
                         }
@@ -95,7 +95,7 @@
                         }
                     </style>
 
-                    <div class="hero-bg rounded-lg bg-transparent p-6" style="background:transparent;">
+                    <div class="hero-bg rounded-lg bg-transparent p-1" style="background:transparent;">
                         <div class="hero-content">
                             <h1 class="mb-4 !leading-normal lg:text-5xl 2xl:text-6xl dark:text-zinc-100"
                                 data-aos="fade-right" data-aos-delay="300"> Selamat Datang di Website Resmi SMKN 1 Talaga
@@ -260,106 +260,44 @@
                                                     @endif
                                                 </div>
 
-                                                <!-- Title Only -->
-                                                <div class="flex flex-1 flex-col justify-center overflow-hidden p-4">
-                                                    <h3
-                                                        class="dark:text-zink-50 line-clamp-3 text-sm font-semibold leading-tight text-gray-900">
-                                                        {{ $item->title }}
-                                                    </h3>
+                                    <!-- Content Container - Remaining space with strict overflow control -->
+                                    <div class="flex min-h-0 flex-1 flex-col overflow-hidden p-4">
+                                        <!-- Title - Fixed height 56px (2 lines) -->
+                                        <h3
+                                            class="mb-3 h-14 flex-shrink-0 overflow-hidden text-lg font-semibold leading-tight text-gray-900 dark:text-zink-50">
+                                            <span class="line-clamp-2">{{ $item->title }}</span>
+                                        </h3>
+
+                                        <!-- Meta Information - Controlled height -->
+                                        <div class="min-h-0 flex-1 overflow-hidden">
+                                            <div class="flex flex-col gap-2 text-sm text-gray-600 dark:text-zink-200">
+                                                <!-- Date - Single line -->
+                                                <div class="flex items-start gap-2">
+                                                    <span class="flex-shrink-0 text-cyan-500">📅</span>
+                                                    <span
+                                                        class="truncate">{{ $item->created_at->format('l, d F Y') }}</span>
                                                 </div>
-                                            </div>
-                                        </a>
-                                    </div>
-                                @endforeach
-                            </div>
-                            <div class="swiper-pagination mt-2"></div>
-                            <!-- Navigation buttons -->
-                            <button
-                                class="swiper-button-prev news-carousel-prev dark:bg-zink-600/80 dark:hover:bg-zink-600 absolute left-2 top-1/2 z-10 flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-full bg-white/80 p-1.5 shadow-md transition-all duration-200 hover:bg-white">
-                                <i data-lucide="chevron-left" class="size-4 text-gray-900 dark:text-white"></i>
-                            </button>
-                            <button
-                                class="swiper-button-next news-carousel-next dark:bg-zink-600/80 dark:hover:bg-zink-600 absolute right-2 top-1/2 z-10 flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-full bg-white/80 p-1.5 shadow-md transition-all duration-200 hover:bg-white">
-                                <i data-lucide="chevron-right" class="size-4 text-gray-900 dark:text-white"></i>
-                            </button>
-                        </div>
-                    </div>
 
-                    <!-- Right: 6 News in Grid (3 columns x 2 rows) -->
-                    <div class="lg:col-span-3">
-                        <div class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-                            @foreach ($news->skip(3)->take(6) as $item)
-                                <a href="{{ route('news.show', $item->id) }}" class="block">
-                                    <div class="dark:bg-zink-600 flex flex-col overflow-hidden rounded-lg bg-white shadow-md transition-all duration-300 ease-linear hover:-translate-y-2 hover:shadow-lg"
-                                        style="height: 305px;" data-aos="fade-up" data-aos-easing="linear">
-
-                                        <!-- Image Container -->
-                                        <div class="relative overflow-hidden bg-gray-100"
-                                            style="height: 140px; flex-shrink: 0;">
-                                            @php
-                                                $firstImgSrc = null;
-                                                if (!empty($item->content)) {
-                                                    if (
-                                                        preg_match(
-                                                            '/<img[^>]+src="([^">]+)"/i',
-                                                            $item->content,
-                                                            $matches,
-                                                        )
-                                                    ) {
-                                                        $firstImgSrc = $matches[1];
-                                                    }
-                                                }
-                                            @endphp
-
-                                            @if ($firstImgSrc)
-                                                <img src="{{ $firstImgSrc }}" alt="{{ $item->title }}"
-                                                    style="height: 100%; width: 100%; object-fit: cover;"
-                                                    loading="lazy" />
-                                            @else
-                                                <img src="{{ asset('assets/images/default-news.png') }}"
-                                                    alt="{{ $item->title }}"
-                                                    style="height: 100%; width: 100%; object-fit: cover;"
-                                                    loading="lazy" />
-                                            @endif
-
-                                            @if ($item->categories)
-                                                <span
-                                                    class="absolute right-2 top-2 rounded bg-gray-800 px-2 py-1 text-xs font-medium text-white">
-                                                    {{ $item->categories->name }}
-                                                </span>
-                                            @endif
-                                        </div>
-
-                                        <!-- Content Container -->
-                                        <div class="flex flex-1 flex-col p-3" style="min-height: 0;">
-                                            <!-- Title -->
-                                            <h3
-                                                class="dark:text-zink-50 mb-2 line-clamp-2 text-sm font-semibold leading-tight text-gray-900">
-                                                {{ $item->title }}
-                                            </h3>
-
-                                            <!-- Meta & Preview -->
-                                            <div class="flex flex-1 flex-col" style="min-height: 0;">
-                                                <!-- Date & Author -->
-                                                <div class="dark:text-zink-300 mb-2 text-xs text-gray-600">
-                                                    <div>
-                                                        {{ \Carbon\Carbon::parse($item->created_at)->locale('id')->isoFormat('D MMMM YYYY') }}
+                                                <!-- Author - Single line -->
+                                                @if ($item->created_by && $item->createdBy)
+                                                    <div class="flex items-start gap-2">
+                                                        <span class="flex-shrink-0 text-cyan-500">👤</span>
+                                                        <span class="truncate">{{ $item->createdBy->name }}</span>
                                                     </div>
-                                                    @if ($item->created_by && $item->createdBy)
-                                                        <div class="mt-0.5">{{ $item->createdBy->name }}</div>
-                                                    @endif
-                                                </div>
+                                                @endif
 
-                                                <!-- Preview -->
-                                                <div
-                                                    class="dark:text-zink-400 line-clamp-2 text-xs leading-relaxed text-gray-700">
-                                                    {{ Str::limit(strip_tags($item->content), 80, '...') }}
+                                                <!-- Preview - Max 3 lines -->
+                                                <div class="flex items-start gap-2">
+                                                    <span class="flex-shrink-0 text-cyan-500">📄</span>
+                                                    <span class="line-clamp-3 min-w-0 flex-1">
+                                                        {{ Str::limit(strip_tags($item->content), 100, '...') }}
+                                                    </span>
                                                 </div>
                                             </div>
                                         </div>
                                     </div>
-                                </a>
-                            @endforeach
+                                </div>
+                            </a>
                         </div>
                     </div>
                 </div><!--end grid-->
@@ -467,14 +405,14 @@
                                 </div>
                             </div>
 
-                            <div class="program-subs mt-4"
-                                style="max-height:0; overflow:hidden; opacity:0; transition: max-height 380ms ease, opacity 280ms ease;">
+                            {{-- HAPUS INLINE STYLE DI SINI --}}
+                            <div class="program-subs mt-4">
                                 @if (count($subs) === 0)
                                     <div class="text-sm text-slate-500">Belum ada konsentrasi terdaftar.</div>
                                 @else
                                     @foreach ($subs as $index => $s)
                                         <a href="{{ route('expertise.show', $s->slug) }}"
-                                            class="program-sub block rounded border px-3 py-2 hover:bg-slate-50"
+                                            class="program-sub block rounded border border-slate-200 px-3 py-2 mb-2 text-slate-700 hover:bg-slate-50 dark:border-zinc-500 dark:text-zinc-100 dark:hover:bg-zinc-500"
                                             data-index="{{ $index }}">{{ $s->name }}</a>
                                     @endforeach
                                 @endif
@@ -484,8 +422,85 @@
                 </div>
             </div>
         </section>
-    @endif
 
+        <style>
+            .program-subs {
+                max-height: 0;
+                overflow: hidden;
+                opacity: 0;
+                transition: max-height 0.4s ease, opacity 0.3s ease;
+            }
+
+            .program-card.open .program-subs {
+                opacity: 1;
+            }
+
+            .program-sub {
+                opacity: 0;
+                transform: translateY(-6px);
+                transition: opacity 0.32s ease, transform 0.32s ease;
+            }
+
+            .program-card.open .program-sub {
+                opacity: 1;
+                transform: translateY(0);
+            }
+        </style>
+
+        <script>
+            document.addEventListener('DOMContentLoaded', function() {
+                const cards = document.querySelectorAll('.program-card');
+
+                function closeCard(card) {
+                    const subs = card.querySelector('.program-subs');
+                    if (!subs) return;
+
+                    card.classList.remove('open');
+                    subs.style.maxHeight = '0';
+
+                    // Reset animasi sub items
+                    subs.querySelectorAll('.program-sub').forEach((el) => {
+                        el.style.transitionDelay = '0ms';
+                    });
+                }
+
+                function openCard(card) {
+                    const subs = card.querySelector('.program-subs');
+                    if (!subs) return;
+
+                    // Close cards lain (accordion behavior)
+                    document.querySelectorAll('.program-card.open').forEach((c) => {
+                        if (c === card) return;
+                        closeCard(c);
+                    });
+
+                    card.classList.add('open');
+
+                    // Set max-height ke scrollHeight untuk trigger transition
+                    const fullHeight = subs.scrollHeight;
+                    subs.style.maxHeight = fullHeight + 'px';
+
+                    // Animasi staggered untuk sub items
+                    subs.querySelectorAll('.program-sub').forEach((el, i) => {
+                        el.style.transitionDelay = (i * 60) + 'ms';
+                    });
+                }
+
+                cards.forEach((card) => {
+                    const header = card.querySelector('.program-header');
+                    if (!header) return;
+
+                    header.addEventListener('click', function() {
+                        if (card.classList.contains('open')) {
+                            closeCard(card);
+                        } else {
+                            openCard(card);
+                        }
+                    });
+                });
+            });
+        </script>
+    @endif
     {{-- =============== Ekstrakurikuler =============== --}}
     @if ($extrakurikulerMenu && $extrakurikulers->count() > 0)
         <section class="relative py-24 xl:py-32" id="{{ $extrakurikulerMenu->slug }}">
@@ -728,7 +743,7 @@
         <!--end grid-->
 
         <!-- Tombol Lihat Semua Galeri -->
-        <div class="mt-8 flex justify-center">
+        <div class="mt-8 mb-5 flex justify-center">
             @if (Route::has('galleries.index'))
                 <a href="{{ route('galleries.index') }}"
                     class="bg-custom-500 border-custom-500 hover:bg-custom-600 hover:border-custom-600 focus:bg-custom-600 focus:border-custom-600 inline-flex items-center gap-2 rounded border px-6 py-3 text-base font-medium text-white transition-all duration-200 ease-linear">

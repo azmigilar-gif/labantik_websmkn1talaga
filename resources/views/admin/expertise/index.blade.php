@@ -38,15 +38,23 @@
                                     <td class="border p-2">{{ $core->slug ?? '-' }}</td>
                                     <td class="border p-2">{{ $core->sDescription ? 'Ada' : 'Belum' }}</td>
                                     <td class="border p-2">
-                                        <a href="{{ route('admin.expertise.show', $core->id) }}"
-                                            class="mr-2 text-blue-600">Lihat</a>
-                                        @if ($core->sDescription)
-                                            <a href="{{ route('admin.expertise.edit', $core->id) }}"
-                                                class="mr-2 text-green-600">Edit</a>
-                                        @else
-                                            <a href="{{ route('admin.expertise.create', ['id' => $core->id]) }}"
-                                                class="mr-2 text-indigo-600">Tambah</a>
-                                        @endif
+                                        <div class="flex items-center gap-2">
+                                            <a href="{{ route('admin.expertise.show', $core->id) }}"
+                                                class="flex items-center justify-center transition-all duration-200 ease-linear rounded-md size-8 edit-item-btn bg-slate-100 text-slate-500 hover:text-green-500 hover:bg-green-100 dark:bg-zink-600 dark:text-zink-200 dark:hover:bg-green-500/20 dark:hover:text-green-500">
+                                                <i data-lucide="eye" class="size-4"></i>
+                                            </a>
+                                            @if ($core->sDescription)
+                                                <a href="{{ route('admin.expertise.edit', $core->id) }}"
+                                                    class="flex items-center justify-center transition-all duration-200 ease-linear rounded-md size-8 edit-item-btn bg-slate-100 text-slate-500 hover:text-green-500 hover:bg-green-100 dark:bg-zink-600 dark:text-zink-200 dark:hover:bg-green-500/20 dark:hover:text-green-500">
+                                                    <i data-lucide="pencil" class="size-4"></i>
+                                                </a>
+                                            @else
+                                                <a href="{{ route('admin.expertise.create', ['id' => $core->id]) }}"
+                                                    class="flex items-center justify-center transition-all duration-200 ease-linear rounded-md size-8 edit-item-btn bg-slate-100 text-slate-500 hover:text-green-500 hover:bg-green-100 dark:bg-zink-600 dark:text-zink-200 dark:hover:bg-green-500/20 dark:hover:text-green-500">
+                                                    <i data-lucide="plus" class="size-4"></i>
+                                                </a>
+                                            @endif
+                                        </div>
                                     </td>
                                 </tr>
                             @endforeach

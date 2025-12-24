@@ -314,7 +314,7 @@
                                 Berita</a>
                         </div>
 
-                        @if (isset($news) && $news->count())
+                        @if (isset($news) && $news->count() > 0)
                             <table id="rowBorder" class="w-full">
                                 <thead>
                                     <tr>

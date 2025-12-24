@@ -18,6 +18,19 @@
                     </button>
                 </div>
             @endif
+            @if (session('error'))
+                <div
+                    class="mt-5 rounded-md bg-red-50 p-4 text-sm text-red-700 border border-red-200 flex items-center justify-between">
+                    <div class="flex items-center">
+                        <i data-lucide="alert-circle" class="mr-2 h-5 w-5 flex-shrink-0 text-red-400"></i>
+                        <p>{{ session('error') }}</p>
+                    </div>
+                    <button onclick="this.parentElement.style.display='none';"
+                        class="ml-4 rounded-md bg-red-100 p-1 text-red-500 hover:bg-red-200 focus:outline-none focus:ring-2 focus:ring-red-500">
+                        <i data-lucide="x" class="h-4 w-4"></i>
+                    </button>
+                </div>
+            @endif
             <div class="flex flex-col gap-2 py-4 md:flex-row md:items-center print:hidden">
                 <div class="grow">
                     <h5 class="text-16">Dashboard</h5>
@@ -103,11 +116,15 @@
             <div class="card mt-5">
                 <div class="card">
                     <div class="card-body">
-                        <div class="flex items-center justify-between mb-4">
+                        <div class="flex items-center justify-between mb-4 gap-3">
                             <a href="#!" data-modal-target="addMenuModal" type="button"
                                 class="text-white btn bg-custom-500 border-custom-500 hover:text-white hover:bg-custom-600 hover:border-custom-600 focus:text-white focus:bg-custom-600 focus:border-custom-600 focus:ring focus:ring-custom-100 active:text-white active:bg-custom-600 active:border-custom-600 active:ring active:ring-custom-100 dark:ring-custom-400/20 add-employee"><i
                                     data-lucide="plus" class="inline-block size-4"></i> <span class="align-middle">Tambah
                                     Menu</span></a>
+                            <a href="#!" data-modal-target="addLinkModal" type="button"
+                                class="text-white btn bg-sky-500 border-sky-500 hover:text-white hover:bg-sky-600 hover:border-custom-600 focus:text-white focus:bg-sky-600 focus:border-sky-600 focus:ring focus:ring-sky-100 active:text-white active:bg-sky-600 active:border-custom-600 active:ring active:ring-sky-100 dark:ring-sky-400/20 add-employee"><i
+                                    data-lucide="link" class="inline-block size-4"></i> <span class="align-middle">Tambah
+                                    Konfigurasi Submenu</span></a>
                         </div>
 
 
@@ -172,6 +189,54 @@
                                                             <input type="text" name="name"
                                                                 class="form-input border-slate-200 dark:border-zink-500 focus:outline-none focus:border-custom-500 disabled:bg-slate-100 dark:disabled:bg-zink-600 disabled:border-slate-300 dark:disabled:border-zink-500 dark:disabled:text-zink-200 disabled:text-slate-500 dark:text-zink-100 dark:bg-zink-700 dark:focus:border-custom-800 placeholder:text-slate-400 dark:placeholder:text-zink-200"
                                                                 placeholder="Masukkan Nama Sub Menu" required="">
+                                                        </div>
+                                                        <div class="mt-3">
+                                                            <label for="phoneNumberInput"
+                                                                class="inline-block mb-2 text-base font-medium">Nama
+                                                                Nama Model Key</label>
+                                                            <select
+                                                                class="form-input border-slate-200 dark:border-zink-500 focus:outline-none focus:border-custom-500 disabled:bg-slate-100 dark:disabled:bg-zink-600 disabled:border-slate-300 dark:disabled:border-zink-500 dark:disabled:text-zink-200 disabled:text-slate-500 dark:text-zink-100 dark:bg-zink-700 dark:focus:border-custom-800 placeholder:text-slate-400 dark:placeholder:text-zink-200"
+                                                                data-choices="" name="s_model_key_id"
+                                                                id="choices-single-default">
+                                                                <option value="">Pilih Nama Model Key</option>
+                                                                @foreach ($modelKey as $model)
+                                                                    <option value="{{ $model->id }}">
+                                                                        {{ $model->name }}
+                                                                    </option>
+                                                                @endforeach
+                                                            </select>
+                                                        </div>
+                                                        <div class="mt-3">
+                                                            <label for="phoneNumberInput"
+                                                                class="inline-block mb-2 text-base font-medium">Nama
+                                                                Nama View</label>
+                                                            <select
+                                                                class="form-input border-slate-200 dark:border-zink-500 focus:outline-none focus:border-custom-500 disabled:bg-slate-100 dark:disabled:bg-zink-600 disabled:border-slate-300 dark:disabled:border-zink-500 dark:disabled:text-zink-200 disabled:text-slate-500 dark:text-zink-100 dark:bg-zink-700 dark:focus:border-custom-800 placeholder:text-slate-400 dark:placeholder:text-zink-200"
+                                                                data-choices="" name="s_view_name_id"
+                                                                id="choices-single-default">
+                                                                <option value="">Pilih Nama View</option>
+                                                                @foreach ($viewName as $view)
+                                                                    <option value="{{ $view->id }}">
+                                                                        {{ $view->name }}
+                                                                    </option>
+                                                                @endforeach
+                                                            </select>
+                                                        </div>
+                                                        <div class="mt-3">
+                                                            <label for="phoneNumberInput"
+                                                                class="inline-block mb-2 text-base font-medium">Nama
+                                                                Nama Redirect Ke</label>
+                                                            <select
+                                                                class="form-input border-slate-200 dark:border-zink-500 focus:outline-none focus:border-custom-500 disabled:bg-slate-100 dark:disabled:bg-zink-600 disabled:border-slate-300 dark:disabled:border-zink-500 dark:disabled:text-zink-200 disabled:text-slate-500 dark:text-zink-100 dark:bg-zink-700 dark:focus:border-custom-800 placeholder:text-slate-400 dark:placeholder:text-zink-200"
+                                                                data-choices="" name="s_redirect_to_id"
+                                                                id="choices-single-default">
+                                                                <option value="">Pilih Nama Redirect Ke</option>
+                                                                @foreach ($redirectTo as $red)
+                                                                    <option value="{{ $red->id }}">
+                                                                        {{ $red->name }}
+                                                                    </option>
+                                                                @endforeach
+                                                            </select>
                                                         </div>
                                                         <div class="flex justify-end gap-2 mt-4">
                                                             <button type="reset" id="close-modal"
@@ -323,10 +388,204 @@
                         </div>
                     </div>
                 </div><!--end add Employee-->
+                <div id="addLinkModal" modal-center=""
+                    class="fixed flex flex-col hidden transition-all duration-300 ease-in-out left-2/4 z-drawer -translate-x-2/4 -translate-y-2/4 show">
+                    <div class="w-screen md:w-[40rem] bg-white shadow rounded-md dark:bg-zink-600">
+                        <div class="flex items-center justify-between p-4 border-b dark:border-zink-500">
+                            <h5 class="text-16" id="addEmployeeLabel">Tambah Konfigurasi Submenu</h5>
+                            <button data-modal-close="addLinkModal"
+                                class="transition-all duration-200 ease-linear text-slate-400 hover:text-red-500">
+                                <i class="ri-close-line text-xl"></i>
+                            </button>
+                        </div>
+
+                        <!-- Step Indicators -->
+                        <div class="bg-slate-50 dark:bg-zink-700 px-6 py-4 border-b dark:border-zink-500">
+                            <div class="flex items-center justify-between">
+                                <!-- Step 1 -->
+                                <div class="flex flex-col items-center flex-1">
+                                    <div class="step-circle active w-10 h-10 rounded-full border-2 flex items-center justify-center font-bold text-sm bg-custom-500 text-white border-custom-500"
+                                        data-step="1">
+                                        1
+                                    </div>
+                                    <p class="text-xs mt-1 font-medium text-slate-700 dark:text-zink-200">Model Key</p>
+                                </div>
+
+                                <!-- Line 1 -->
+                                <div class="flex-1 h-0.5 bg-slate-300 dark:bg-zink-500 step-line mx-2" data-line="1">
+                                </div>
+
+                                <!-- Step 2 -->
+                                <div class="flex flex-col items-center flex-1">
+                                    <div class="step-circle w-10 h-10 rounded-full border-2 border-slate-300 dark:border-zink-500 bg-white dark:bg-zink-600 flex items-center justify-center font-bold text-sm text-slate-400"
+                                        data-step="2">
+                                        2
+                                    </div>
+                                    <p class="text-xs mt-1 font-medium text-slate-700 dark:text-zink-200">Nama View</p>
+                                </div>
+
+                                <!-- Line 2 -->
+                                <div class="flex-1 h-0.5 bg-slate-300 dark:bg-zink-500 step-line mx-2" data-line="2">
+                                </div>
+
+                                <!-- Step 3 -->
+                                <div class="flex flex-col items-center flex-1">
+                                    <div class="step-circle w-10 h-10 rounded-full border-2 border-slate-300 dark:border-zink-500 bg-white dark:bg-zink-600 flex items-center justify-center font-bold text-sm text-slate-400"
+                                        data-step="3">
+                                        3
+                                    </div>
+                                    <p class="text-xs mt-1 font-medium text-slate-700 dark:text-zink-200">Redirect</p>
+                                </div>
+                            </div>
+                        </div>
+
+                        <div class="max-h-[calc(theme('height.screen')_-_280px)] p-4 overflow-y-auto">
+                            <form class="create-form" id="create-form"
+                                action="{{ route('admin.submenu.addConfiguration') }}" method="POST">
+                                @csrf
+
+                                <!-- Step 1: Model Key -->
+                                <div class="form-step active" data-step="1">
+                                    <h6 class="mb-4 text-15 font-semibold text-slate-700 dark:text-zink-100">Langkah 1:
+                                        Model Key & Slug</h6>
+                                    <div class="grid grid-cols-1 gap-4">
+                                        <div class="xl:col-span-6">
+                                            <label class="inline-block mb-2 text-base font-medium">Model Key</label>
+                                            <input type="text" name="model_key" id="model_key"
+                                                class="form-input border-slate-200 dark:border-zink-500 focus:outline-none focus:border-custom-500 disabled:bg-slate-100 dark:disabled:bg-zink-600 disabled:border-slate-300 dark:disabled:border-zink-500 dark:disabled:text-zink-200 disabled:text-slate-500 dark:text-zink-100 dark:bg-zink-700 dark:focus:border-custom-800 placeholder:text-slate-400 dark:placeholder:text-zink-200"
+                                                placeholder="Masukkan Model Key" required>
+                                        </div>
+                                        <div class="xl:col-span-6">
+                                            <label class="inline-block mb-2 text-base font-medium">Slug Model</label>
+                                            <input type="text" name="model_slug" id="model_slug"
+                                                class="form-input border-slate-200 dark:border-zink-500 focus:outline-none focus:border-custom-500 disabled:bg-slate-100 dark:disabled:bg-zink-600 disabled:border-slate-300 dark:disabled:border-zink-500 dark:disabled:text-zink-200 disabled:text-slate-500 dark:text-zink-100 dark:bg-zink-700 dark:focus:border-custom-800 placeholder:text-slate-400 dark:placeholder:text-zink-200"
+                                                placeholder="Masukkan Slug Model" required>
+                                            <small class="text-slate-500 dark:text-zink-300">Contoh:
+                                                model-key-example</small>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Step 2: Nama View -->
+                                <div class="form-step" data-step="2" style="display: none;">
+                                    <h6 class="mb-4 text-15 font-semibold text-slate-700 dark:text-zink-100">Langkah 2:
+                                        Nama View & Slug</h6>
+                                    <div class="grid grid-cols-1 gap-4">
+                                        <div class="xl:col-span-6">
+                                            <label class="inline-block mb-2 text-base font-medium">Nama View</label>
+                                            <input type="text" name="view_name" id="view_name"
+                                                class="form-input border-slate-200 dark:border-zink-500 focus:outline-none focus:border-custom-500 disabled:bg-slate-100 dark:disabled:bg-zink-600 disabled:border-slate-300 dark:disabled:border-zink-500 dark:disabled:text-zink-200 disabled:text-slate-500 dark:text-zink-100 dark:bg-zink-700 dark:focus:border-custom-800 placeholder:text-slate-400 dark:placeholder:text-zink-200"
+                                                placeholder="Masukkan Nama View" required>
+                                        </div>
+                                        <div class="xl:col-span-6">
+                                            <label class="inline-block mb-2 text-base font-medium">Slug View</label>
+                                            <input type="text" name="view_slug" id="view_slug"
+                                                class="form-input border-slate-200 dark:border-zink-500 focus:outline-none focus:border-custom-500 disabled:bg-slate-100 dark:disabled:bg-zink-600 disabled:border-slate-300 dark:disabled:border-zink-500 dark:disabled:text-zink-200 disabled:text-slate-500 dark:text-zink-100 dark:bg-zink-700 dark:focus:border-custom-800 placeholder:text-slate-400 dark:placeholder:text-zink-200"
+                                                placeholder="Masukkan Slug View" required>
+                                            <small class="text-slate-500 dark:text-zink-300">Contoh:
+                                                view-name-example</small>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Step 3: Redirect -->
+                                <div class="form-step" data-step="3" style="display: none;">
+                                    <h6 class="mb-4 text-15 font-semibold text-slate-700 dark:text-zink-100">Langkah 3:
+                                        Redirect & Slug</h6>
+                                    <div class="grid grid-cols-1 gap-4">
+                                        <div class="xl:col-span-6">
+                                            <label class="inline-block mb-2 text-base font-medium">Redirect Ke</label>
+                                            <input type="text" name="redirect_to" id="redirect_to"
+                                                class="form-input border-slate-200 dark:border-zink-500 focus:outline-none focus:border-custom-500 disabled:bg-slate-100 dark:disabled:bg-zink-600 disabled:border-slate-300 dark:disabled:border-zink-500 dark:disabled:text-zink-200 disabled:text-slate-500 dark:text-zink-100 dark:bg-zink-700 dark:focus:border-custom-800 placeholder:text-slate-400 dark:placeholder:text-zink-200"
+                                                placeholder="Masukkan Redirect Ke" required>
+                                            <small class="text-slate-500 dark:text-zink-300">Contoh: /example/example atau
+                                                /example</small>
+                                        </div>
+                                        <div class="xl:col-span-6">
+                                            <label class="inline-block mb-2 text-base font-medium">Slug Redirect</label>
+                                            <input type="text" name="redirect_slug" id="redirect_slug"
+                                                class="form-input border-slate-200 dark:border-zink-500 focus:outline-none focus:border-custom-500 disabled:bg-slate-100 dark:disabled:bg-zink-600 disabled:border-slate-300 dark:disabled:border-zink-500 dark:disabled:text-zink-200 disabled:text-slate-500 dark:text-zink-100 dark:bg-zink-700 dark:focus:border-custom-800 placeholder:text-slate-400 dark:placeholder:text-zink-200"
+                                                placeholder="Masukkan Slug Redirect" required>
+                                            <small class="text-slate-500 dark:text-zink-300">Contoh:
+                                                redirect-example</small>
+                                        </div>
+                                    </div>
+                                </div>
+
+                                <!-- Navigation Buttons -->
+                                <div class="flex justify-between gap-2 mt-4">
+                                    <button type="button" id="prevBtn"
+                                        class="text-slate-500 bg-white btn hover:text-slate-700 hover:bg-slate-100 focus:text-slate-700 focus:bg-slate-100 dark:bg-zink-700 dark:text-zink-200 dark:hover:bg-zink-600 border border-slate-300 dark:border-zink-500"
+                                        style="display: none;">
+                                        Kembali
+                                    </button>
+                                    <div class="flex gap-2 ml-auto">
+                                        <button type="button" id="close-modal" data-modal-close="addLinkModal"
+                                            class="text-red-500 bg-white btn hover:text-red-500 hover:bg-red-100 focus:text-red-500 focus:bg-red-100 active:text-red-500 active:bg-red-100 dark:bg-zink-600 dark:hover:bg-red-500/10 dark:focus:bg-red-500/10 dark:active:bg-red-500/10">
+                                            Cancel
+                                        </button>
+                                        <button type="button" id="nextBtn"
+                                            class="text-white btn bg-custom-500 border-custom-500 hover:text-white hover:bg-custom-600 hover:border-custom-600 focus:text-white focus:bg-custom-600 focus:border-custom-600 focus:ring focus:ring-custom-100 active:text-white active:bg-custom-600 active:border-custom-600 active:ring active:ring-custom-100 dark:ring-custom-400/20">
+                                            Selanjutnya
+                                        </button>
+                                        <button type="submit" id="submitBtn"
+                                            class="text-white btn bg-custom-500 border-custom-500 hover:text-white hover:bg-custom-600 hover:border-custom-600 focus:text-white focus:bg-custom-600 focus:border-custom-600 focus:ring focus:ring-custom-100 active:text-white active:bg-custom-600 active:border-custom-600 active:ring active:ring-custom-100 dark:ring-custom-400/20"
+                                            style="display: none;">
+                                            Tambah Konfigurasi Submenu
+                                        </button>
+                                    </div>
+                                </div>
+                            </form>
+                        </div>
+                    </div>
+                </div>
             </div>
         </div>
 
     </div>
+    <style>
+        .form-step {
+            animation: fadeIn 0.3s ease;
+        }
+
+        @keyframes fadeIn {
+            from {
+                opacity: 0;
+                transform: translateX(20px);
+            }
+
+            to {
+                opacity: 1;
+                transform: translateX(0);
+            }
+        }
+
+        .step-circle {
+            transition: all 0.3s ease;
+        }
+
+        .step-circle.active {
+            background-color: #8b5cf6 !important;
+            color: white !important;
+            border-color: #8b5cf6 !important;
+        }
+
+        .step-circle.completed {
+            background-color: #10b981 !important;
+            color: white !important;
+            border-color: #10b981 !important;
+        }
+
+        .step-line {
+            transition: background-color 0.3s ease;
+        }
+
+        .step-line.completed {
+            background-color: #10b981 !important;
+        }
+    </style>
+
+
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             const slugInput = document.getElementById('slugInput');
@@ -352,5 +611,104 @@
             });
         });
     </script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            let currentStep = 1;
+            const totalSteps = 3;
 
+            const nextBtn = document.getElementById('nextBtn');
+            const prevBtn = document.getElementById('prevBtn');
+            const submitBtn = document.getElementById('submitBtn');
+            const form = document.getElementById('create-form');
+
+            function showStep(step) {
+                // Hide all steps
+                document.querySelectorAll('.form-step').forEach(s => {
+                    s.style.display = 'none';
+                });
+
+                // Show current step
+                document.querySelector(`.form-step[data-step="${step}"]`).style.display = 'block';
+
+                // Update step indicators
+                for (let i = 1; i <= totalSteps; i++) {
+                    const circle = document.querySelector(`.step-circle[data-step="${i}"]`);
+                    const line = document.querySelector(`.step-line[data-line="${i}"]`);
+
+                    circle.classList.remove('active', 'completed');
+                    circle.style.backgroundColor = '';
+                    circle.style.color = '';
+                    circle.style.borderColor = '';
+
+                    if (i < step) {
+                        circle.classList.add('completed');
+                        if (line) line.classList.add('completed');
+                    } else if (i === step) {
+                        circle.classList.add('active');
+                    } else {
+                        if (line) line.classList.remove('completed');
+                    }
+                }
+
+                // Update buttons
+                prevBtn.style.display = step === 1 ? 'none' : 'inline-block';
+                nextBtn.style.display = step === totalSteps ? 'none' : 'inline-block';
+                submitBtn.style.display = step === totalSteps ? 'inline-block' : 'none';
+            }
+
+            function validateStep(step) {
+                const stepElement = document.querySelector(`.form-step[data-step="${step}"]`);
+                const inputs = stepElement.querySelectorAll('input[required]');
+
+                for (let input of inputs) {
+                    if (!input.value.trim()) {
+                        input.focus();
+                        alert('Mohon lengkapi semua field yang wajib diisi');
+                        return false;
+                    }
+                }
+                return true;
+            }
+
+            if (nextBtn) {
+                nextBtn.addEventListener('click', function() {
+                    if (validateStep(currentStep)) {
+                        if (currentStep < totalSteps) {
+                            currentStep++;
+                            showStep(currentStep);
+                        }
+                    }
+                });
+            }
+
+            if (prevBtn) {
+                prevBtn.addEventListener('click', function() {
+                    if (currentStep > 1) {
+                        currentStep--;
+                        showStep(currentStep);
+                    }
+                });
+            }
+
+            if (form) {
+                form.addEventListener('submit', function(e) {
+                    if (!validateStep(currentStep)) {
+                        e.preventDefault();
+                    }
+                });
+            }
+
+            // Reset wizard when modal closes
+            document.querySelectorAll('[data-modal-close="addLinkModal"]').forEach(btn => {
+                btn.addEventListener('click', function() {
+                    currentStep = 1;
+                    showStep(currentStep);
+                    if (form) form.reset();
+                });
+            });
+
+            // Initialize
+            showStep(currentStep);
+        });
+    </script>
 @endsection

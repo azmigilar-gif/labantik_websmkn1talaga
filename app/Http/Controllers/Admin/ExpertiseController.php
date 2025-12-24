@@ -132,8 +132,8 @@ class ExpertiseController extends Controller
      */
     public function edit($id)
     {
-        $expertise = S_ExpertiseConcentration::findOrFail($id);
-        $cores = CoreExpertiseConcentration::orderBy('name')->get();
+        $expertise = S_ExpertiseConcentration::where('id_concentrations', $id)->get();
+        $cores = CoreExpertiseConcentration::where('id', $id)->orderBy('name')->first();
         return view('admin.expertise.edit', compact('expertise', 'cores'));
     }
 

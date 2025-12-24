@@ -21,6 +21,9 @@
 
 <script src="{{ asset('assets/js/datatables/datatables.init.js') }}"></script>
 
+<script src="{{ asset('assets/libs/apexcharts/apexcharts.min.js') }}"></script>
+
+
 <!--dashboard ecommerce init js-->
 <script src="{{ asset('assets/js/pages/dashboards-ecommerce.init.js') }}"></script>
 
