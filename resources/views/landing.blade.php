@@ -368,10 +368,173 @@
                     </div>
                 </div><!--end grid-->
 
+                {{-- =============== Berita Sekolah =============== --}}
+
+    @if ($newsMenu && $news->count() > 0)
+        <section id="{{ $newsMenu->slug }}" class="dark:bg-zink-700/40 relative bg-slate-50 py-24 pb-16 xl:py-32 xl:pb-20">
+            <div class="container mx-auto px-4 2xl:max-w-[87.5rem]">
+                <div class="mx-auto mb-8 text-center xl:max-w-3xl">
+                    <h2 class="text-gradient mb-0 capitalize leading-normal">{{ $newsMenu->name ?? 'Berita Sekolah' }}
+                    </h2>
+                </div>
+
+                <div class="grid grid-cols-1 gap-6 lg:grid-cols-5">
+                    <!-- Left: Large Auto-Scroll Carousel (3 news) -->
+                    <div class="lg:col-span-2">
+                        <!-- 2 rows: (305px + 305px) + gap 24px = 634px -->
+                        <div class="swiper news-carousel relative" style="height: 634px;">
+                            <div class="swiper-wrapper">
+                                @foreach ($news->take(3) as $item)
+                                    <div class="swiper-slide">
+                                        <a href="{{ route('news.show', $item->id) }}" class="block h-full">
+                                            <div class="dark:bg-zink-600 relative flex h-full overflow-hidden rounded-lg bg-white shadow-md transition-all duration-300 ease-linear hover:shadow-lg"
+                                                data-aos="fade-up" data-aos-easing="linear">
+
+                                                @php
+                                                    $firstImgSrc = null;
+                                                    if (!empty($item->content)) {
+                                                        if (
+                                                            preg_match(
+                                                                '/<img[^>]+src="([^">]+)"/i',
+                                                                $item->content,
+                                                                $matches,
+                                                            )
+                                                        ) {
+                                                            $firstImgSrc = $matches[1];
+                                                        }
+                                                    }
+                                                @endphp
+
+                                                <!-- Full Image with Overlay -->
+                                                <img src="{{ $firstImgSrc ?? asset('assets/images/default-news.png') }}"
+                                                    alt="{{ $item->title }}"
+                                                    class="absolute inset-0 h-full w-full object-cover" loading="lazy" />
+
+                                                <!-- Dark Gradient Overlay - 35% from bottom -->
+                                                <div
+                                                    style="position: absolute; bottom: 0; left: 0; right: 0; height: 35%; background: linear-gradient(to top, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.6) 50%, transparent 100%);">
+                                                </div>
+
+                                                <!-- Category Badge -->
+                                                @if ($item->category)
+                                                    <span
+                                                        class="absolute right-3 top-3 z-10 rounded bg-gray-800 px-3 py-1.5 text-xs font-medium text-white">
+                                                        {{ $item->category->name }}
+                                                    </span>
+                                                @endif
+
+                                                <!-- Title at Bottom -->
+                                                <div class="absolute bottom-0 left-0 right-0 z-10 p-6">
+                                                    <h3
+                                                        class="line-clamp-3 text-2xl font-bold leading-tight text-white drop-shadow-lg">
+                                                        {{ $item->title }}
+                                                    </h3>
+                                                </div>
+                                            </div>
+                                        </a>
+                                    </div>
+                                @endforeach
+                            </div>
+                            <div></div>
+                            <!-- Navigation buttons -->
+                            <button
+                                class="news-carousel-prev dark:bg-zink-600/80 dark:hover:bg-zink-600 absolute left-2 top-1/2 z-10 flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-full bg-white/80 p-1.5 shadow-md transition-all duration-200 hover:bg-white">
+                                <i data-lucide="chevron-left" class="size-4 text-gray-900 dark:text-white"></i>
+                            </button>
+                            <button
+                                class="news-carousel-next dark:bg-zink-600/80 dark:hover:bg-zink-600 absolute right-2 top-1/2 z-10 flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-full bg-white/80 p-1.5 shadow-md transition-all duration-200 hover:bg-white">
+                                <i data-lucide="chevron-right" class="size-4 text-gray-900 dark:text-white"></i>
+                            </button>
+                        </div>
+                    </div>
+
+                    <!-- Right: 6 News in Grid (3 columns x 2 rows) -->
+                    <div class="lg:col-span-3">
+                        <div class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
+                            @foreach ($news->skip(3)->take(6) as $item)
+                                <a href="{{ route('news.show', $item->id) }}" class="block">
+                                    <div class="dark:bg-zink-600 flex flex-col overflow-hidden rounded-lg bg-white shadow-md transition-all duration-300 ease-linear hover:-translate-y-2 hover:shadow-lg"
+                                        style="height: 305px;" data-aos="fade-up" data-aos-easing="linear">
+
+                                        <!-- Image Container -->
+                                        <div class="relative overflow-hidden bg-gray-100"
+                                            style="height: 140px; flex-shrink: 0;">
+                                            @php
+                                                $firstImgSrc = null;
+                                                if (!empty($item->content)) {
+                                                    if (
+                                                        preg_match(
+                                                            '/<img[^>]+src="([^">]+)"/i',
+                                                            $item->content,
+                                                            $matches,
+                                                        )
+                                                    ) {
+                                                        $firstImgSrc = $matches[1];
+                                                    }
+                                                }
+                                            @endphp
+
+                                            @if ($firstImgSrc)
+                                                <img src="{{ $firstImgSrc }}" alt="{{ $item->title }}"
+                                                    style="height: 100%; width: 100%; object-fit: cover;"
+                                                    loading="lazy" />
+                                            @else
+                                                <img src="{{ asset('assets/images/default-news.png') }}"
+                                                    alt="{{ $item->title }}"
+                                                    style="height: 100%; width: 100%; object-fit: cover;"
+                                                    loading="lazy" />
+                                            @endif
+
+                                            @if ($item->category)
+                                                <span
+                                                    class="absolute right-2 top-2 rounded bg-gray-800 px-2 py-1 text-xs font-medium text-white">
+                                                    {{ $item->category->name }}
+                                                </span>
+                                            @endif
+                                        </div>
+
+                                        <!-- Content Container -->
+                                        <div class="flex flex-1 flex-col p-3" style="min-height: 0;">
+                                            <!-- Title -->
+                                            <h3
+                                                class="dark:text-zink-50 mb-2 line-clamp-2 text-sm font-semibold leading-tight text-gray-900">
+                                                {{ $item->title }}
+                                            </h3>
+
+                                            <!-- Meta & Preview -->
+                                            <div class="flex flex-1 flex-col" style="min-height: 0;">
+                                                <!-- Date & Author -->
+                                                <div class="dark:text-zink-300 mb-2 text-xs text-gray-600">
+                                                    <div>
+                                                        {{ \Carbon\Carbon::parse($item->created_at)->locale('id')->isoFormat('D MMMM YYYY') }}
+                                                    </div>
+                                                    @if ($item->created_by && $item->createdBy)
+                                                        <div class="mt-0.5">{{ $item->createdBy->name }}</div>
+                                                    @endif
+                                                </div>
+
+                                                <!-- Preview -->
+                                                <div
+                                                    class="dark:text-zink-400 line-clamp-2 text-xs leading-relaxed text-gray-700">
+                                                    {{ Str::limit(strip_tags($item->content), 80, '...') }}
+                                                </div>
+                                            </div>
+                                        </div>
+                                    </div>
+                                </a>
+                            @endforeach
+                        </div>
+                    </div>
+                </div><!--end grid-->
+
                 {{-- =============== Berita Per Kategori =============== --}}
                 @php
-                    // Kelompokkan berita berdasarkan kategori
-                    $newsByCategory = $news->groupBy('s_category_id');
+                    // Kelompokkan berita berdasarkan kategori dan urutkan berdasarkan jumlah berita terbanyak
+                    $newsByCategory = $news->groupBy('s_category_id')
+                        ->sortByDesc(function($categoryNews) {
+                            return $categoryNews->count();
+                        })
+                        ->take(3); // Ambil hanya 3 kategori teratas
                 @endphp
 
                 @if($newsByCategory->count() > 0)
@@ -468,6 +631,9 @@
             </div>
         </section><!--end -->
     @endif
+
+               
+        @endif
 
     {{-- =============== Program Keahlian =============== --}}
 
