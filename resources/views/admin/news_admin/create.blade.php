@@ -107,6 +107,33 @@
                                 @endforeach
                             </select>
                         </div>
+                        <div class="col-span-12 md:col-span-8">
+                            <label class="mb-2 block text-sm font-semibold text-gray-700">Topik Artikel (AI)</label>
+
+                            <div class="relative flex items-center gap-2">
+                                <input type="text" id="ai-topic"
+                                    class="w-full rounded-lg border border-gray-300 bg-gray-50 px-4 py-3 pr-12 text-sm focus:border-purple-500 focus:ring-purple-500"
+                                    placeholder="Contoh: Prestasi Juara LKS Tingkat Provinsi">
+
+                                <button type="button" id="btn-ai-generate"
+                                    class="flex h-11 items-center gap-2 rounded-lg bg-custom-600 px-4 text-sm font-medium text-white hover:bg-custom-700 disabled:opacity-60">
+                                    <i data-lucide="wand" class="h-4 w-4"></i>
+                                    Generate
+                                </button>
+                            </div>
+
+                            <div id="ai-topic-loader" class="mt-2 hidden flex items-center gap-2 text-sm text-custom-600">
+                                <svg class="h-4 w-4 animate-spin" viewBox="0 0 24 24" fill="none">
+                                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor"
+                                        stroke-width="4"></circle>
+                                    <path class="opacity-75" fill="currentColor"
+                                        d="M4 12a8 8 0 018-8v4l3-3-3-3v4a12 12 0 00-12 12h4z"></path>
+                                </svg>
+                                <span>AI sedang menyusun artikel...</span>
+                            </div>
+                        </div>
+
+
 
                         <div class="col-span-12 md:col-span-8">
                             <label class="mb-2 block text-sm font-medium text-gray-700">Judul</label>
@@ -177,6 +204,69 @@
     <!-- Quill editor (free, no jQuery). Custom image upload handler that posts to your news.upload.image route -->
     <link href="https://cdn.quilljs.com/1.3.7/quill.snow.css" rel="stylesheet">
     <script src="https://cdn.quilljs.com/1.3.7/quill.min.js"></script>
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+
+            const btnGenerate = document.getElementById('btn-ai-generate');
+            const loader = document.getElementById('ai-topic-loader');
+
+            btnGenerate.addEventListener('click', async function() {
+                const topic = document.getElementById('ai-topic').value.trim();
+
+                if (!topic) {
+                    alert('Topik artikel belum diisi.');
+                    return;
+                }
+
+                loader.classList.remove('hidden');
+                btnGenerate.disabled = true;
+
+                try {
+                    const res = await fetch('/api/ai/ask', {
+                        method: 'POST',
+                        headers: {
+                            'Content-Type': 'application/json',
+                            'X-CSRF-TOKEN': "{{ csrf_token() }}"
+                        },
+                        body: JSON.stringify({
+                            prompt: `Buatkan artikel gaya narasi majalah/berita sekolah lengkap, judulnya jelas, pembagian pembukaan, isi dan penutupnya harus rapi dan berparagraf dengan topik: "${topic}".
+
+                                FORMAT OUTPUT WAJIB:
+                                1. Setiap paragraf HARUS berada di dalam <p>...</p> dan TIDAK BOLEH ADA <p></p> kosong.
+                                2. JIKA ingin memberi jarak antar paragraf, gunakan <br> di antara <p>, BUKAN <p><br></p> dan BUKAN <p></p>.
+                                3. Gunakan tag <b>...</b> untuk menebalkan teks. DILARANG menggunakan **, __, markdown, atau simbol lain.
+                                4. DILARANG menggunakan html atau blok kode apa pun.
+                                5. Gunakan hanya tag: <p>, <br>, <b>, <ul>, <li>.
+                                6. Output HARUS langsung berupa HTML bersih tanpa penjelasan, tanpa komentar, tanpa teks tambahan.
+                                7. Setiap output harus menjelaskan/berfokus pada smkn 1 talaga.
+                                8. Gunakan <b> dan list <li> jika ada bagian yang perlu menggunakan elemen tersebut.`
+                        })
+                    });
+
+                    const data = await res.json();
+
+                    if (!data.result) {
+                        alert('AI gagal menghasilkan artikel.');
+                        return;
+                    }
+
+                    const quill = Quill.find(document.getElementById('quill-editor'));
+                    quill.setText('');
+                    quill.clipboard.dangerouslyPasteHTML(data.result);
+
+                } catch (e) {
+                    alert('Terjadi kesalahan: ' + e.message);
+                } finally {
+                    loader.classList.add('hidden');
+                    btnGenerate.disabled = false;
+                }
+            });
+
+        });
+    </script>
+
+
+
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             // Create editor container and hide original textarea visually
@@ -273,7 +363,7 @@
                                             }
                                         }
                                     } else {
-                                        alert('Upload failed: invalid response');
+                                        alert('Upload fa    iled: invalid response');
                                     }
                                 } catch (e) {
                                     alert('Upload failed: ' + e.message);
