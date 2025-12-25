@@ -33,6 +33,11 @@ class S_Categories extends Model
         'updated_by',
     ];
 
+    public function news()
+    {
+        return $this->hasOne(S_News::class, 's_category_id');
+    }
+
     public function createdBy()
     {
         return $this->belongsTo(User::class, 'created_by', 'id');
@@ -42,5 +47,4 @@ class S_Categories extends Model
     {
         return $this->belongsTo(User::class, 'updated_by', 'id');
     }
-
 }
