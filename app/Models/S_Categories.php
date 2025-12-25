@@ -42,5 +42,9 @@ class S_Categories extends Model
     {
         return $this->belongsTo(User::class, 'updated_by', 'id');
     }
+    public function news()
+{
+    return $this->hasMany(S_News::class, 's_category_id', 'id');
+}
 
 }
