@@ -16,19 +16,20 @@ class GeminiController extends Controller
             'prompt' => 'required|string'
         ]);
 
-        $payload = [
-            [
-                "role" => "user",
-                "content" => $request->prompt
-            ]
-        ];
-
         $res = Http::withHeaders([
-            'Content-Type' => 'application/json',
-            'Accept' => '*/*'
-        ])->post('https://api.siputzx.my.id/api/ai/gpt3', $payload);
-        // dd($res->json());
-
+            'Authorization' => 'Bearer ' . config('services.groq.key'),
+            'Content-Type'  => 'application/json',
+        ])->post('https://api.groq.com/openai/v1/chat/completions', [
+            'model' => config('services.groq.model'),
+            'messages' => [
+                [
+                    'role' => 'user',
+                    'content' => $request->prompt
+                ]
+            ],
+            'temperature' => 0.7,
+            'max_tokens' => 1500, // aman buat artikel sekolah
+        ]);
 
         if ($res->failed()) {
             return response()->json([
@@ -38,10 +39,8 @@ class GeminiController extends Controller
             ], 500);
         }
 
-        $json = $res->json();
-
         return response()->json([
-            'result' => $json['data'] ?? ''
+            'result' => $res->json('choices.0.message.content')
         ]);
     }
 }

@@ -233,7 +233,7 @@
 
                                 FORMAT OUTPUT WAJIB:
                                 1. Setiap paragraf HARUS berada di dalam <p>...</p> dan TIDAK BOLEH ADA <p></p> kosong.
-                                2. JIKA ingin memberi jarak antar paragraf, gunakan <br> di antara <p>, BUKAN <p><br></p> dan BUKAN <p></p>.
+                                2. JIKA ingin memberi jarak(enter)antar paragraf, gunakan <br> setiap setelah </p>.
                                 3. Gunakan tag <b>...</b> untuk menebalkan teks. DILARANG menggunakan **, __, markdown, atau simbol lain.
                                 4. DILARANG menggunakan html atau blok kode apa pun.
                                 5. Gunakan hanya tag: <p>, <br>, <b>, <ul>, <li>.

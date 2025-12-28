@@ -40,4 +40,9 @@ return [
         'model' => env('GEMINI_MODEL'),
     ],
 
+    'groq' => [
+        'key' => env('GROQ_API_KEY'),
+        'model' => 'llama-3.1-8b-instant',
+    ],
+
 ];
