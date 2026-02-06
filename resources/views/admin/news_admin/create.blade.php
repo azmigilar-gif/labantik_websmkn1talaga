@@ -99,13 +99,17 @@
 
                             <select
                                 class="form-input border-slate-200 dark:border-zink-500 focus:outline-none focus:border-custom-500 disabled:bg-slate-100 dark:disabled:bg-zink-600 disabled:border-slate-300 dark:disabled:border-zink-500 dark:disabled:text-zink-200 disabled:text-slate-500 dark:text-zink-100 dark:bg-zink-700 dark:focus:border-custom-800 placeholder:text-slate-400 dark:placeholder:text-zink-200"
-                                id="choices-multiple-default" data-choices="" name="s_tag_id[]" multiple="">
+                                id="choices-multiple-default" name="s_tag_id[]" multiple="">
                                 @foreach ($tags as $item)
                                     <option value="{{ $item->id }}"
                                         {{ collect(old('s_tag_id'))->contains($item->id) ? 'selected' : '' }}>
-                                        {{ $item->name }}</option>
+                                        {{ $item->name }}
+                                    </option>
                                 @endforeach
                             </select>
+                            @error('s_tag_id')
+                                <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
+                            @enderror
                         </div>
                         <div class="col-span-12 md:col-span-8">
                             <label class="mb-2 block text-sm font-semibold text-gray-700">Topik Artikel (AI)</label>
@@ -201,77 +205,182 @@
 @endsection
 
 @push('scripts')
-    <!-- Quill editor (free, no jQuery). Custom image upload handler that posts to your news.upload.image route -->
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/choices.js/public/assets/styles/choices.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
+
     <link href="https://cdn.quilljs.com/1.3.7/quill.snow.css" rel="stylesheet">
     <script src="https://cdn.quilljs.com/1.3.7/quill.min.js"></script>
+
     <script>
         document.addEventListener('DOMContentLoaded', function() {
+            // Initialize Choices.js for tag select
+            const tagSelect = document.getElementById('choices-multiple-default');
 
-            const btnGenerate = document.getElementById('btn-ai-generate');
-            const loader = document.getElementById('ai-topic-loader');
+            const choicesInstance = new Choices(tagSelect, {
+                removeItemButton: true,
+                searchEnabled: true,
+                searchChoices: true,
+                searchPlaceholderValue: 'Cari atau ketik tag baru...',
+                noResultsText: 'Tidak ada hasil. Tekan Enter untuk menambah.',
+                noChoicesText: 'Tidak ada pilihan',
+                itemSelectText: 'Klik untuk pilih',
+                maxItemCount: -1,
 
-            btnGenerate.addEventListener('click', async function() {
-                const topic = document.getElementById('ai-topic').value.trim();
+                // KUNCI UTAMA: Setting ini memungkinkan penambahan item baru
+                addItems: true,
+                addChoices: true,
+                editItems: false,
+                duplicateItemsAllowed: false,
+                delimiter: ',',
+                paste: true,
+                searchResultLimit: 10,
+                shouldSort: false,
 
-                if (!topic) {
-                    alert('Topik artikel belum diisi.');
-                    return;
-                }
-
-                loader.classList.remove('hidden');
-                btnGenerate.disabled = true;
-
-                try {
-                    const res = await fetch('/api/ai/ask', {
-                        method: 'POST',
-                        headers: {
-                            'Content-Type': 'application/json',
-                            'X-CSRF-TOKEN': "{{ csrf_token() }}"
-                        },
-                        body: JSON.stringify({
-                            prompt: `Buatkan artikel gaya narasi majalah/berita sekolah lengkap, judulnya jelas, pembagian pembukaan, isi dan penutupnya harus rapi dan berparagraf dengan topik: "${topic}".
-
-                                FORMAT OUTPUT WAJIB:
-                                1. Setiap paragraf HARUS berada di dalam <p>...</p> dan TIDAK BOLEH ADA <p></p> kosong.
-                                2. JIKA ingin memberi jarak(enter)antar paragraf, gunakan <br> setiap setelah </p>.
-                                3. Gunakan tag <b>...</b> untuk menebalkan teks. DILARANG menggunakan **, __, markdown, atau simbol lain.
-                                4. DILARANG menggunakan html atau blok kode apa pun.
-                                5. Gunakan hanya tag: <p>, <br>, <b>, <ul>, <li>.
-                                6. Output HARUS langsung berupa HTML bersih tanpa penjelasan, tanpa komentar, tanpa teks tambahan.
-                                7. Setiap output harus menjelaskan/berfokus pada smkn 1 talaga.
-                                8. Gunakan <b> dan list <li> jika ada bagian yang perlu menggunakan elemen tersebut.`
-                        })
-                    });
-
-                    const data = await res.json();
-
-                    if (!data.result) {
-                        alert('AI gagal menghasilkan artikel.');
-                        return;
+                // Custom validation untuk tag baru
+                addItemFilter: function(value) {
+                    // Minimal 2 karakter
+                    if (!value || value.trim().length < 2) {
+                        return false;
                     }
 
-                    const quill = Quill.find(document.getElementById('quill-editor'));
-                    quill.setText('');
-                    quill.clipboard.dangerouslyPasteHTML(data.result);
+                    // Cek duplikat (case insensitive)
+                    const normalizedValue = value.trim().toLowerCase();
+                    const items = choicesInstance.getValue(true); // Get selected values
 
-                } catch (e) {
-                    alert('Terjadi kesalahan: ' + e.message);
-                } finally {
-                    loader.classList.add('hidden');
-                    btnGenerate.disabled = false;
+                    // Check in selected items
+                    const isDuplicate = items.some(item => {
+                        const itemLabel = choicesInstance._store.choices.find(c => c.value ==
+                            item);
+                        return itemLabel && itemLabel.label.toLowerCase() === normalizedValue;
+                    });
+
+                    return !isDuplicate;
+                },
+
+                // Fungsi untuk menampilkan pesan saat mengetik
+                addItemText: (value) => {
+                    return `Tekan <b>Enter</b> untuk menambah tag: "${value}"`;
+                },
+            });
+
+            // Event handler untuk menambah tag baru saat Enter
+            tagSelect.addEventListener('addItem', function(event) {
+                const addedValue = event.detail.value;
+                const addedLabel = event.detail.label;
+
+                // Jika value adalah string (bukan ID dari database), tandai sebagai tag baru
+                if (isNaN(addedValue)) {
+                    console.log('Tag baru ditambahkan:', addedLabel);
+
+                    // Optional: Bisa tambahkan indikator visual untuk tag baru
+                    setTimeout(() => {
+                        const items = document.querySelectorAll('.choices__item');
+                        items.forEach(item => {
+                            if (item.dataset.value === addedValue) {
+                                item.style.backgroundColor =
+                                    '#10b981'; // Green for new tags
+                                item.title = 'Tag baru (akan dibuat saat save)';
+                            }
+                        });
+                    }, 100);
                 }
             });
 
-        });
-    </script>
+            // Fetch tags dari server saat user mencari
+            let searchTimeout;
+            tagSelect.addEventListener('search', function(e) {
+                clearTimeout(searchTimeout);
+                const searchText = e.detail.value;
 
+                if (searchText && searchText.length > 1) {
+                    searchTimeout = setTimeout(function() {
+                        fetch('{{ route('admin.news.fetch-tags') }}?search=' + encodeURIComponent(
+                                searchText))
+                            .then(response => response.json())
+                            .then(data => {
+                                // Get currently selected values
+                                const selectedValues = choicesInstance.getValue(true);
 
+                                // Clear existing choices
+                                choicesInstance.clearChoices();
 
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            // Create editor container and hide original textarea visually
+                                // Add fetched tags as choices
+                                if (data && data.length > 0) {
+                                    const choices = data.map(tag => ({
+                                        value: tag.id.toString(),
+                                        label: tag.label,
+                                        selected: false,
+                                        disabled: false
+                                    }));
+
+                                    choicesInstance.setChoices(choices, 'value', 'label', true);
+                                }
+                            })
+                            .catch(err => console.error('Error fetching tags:', err));
+                    }, 300);
+                }
+            });
+
+            // AI Generate Button
+            const btnGenerate = document.getElementById('btn-ai-generate');
+            const loader = document.getElementById('ai-topic-loader');
+
+            if (btnGenerate) {
+                btnGenerate.addEventListener('click', async function() {
+                    const topic = document.getElementById('ai-topic').value.trim();
+
+                    if (!topic) {
+                        alert('Topik artikel belum diisi.');
+                        return;
+                    }
+
+                    loader.classList.remove('hidden');
+                    btnGenerate.disabled = true;
+
+                    try {
+                        const res = await fetch('/api/ai/ask', {
+                            method: 'POST',
+                            headers: {
+                                'Content-Type': 'application/json',
+                                'X-CSRF-TOKEN': "{{ csrf_token() }}"
+                            },
+                            body: JSON.stringify({
+                                prompt: `Buatkan artikel gaya narasi majalah/berita sekolah lengkap, judulnya jelas, pembagian pembukaan, isi dan penutupnya harus rapi dan berparagraf dengan topik: "${topic}".
+
+                                    FORMAT OUTPUT WAJIB:
+                                    1. Setiap paragraf HARUS berada di dalam <p>...</p> dan TIDAK BOLEH ADA <p></p> kosong.
+                                    2. JIKA ingin memberi jarak(enter)antar paragraf, gunakan <br> setiap setelah </p>.
+                                    3. Gunakan tag <b>...</b> untuk menebalkan teks. DILARANG menggunakan **, __, markdown, atau simbol lain.
+                                    4. DILARANG menggunakan html atau blok kode apa pun.
+                                    5. Gunakan hanya tag: <p>, <br>, <b>, <ul>, <li>.
+                                    6. Output HARUS langsung berupa HTML bersih tanpa penjelasan, tanpa komentar, tanpa teks tambahan.
+                                    7. Setiap output harus menjelaskan/berfokus pada smkn 1 talaga.
+                                    8. Gunakan <b> dan list <li> jika ada bagian yang perlu menggunakan elemen tersebut.`
+                            })
+                        });
+
+                        const data = await res.json();
+
+                        if (!data.result) {
+                            alert('AI gagal menghasilkan artikel.');
+                            return;
+                        }
+
+                        const quill = Quill.find(document.getElementById('quill-editor'));
+                        quill.setText('');
+                        quill.clipboard.dangerouslyPasteHTML(data.result);
+
+                    } catch (e) {
+                        alert('Terjadi kesalahan: ' + e.message);
+                    } finally {
+                        loader.classList.add('hidden');
+                        btnGenerate.disabled = false;
+                    }
+                });
+            }
+
+            // Quill Editor Setup
             var textarea = document.getElementById('editor');
-            // create a div to host quill and insert it before textarea
             var quillContainer = document.createElement('div');
             quillContainer.id = 'quill-editor';
             quillContainer.style.height = '500px';
@@ -307,12 +416,10 @@
                 theme: 'snow'
             });
 
-            // If textarea already has content, load into quill
             if (textarea.value) {
                 quill.root.innerHTML = textarea.value;
             }
 
-            // Image handler: open file input, upload to server, insert image URL
             function imageHandler() {
                 var input = document.createElement('input');
                 input.setAttribute('type', 'file');
@@ -327,66 +434,47 @@
                     formData.append('upload', file);
 
                     var xhr = new XMLHttpRequest();
-                    var url = '{{ route('admin.news.upload.image') }}';
-                    xhr.open('POST', url, true);
+                    xhr.open('POST', '{{ route('admin.news.upload.image') }}', true);
                     xhr.setRequestHeader('X-CSRF-TOKEN', '{{ csrf_token() }}');
 
                     xhr.onreadystatechange = function() {
-                        if (xhr.readyState === 4) {
-                            if (xhr.status >= 200 && xhr.status < 300) {
-                                try {
-                                    var resp = JSON.parse(xhr.responseText);
-                                    if (resp && resp.url) {
-                                        // Ask user for image width in pixels
-                                        var width = prompt(
-                                            'Masukkan lebar gambar (pixel):\n\nContoh: 300, 400, 500',
-                                            '300');
-
-                                        if (width !== null && width.trim() !== '') {
-                                            // Validate that it's a number
-                                            width = parseInt(width);
-                                            if (!isNaN(width) && width > 0) {
-                                                var range = quill.getSelection(true);
-                                                // Insert image with width style
-                                                quill.insertEmbed(range.index, 'image', resp.url);
-                                                // Get the inserted image and set its style
-                                                var imgElement = quill.root.querySelector('img[src="' + resp
-                                                    .url + '"]');
-                                                if (imgElement) {
-                                                    imgElement.style.width = width + 'px';
-                                                    imgElement.style.maxWidth = '100%';
-                                                    imgElement.style.height = 'auto';
-                                                }
-                                                quill.setSelection(range.index + 1);
-                                            } else {
-                                                alert('Lebar harus berupa angka positif!');
+                        if (xhr.readyState === 4 && xhr.status >= 200 && xhr.status < 300) {
+                            try {
+                                var resp = JSON.parse(xhr.responseText);
+                                if (resp && resp.url) {
+                                    var width = prompt(
+                                        'Masukkan lebar gambar (pixel):\n\nContoh: 300, 400, 500', '300'
+                                    );
+                                    if (width !== null && width.trim() !== '') {
+                                        width = parseInt(width);
+                                        if (!isNaN(width) && width > 0) {
+                                            var range = quill.getSelection(true);
+                                            quill.insertEmbed(range.index, 'image', resp.url);
+                                            var imgElement = quill.root.querySelector('img[src="' + resp
+                                                .url + '"]');
+                                            if (imgElement) {
+                                                imgElement.style.width = width + 'px';
+                                                imgElement.style.maxWidth = '100%';
+                                                imgElement.style.height = 'auto';
                                             }
+                                            quill.setSelection(range.index + 1);
+                                        } else {
+                                            alert('Lebar harus berupa angka positif!');
                                         }
-                                    } else {
-                                        alert('Upload fa    iled: invalid response');
                                     }
-                                } catch (e) {
-                                    alert('Upload failed: ' + e.message);
                                 }
-                            } else if (xhr.status === 401 || xhr.status === 403) {
-                                alert('Upload failed: authentication error');
-                            } else {
-                                alert('Upload failed: ' + xhr.status);
+                            } catch (e) {
+                                alert('Upload failed: ' + e.message);
                             }
                         }
                     };
 
-                    xhr.onerror = function() {
-                        alert('Upload failed due to network error');
-                    };
                     xhr.send(formData);
                 };
             }
 
-            // Attach the image handler to the toolbar
             quill.getModule('toolbar').addHandler('image', imageHandler);
 
-            // On form submit, copy quill HTML to textarea so it's submitted
             var form = textarea.closest('form');
             if (form) {
                 form.addEventListener('submit', function(e) {

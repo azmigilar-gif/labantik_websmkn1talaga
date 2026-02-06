@@ -347,7 +347,7 @@ class NewsAdminController extends Controller
             $news->save();
 
             // Delete old news_logs entries for this news
-            NewsLog::where('s_menu_id', $menuId)->delete();
+            NewsLog::where('s_news_id', $news->id)->delete();
 
             // Process tags and create news_logs entries - loop setiap tag
             if (!empty($data['s_tag_id']) && is_array($data['s_tag_id'])) {
@@ -381,7 +381,7 @@ class NewsAdminController extends Controller
                     // CREATE news_log entry dengan tag_id hasil dari create/resolve
                     $newsLog = new NewsLog();
                     $newsLog->id = (string) Str::uuid();
-                    $newsLog->s_menu_id = $menuId;
+                    $newsLog->s_news_id = $news->id;
                     $newsLog->s_tags_id = $tagId;
                     $newsLog->save();
                 }

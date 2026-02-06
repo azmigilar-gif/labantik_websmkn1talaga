@@ -97,11 +97,18 @@
 
                         <div class="col-span-12 md:col-span-4">
                             <label class="mb-2 block text-sm font-medium text-gray-700">Tag</label>
-                            <input
-                                class="form-input border-slate-200 focus:outline-none focus:border-custom-500 disabled:bg-slate-100 disabled:border-slate-300 disabled:text-slate-500 dark:text-zink-100 dark:bg-zink-700 dark:border-zink-500 dark:focus:border-custom-800 dark:disabled:bg-zink-600 dark:disabled:border-zink-500 dark:disabled:text-zink-200 placeholder:text-slate-400 dark:placeholder:text-zink-200 {{ $errors->has('s_tag_id') ? 'border-red-500' : '' }}"
-                                id="tag-input" name="s_tag_id[]" data-choices="" data-choices-text-unique-true=""
-                                type="text" placeholder="Ketik nama tag..."
-                                value="{{ old('s_tag_id', $news->tag ? $news->tag->id : '') }}">
+
+                            <select
+                                class="form-input border-slate-200 dark:border-zink-500 focus:outline-none focus:border-custom-500 disabled:bg-slate-100 dark:disabled:bg-zink-600 disabled:border-slate-300 dark:disabled:border-zink-500 dark:disabled:text-zink-200 disabled:text-slate-500 dark:text-zink-100 dark:bg-zink-700 dark:focus:border-custom-800 placeholder:text-slate-400 dark:placeholder:text-zink-200"
+                                id="choices-multiple-default" name="s_tag_id[]" multiple="">
+                                @foreach ($tags as $item)
+                                    <option value="{{ $item->id }}"
+                                        {{ collect(old('s_tag_id', $news->tags->pluck('id')))->contains($item->id) ? 'selected' : '' }}>
+                                        {{ $item->name }}
+                                    </option>
+                                @endforeach
+                            </select>
+
                             @error('s_tag_id')
                                 <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                             @enderror
@@ -153,76 +160,97 @@
     <script src="https://cdn.quilljs.com/1.3.7/quill.min.js"></script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
-            // Initialize Choices.js for tag input - MULTIPLE mode
-            const tagInput = document.getElementById('tag-input');
-            let choicesInstance = new Choices(tagInput, {
+            // Initialize Choices.js for tag select
+            const tagSelect = document.getElementById('choices-multiple-default');
+
+            const choicesInstance = new Choices(tagSelect, {
                 removeItemButton: true,
+                searchEnabled: true,
+                searchChoices: true,
+                searchPlaceholderValue: 'Cari atau ketik tag baru...',
+                noResultsText: 'Tidak ada hasil. Tekan Enter untuk menambah.',
+                noChoicesText: 'Tidak ada pilihan',
+                itemSelectText: 'Klik untuk pilih',
+                maxItemCount: -1,
                 addItems: true,
+                addChoices: true,
+                editItems: false,
+                duplicateItemsAllowed: false,
+                delimiter: ',',
+                paste: true,
+                searchResultLimit: 10,
+                shouldSort: false,
+
                 addItemFilter: function(value) {
-                    // Allow adding new items
-                    return value.trim().length > 0;
+                    if (!value || value.trim().length < 2) {
+                        return false;
+                    }
+
+                    const normalizedValue = value.trim().toLowerCase();
+                    const items = choicesInstance.getValue(true);
+
+                    const isDuplicate = items.some(item => {
+                        const itemLabel = choicesInstance._store.choices.find(c => c.value ==
+                            item);
+                        return itemLabel && itemLabel.label.toLowerCase() === normalizedValue;
+                    });
+
+                    return !isDuplicate;
                 },
-                delimiter: ',', // Gunakan koma sebagai delimiter
-                paste: false, // Jangan allow paste untuk avoid confusion
-                duplicateItemsAllowed: false, // Tidak boleh duplicate
-                classNames: {
-                    containerOuter: 'choices',
-                    containerInner: 'choices__inner',
-                    input: 'choices__input',
-                    inputCloned: 'choices__input--cloned',
-                    list: 'choices__list',
-                    listItems: 'choices__list--multiple',
-                    listSingle: 'choices__list--single',
-                    listDropdown: 'choices__list--dropdown',
-                    item: 'choices__item',
-                    itemSelectable: 'choices__item--selectable',
-                    itemDeletable: 'choices__item--deletable',
-                    itemChoice: 'choices__item--choice',
-                    placeholder: 'choices__placeholder',
-                    group: 'choices__group',
-                    groupHeading: 'choices__heading',
-                    button: 'choices__button',
-                    activeState: 'is-active',
-                    focusState: 'is-focused',
-                    disabledState: 'is-disabled',
-                    highlightedState: 'is-highlighted',
-                    selectedState: 'is-selected',
-                    flippedState: 'is-flipped',
-                    loadingState: 'is-loading',
-                    noResults: 'has-no-results',
-                    noChoices: 'has-no-choices'
+
+                addItemText: (value) => {
+                    return `Tekan <b>Enter</b> untuk menambah tag: "${value}"`;
+                },
+            });
+
+            tagSelect.addEventListener('addItem', function(event) {
+                const addedValue = event.detail.value;
+                const addedLabel = event.detail.label;
+
+                if (isNaN(addedValue)) {
+                    console.log('Tag baru ditambahkan:', addedLabel);
+
+                    setTimeout(() => {
+                        const items = document.querySelectorAll('.choices__item');
+                        items.forEach(item => {
+                            if (item.dataset.value === addedValue) {
+                                item.style.backgroundColor = '#10b981';
+                                item.title = 'Tag baru (akan dibuat saat save)';
+                            }
+                        });
+                    }, 100);
                 }
             });
 
-            // Fetch tags from server when user types
             let searchTimeout;
-            tagInput.addEventListener('search', function(e) {
+            tagSelect.addEventListener('search', function(e) {
                 clearTimeout(searchTimeout);
                 const searchText = e.detail.value;
 
-                if (searchText.length > 0) {
+                if (searchText && searchText.length > 1) {
                     searchTimeout = setTimeout(function() {
                         fetch('{{ route('admin.news.fetch-tags') }}?search=' + encodeURIComponent(
                                 searchText))
                             .then(response => response.json())
                             .then(data => {
-                                // Clear existing items except selected ones
+                                const selectedValues = choicesInstance.getValue(true);
                                 choicesInstance.clearChoices();
 
-                                // Add fetched tags as choices
-                                data.forEach(tag => {
-                                    choicesInstance.setChoices([{
-                                        value: tag.id,
+                                if (data && data.length > 0) {
+                                    const choices = data.map(tag => ({
+                                        value: tag.id.toString(),
                                         label: tag.label,
-                                        selected: false
-                                    }], 'value', 'label', true);
-                                });
+                                        selected: false,
+                                        disabled: false
+                                    }));
+
+                                    choicesInstance.setChoices(choices, 'value', 'label', true);
+                                }
                             })
                             .catch(err => console.error('Error fetching tags:', err));
                     }, 300);
                 }
             });
-
             // Create editor container and hide original textarea visually
             var textarea = document.getElementById('editor');
             // create a div to host quill and insert it before textarea
@@ -284,7 +312,8 @@
 
                     var xhr = new XMLHttpRequest();
                     var url = document.getElementById('ck-upload-url') ? document.getElementById(
-                        'ck-upload-url').textContent.trim() : '{{ route('admin.news.upload.image') }}';
+                            'ck-upload-url').textContent.trim() :
+                        '{{ route('admin.news.upload.image') }}';
                     xhr.open('POST', url, true);
                     xhr.setRequestHeader('X-CSRF-TOKEN', '{{ csrf_token() }}');
 
