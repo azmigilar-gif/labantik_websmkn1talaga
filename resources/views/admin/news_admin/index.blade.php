@@ -143,8 +143,8 @@
                                                                         class="btn-edit-tag hover:text-custom-500 hover:bg-custom-100 dark:bg-zink-600 dark:text-zink-200 dark:hover:bg-custom-500/20 dark:hover:text-custom-500 flex size-8 items-center justify-center rounded-md bg-slate-100 text-slate-500 transition-all duration-200 ease-linear">
                                                                         <i data-lucide="pencil" class="size-4"></i>
                                                                     </button>
-                                                                    <button type="button"
-                                                                        data-modal-target="deleteCatModal{{ $tag->id }}"
+                                                                    <button type="button" <button type="button"
+                                                                        data-modal-target="deleteTagModal{{ $tag->id }}"
                                                                         class="hover:text-custom-500 hover:bg-custom-100 dark:bg-zink-600 dark:text-zink-200 dark:hover:bg-custom-500/20 dark:hover:text-custom-500 flex size-8 items-center justify-center rounded-md bg-slate-100 text-slate-500 transition-all duration-200 ease-linear">
                                                                         <i data-lucide="trash-2" class="size-4"></i>
                                                                     </button>
