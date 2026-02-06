@@ -18,21 +18,26 @@
                 @foreach ($menus as $m)
                     <li class="dropdown relative">
                         @if ($m->submenus && $m->submenus->count() > 0)
-                            <!-- Menu dengan Submenu (Split Dropdown Button) - MENGGUNAKAN CLASS CUSTOM -->
-
+                            <!-- Menu dengan Submenu (Split Dropdown Button) -->
                             <div class="flex items-center justify-between md:justify-start md:gap-0">
-                                <a href="{{ url('/#' . $m->slug) }}"
+                                @php
+                                    // Cek apakah slug dimulai dengan http:// atau https://
+                                    $isExternalLink = preg_match('/^https?:\/\//', $m->slug);
+                                    $menuUrl = $isExternalLink ? $m->slug : url('/#' . $m->slug);
+                                @endphp
+
+                                <a href="{{ $menuUrl }}"
+                                    @if ($isExternalLink) target="_blank" rel="noopener noreferrer" @endif
                                     class="nav-link text-15 hover:text-custom-500 [&.active]:text-custom-500 dark:hover:text-custom-500 dark:[&.active]:text-custom-500 block px-4 py-2.5 font-medium text-slate-800 transition-all duration-300 ease-linear md:inline-block md:px-3 md:py-0.5 dark:text-zinc-200">
                                     {{ $m->name }}
                                 </a>
                                 <button type="button"
                                     class="dropdown-toggle-custom hover:text-custom-500 dark:hover:text-custom-500 mr-2 flex items-center justify-center p-0 text-slate-800 transition-all duration-300 md:h-auto md:px-0 md:py-0.5 dark:text-zinc-200">
-
                                     <i data-lucide="chevron-down" class="inline-block size-4"></i>
                                 </button>
                             </div>
 
-                            <!-- Dropdown Menu - MENGGUNAKAN CLASS CUSTOM -->
+                            <!-- Dropdown Menu -->
                             <ul
                                 class="dropdown-menu-custom absolute z-[1000] mt-2 hidden min-w-[10rem] list-none rounded-md bg-white py-2 text-left shadow-lg dark:bg-zinc-600">
                                 @foreach ($m->submenus as $submenu)
@@ -46,41 +51,23 @@
                             </ul>
                         @else
                             <!-- Menu Biasa (Tanpa Submenu) -->
-                            <a href="{{ url('/#' . $m->slug) }}"
+                            @php
+                                // Cek apakah slug dimulai dengan http:// atau https://
+                                $isExternalLink = preg_match('/^https?:\/\//', $m->slug);
+                                $menuUrl = $isExternalLink ? $m->slug : url('/#' . $m->slug);
+                            @endphp
+
+                            <a href="{{ $menuUrl }}"
+                                @if ($isExternalLink) target="_blank" rel="noopener noreferrer" @endif
                                 class="nav-link text-15 hover:text-custom-500 [&.active]:text-custom-500 dark:hover:text-custom-500 dark:[&.active]:text-custom-500 block px-4 py-2.5 font-medium text-slate-800 transition-all duration-300 ease-linear md:inline-block md:px-3 md:py-0.5 dark:text-zinc-200">
                                 {{ $m->name }}
                             </a>
+                        @endif
                     </li>
-                @endif
                 @endforeach
             </ul>
         </div>
 
-        <script>
-            function toggleDropdown(button) {
-                const li = button.closest('li.dropdown');
-                const dropdownMenu = li.querySelector('.dropdown-menu');
-
-                // Tutup semua dropdown lain
-                document.querySelectorAll('.dropdown-menu').forEach(menu => {
-                    if (menu !== dropdownMenu) {
-                        menu.classList.add('hidden');
-                    }
-                });
-
-                // Toggle dropdown saat ini
-                dropdownMenu.classList.toggle('hidden');
-            }
-
-            // Tutup dropdown ketika klik di luar
-            document.addEventListener('click', function(e) {
-                if (!e.target.closest('.dropdown')) {
-                    document.querySelectorAll('.dropdown-menu').forEach(menu => {
-                        menu.classList.add('hidden');
-                    });
-                }
-            });
-        </script>
         <div class="navbar-toggale-button md:hidden ltr:ml-auto rtl:mr-auto">
             <button type="button"
                 class="btn bg-custom-500 border-custom-500 hover:bg-custom-600 hover:border-custom-600 focus:bg-custom-600 focus:border-custom-600 focus:ring-custom-100 active:bg-custom-600 active:border-custom-600 active:ring-custom-100 dark:ring-custom-400/20 flex size-[37.5px] items-center justify-center p-0 text-white hover:text-white focus:text-white focus:ring active:text-white active:ring">
@@ -157,7 +144,8 @@
                 link.classList.remove('active');
                 const href = link.getAttribute('href');
 
-                if (href === '#' + currentSection) {
+                // Hanya aktifkan untuk link internal (bukan external)
+                if (href && href.includes('#') && href === '#' + currentSection) {
                     link.classList.add('active');
                 }
             });
@@ -169,12 +157,16 @@
         // Update saat page load
         updateActiveMenu();
 
-        // Update saat klik menu
+        // Update saat klik menu (hanya untuk internal link)
         document.querySelectorAll('.nav-link').forEach(link => {
             link.addEventListener('click', function() {
-                document.querySelectorAll('.nav-link').forEach(l => l.classList.remove(
-                    'active'));
-                this.classList.add('active');
+                const href = this.getAttribute('href');
+                // Hanya update active untuk internal link
+                if (href && href.includes('#')) {
+                    document.querySelectorAll('.nav-link').forEach(l => l.classList.remove(
+                        'active'));
+                    this.classList.add('active');
+                }
             });
         });
     });

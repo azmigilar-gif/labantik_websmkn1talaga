@@ -372,7 +372,7 @@
                                     <div class="xl:col-span-6">
                                         <label for="slugInput"
                                             class="inline-block mb-2 text-base font-medium">Slug</label>
-                                        <input type="text" id="slugInput" name="slug"
+                                        <input type="text" id="slugInput" name="slug" value="section-"
                                             class="form-input border-slate-200 dark:border-zink-500 focus:outline-none focus:border-custom-500 disabled:bg-slate-100 dark:disabled:bg-zink-600 disabled:border-slate-300 dark:disabled:border-zink-500 dark:disabled:text-zink-200 disabled:text-slate-500 dark:text-zink-100 dark:bg-zink-700 dark:focus:border-custom-800 placeholder:text-slate-400 dark:placeholder:text-zink-200"
                                             placeholder="Masukkan Slug" required>
                                     </div>
@@ -585,32 +585,6 @@
         }
     </style>
 
-
-    <script>
-        document.addEventListener('DOMContentLoaded', function() {
-            const slugInput = document.getElementById('slugInput');
-
-            // Tambahkan prefix Section-
-            const cleave = new Cleave(slugInput, {
-                prefix: 'section-',
-                delimiter: '',
-                blocks: [8, 999], // "Section-" = 8 karakter
-                uppercase: false,
-                lowercase: true,
-                numericOnly: false,
-                onValueChanged: function(e) {
-                    // Ganti spasi jadi -
-                    const cleaned = e.target.value
-                        .replace(/^section-/, '') // hapus prefix sementara
-                        .replace(/\s+/g, '-') // ubah spasi jadi -
-                        .replace(/[^a-zA-Z0-9-]/g, '') // hapus karakter aneh
-                        .toLowerCase();
-
-                    cleave.setRawValue('section-' + cleaned);
-                }
-            });
-        });
-    </script>
     <script>
         document.addEventListener('DOMContentLoaded', function() {
             let currentStep = 1;
@@ -619,7 +593,7 @@
             const nextBtn = document.getElementById('nextBtn');
             const prevBtn = document.getElementById('prevBtn');
             const submitBtn = document.getElementById('submitBtn');
-            const form = document.getElementById('create-form');
+            const wizardForm = document.querySelector('#addLinkModal form'); // ← Spesifik ke form wizard
 
             function showStep(step) {
                 // Hide all steps
@@ -690,8 +664,9 @@
                 });
             }
 
-            if (form) {
-                form.addEventListener('submit', function(e) {
+            // ← HANYA VALIDASI FORM WIZARD, BUKAN SEMUA FORM
+            if (wizardForm) {
+                wizardForm.addEventListener('submit', function(e) {
                     if (!validateStep(currentStep)) {
                         e.preventDefault();
                     }
@@ -703,7 +678,7 @@
                 btn.addEventListener('click', function() {
                     currentStep = 1;
                     showStep(currentStep);
-                    if (form) form.reset();
+                    if (wizardForm) wizardForm.reset();
                 });
             });
 
