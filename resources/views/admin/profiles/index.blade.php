@@ -98,11 +98,12 @@
                                                             </select>
                                                         </div>
 
+                                                        <!-- Ganti bagian textarea di modal edit -->
                                                         <div class="mt-3 xl:col-span-6">
-                                                            <label for="edit_content"
+                                                            <label for="edit_content_{{ $p->id }}"
                                                                 class="mb-2 inline-block text-base font-medium">Profile
                                                                 Sekolah</label>
-                                                            <textarea rows="5" id="editor" name="content"
+                                                            <textarea rows="5" id="edit_content_{{ $p->id }}" name="content"
                                                                 class="block min-h-[300px] w-full rounded border border-gray-200 p-4 text-slate-800"
                                                                 placeholder="Masukkan Profile Sekolah" required>{{ old('content', $p->content) }}</textarea>
                                                         </div>
@@ -257,182 +258,164 @@
             </div>
         </div>
     </div>
-    @push('scripts')
-        <!-- Quill editor (free, no jQuery). Custom image upload handler that posts to your news.upload.image route -->
-        <link href="https://cdn.quilljs.com/1.3.7/quill.snow.css" rel="stylesheet">
-        <script src="https://cdn.quilljs.com/1.3.7/quill.min.js"></script>
-        <script>
-            document.addEventListener('DOMContentLoaded', function() {
-                // Create editor container and hide original textarea visually
-                var textarea = document.getElementById('editor');
-                if (textarea) {
-                    var quillContainer = document.createElement('div');
-                    quillContainer.id = 'quill-editor';
-                    quillContainer.style.height = '500px';
-                    textarea.parentNode.insertBefore(quillContainer, textarea);
-                    textarea.style.display = 'none';
+@endsection
+@push('scripts')
+    <link href="https://cdn.quilljs.com/1.3.7/quill.snow.css" rel="stylesheet">
+    <script src="https://cdn.quilljs.com/1.3.7/quill.min.js"></script>
+    <script>
+        // Konfigurasi toolbar Quill
+        var toolbarOptions = [
+            ['bold', 'italic', 'underline', 'strike'],
+            [{
+                'header': 1
+            }, {
+                'header': 2
+            }],
+            [{
+                'list': 'ordered'
+            }, {
+                'list': 'bullet'
+            }],
+            [{
+                'align': []
+            }],
+            ['link', 'image'],
+            ['clean']
+        ];
 
-                    var toolbarOptions = [
-                        ['bold', 'italic', 'underline', 'strike'],
-                        [{
-                            'header': 1
-                        }, {
-                            'header': 2
-                        }],
-                        [{
-                            'list': 'ordered'
-                        }, {
-                            'list': 'bullet'
-                        }],
-                        [{
-                            'align': []
-                        }],
-                        ['link', 'image'],
-                        ['clean']
-                    ];
+        // Fungsi untuk inisialisasi Quill editor
+        function initQuillEditor(textareaId, containerId) {
+            var textarea = document.getElementById(textareaId);
+            if (!textarea || textarea.dataset.quillInitialized) return null;
 
-                    var quill = new Quill('#quill-editor', {
-                        modules: {
-                            toolbar: {
-                                container: toolbarOptions,
-                                handlers: {}
+            var quillContainer = document.createElement('div');
+            quillContainer.id = containerId;
+            quillContainer.style.height = '500px';
+            textarea.parentNode.insertBefore(quillContainer, textarea);
+            textarea.style.display = 'none';
+
+            var quill = new Quill('#' + containerId, {
+                modules: {
+                    toolbar: {
+                        container: toolbarOptions,
+                        handlers: {
+                            image: function() {
+                                imageHandler(quill);
                             }
-                        },
-                        theme: 'snow'
-                    });
-
-                    // If textarea already has content, load into quill
-                    if (textarea.value) {
-                        quill.root.innerHTML = textarea.value;
+                        }
                     }
+                },
+                theme: 'snow'
+            });
 
-                    // Image handler: open file input, upload to server, insert image URL
-                    function imageHandler() {
-                        var input = document.createElement('input');
-                        input.setAttribute('type', 'file');
-                        input.setAttribute('accept', 'image/*');
-                        input.click();
+            // Load konten dari textarea ke Quill
+            if (textarea.value) {
+                quill.root.innerHTML = textarea.value;
+            }
 
-                        input.onchange = function() {
-                            var file = input.files[0];
-                            if (!file) return;
+            // Update textarea saat konten Quill berubah
+            quill.on('text-change', function() {
+                textarea.value = quill.root.innerHTML;
+            });
 
-                            var formData = new FormData();
-                            formData.append('upload', file);
+            // Update textarea sebelum form submit
+            var form = textarea.closest('form');
+            if (form) {
+                form.addEventListener('submit', function(e) {
+                    textarea.value = quill.root.innerHTML;
+                });
+            }
 
-                            var xhr = new XMLHttpRequest();
-                            var url = '{{ route('admin.news.upload.image') }}';
-                            xhr.open('POST', url, true);
-                            xhr.setRequestHeader('X-CSRF-TOKEN', '{{ csrf_token() }}');
+            textarea.dataset.quillInitialized = 'true';
+            return quill;
+        }
 
-                            xhr.onreadystatechange = function() {
-                                if (xhr.readyState === 4) {
-                                    if (xhr.status >= 200 && xhr.status < 300) {
-                                        try {
-                                            var resp = JSON.parse(xhr.responseText);
-                                            if (resp && resp.url) {
-                                                var width = prompt(
-                                                    'Masukkan lebar gambar (pixel):\n\nContoh: 300, 400, 500',
-                                                    '300');
+        // Image handler untuk upload gambar
+        function imageHandler(quill) {
+            var input = document.createElement('input');
+            input.setAttribute('type', 'file');
+            input.setAttribute('accept', 'image/*');
+            input.click();
 
-                                                if (width !== null && width.trim() !== '') {
-                                                    width = parseInt(width);
-                                                    if (!isNaN(width) && width > 0) {
-                                                        var range = quill.getSelection(true);
-                                                        quill.insertEmbed(range.index, 'image', resp.url);
-                                                        var imgElement = quill.root.querySelector('img[src="' +
-                                                            resp.url + '"]');
-                                                        if (imgElement) {
-                                                            imgElement.style.width = width + 'px';
-                                                            imgElement.style.maxWidth = '100%';
-                                                            imgElement.style.height = 'auto';
-                                                        }
-                                                        quill.setSelection(range.index + 1);
-                                                    } else {
-                                                        alert('Lebar harus berupa angka positif!');
-                                                    }
-                                                }
-                                            } else {
-                                                alert('Upload failed: invalid response');
+            input.onchange = function() {
+                var file = input.files[0];
+                if (!file) return;
+
+                var formData = new FormData();
+                formData.append('upload', file);
+
+                var xhr = new XMLHttpRequest();
+                var url = '{{ route('admin.news.upload.image') }}';
+                xhr.open('POST', url, true);
+                xhr.setRequestHeader('X-CSRF-TOKEN', '{{ csrf_token() }}');
+
+                xhr.onreadystatechange = function() {
+                    if (xhr.readyState === 4) {
+                        if (xhr.status >= 200 && xhr.status < 300) {
+                            try {
+                                var resp = JSON.parse(xhr.responseText);
+                                if (resp && resp.url) {
+                                    var width = prompt(
+                                        'Masukkan lebar gambar (pixel):\n\nContoh: 300, 400, 500',
+                                        '300');
+
+                                    if (width !== null && width.trim() !== '') {
+                                        width = parseInt(width);
+                                        if (!isNaN(width) && width > 0) {
+                                            var range = quill.getSelection(true);
+                                            quill.insertEmbed(range.index, 'image', resp.url);
+                                            var imgElement = quill.root.querySelector('img[src="' +
+                                                resp.url + '"]');
+                                            if (imgElement) {
+                                                imgElement.style.width = width + 'px';
+                                                imgElement.style.maxWidth = '100%';
+                                                imgElement.style.height = 'auto';
                                             }
-                                        } catch (e) {
-                                            alert('Upload failed: ' + e.message);
+                                            quill.setSelection(range.index + 1);
+                                        } else {
+                                            alert('Lebar harus berupa angka positif!');
                                         }
-                                    } else if (xhr.status === 401 || xhr.status === 403) {
-                                        alert('Upload failed: authentication error');
-                                    } else {
-                                        alert('Upload failed: ' + xhr.status);
                                     }
+                                } else {
+                                    alert('Upload failed: invalid response');
                                 }
-                            };
-
-                            xhr.onerror = function() {
-                                alert('Upload failed due to network error');
-                            };
-                            xhr.send(formData);
-                        };
+                            } catch (e) {
+                                alert('Upload failed: ' + e.message);
+                            }
+                        } else {
+                            alert('Upload failed: ' + xhr.status);
+                        }
                     }
+                };
 
-                    // Attach the image handler to the toolbar
-                    quill.getModule('toolbar').addHandler('image', imageHandler);
+                xhr.onerror = function() {
+                    alert('Upload failed due to network error');
+                };
+                xhr.send(formData);
+            };
+        }
 
-                    // On form submit, copy quill HTML to textarea so it's submitted
-                    var form = textarea.closest('form');
-                    if (form) {
-                        form.addEventListener('submit', function(e) {
-                            textarea.value = quill.root.innerHTML;
-                        });
-                    }
+        document.addEventListener('DOMContentLoaded', function() {
+            // Inisialisasi editor untuk form tambah
+            initQuillEditor('editor', 'quill-editor-add');
+
+            // Inisialisasi editor untuk form edit saat modal dibuka
+            document.body.addEventListener('click', function(e) {
+                var trigger = e.target.closest('[data-modal-target^="editProfileModal"]');
+                if (trigger) {
+                    var modalId = trigger.getAttribute('data-modal-target');
+                    setTimeout(function() {
+                        var modal = document.getElementById(modalId);
+                        if (modal) {
+                            var textarea = modal.querySelector('textarea[name="content"]');
+                            if (textarea && !textarea.dataset.quillInitialized) {
+                                var uniqueId = 'quill-editor-edit-' + modalId;
+                                initQuillEditor(textarea.id, uniqueId);
+                            }
+                        }
+                    }, 300);
                 }
             });
-        </script>
-
-        <script>
-            (function() {
-                function initEditors() {
-                    document.querySelectorAll('.ckeditor-classic').forEach(function(el) {
-                        try {
-                            if (el.dataset.ckeditorInitialized) return;
-                            if (window.ClassicEditor) {
-                                ClassicEditor.create(el).then(function(editor) {
-                                    el.dataset.ckeditorInitialized = '1';
-                                    el._ckeditor = editor;
-                                }).catch(function(err) {
-                                    console.error('CKEditor init error', err);
-                                });
-                            }
-                        } catch (e) {
-                            console.error(e);
-                        }
-                    });
-                }
-
-                function loadCkEditorThenInit() {
-                    if (window.ClassicEditor) {
-                        initEditors();
-                        return;
-                    }
-                    var s = document.createElement('script');
-                    s.src = 'https://cdn.ckeditor.com/ckeditor5/39.0.0/classic/ckeditor.js';
-                    s.onload = initEditors;
-                    s.onerror = function() {
-                        console.error('Failed to load CKEditor from CDN');
-                    };
-                    document.head.appendChild(s);
-                }
-
-                document.addEventListener('DOMContentLoaded', function() {
-                    loadCkEditorThenInit();
-
-                    // Re-init editors shortly after a modal open trigger (data-modal-target)
-                    document.body.addEventListener('click', function(e) {
-                        var trigger = e.target.closest('[data-modal-target]');
-                        if (trigger) {
-                            setTimeout(initEditors, 250);
-                        }
-                    });
-                });
-            })();
-        </script>
-    @endpush
-@endsection
+        });
+    </script>
+@endpush
