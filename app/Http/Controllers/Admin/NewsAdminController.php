@@ -118,49 +118,17 @@ class NewsAdminController extends Controller
      */
     public function store(Request $request)
     {
-        // Validate request data
-
-        $data = $request->validate([
-            'title' => 'required|string|max:255',
-            'content' => 'nullable|string',
-            's_tag_id' => 'required|array|min:1',
-            's_tag_id.*' => 'string|exists:s_tags,id',
-            's_category_id' => 'required|string|max:255',
-            's_menu_id' => 'required|string|max:255',
-            'is_published' => 'nullable|boolean',
-        ]);
-
-
         try {
-            // TAMBAH: Convert comma-separated string to array
-            if ($request->has('s_tag_id')) {
-                $tags = $request->input('s_tag_id');
-
-                // Jika s_tag_id adalah string (bukan array), split by comma
-                if (is_string($tags)) {
-                    $tags = array_map('trim', explode(',', $tags));
-                    $request->merge(['s_tag_id' => array_filter($tags)]);
-                } elseif (is_array($tags)) {
-                    // Jika sudah array, pastikan tidak ada yang kosong
-                    $tags = array_filter(array_map('trim', $tags));
-                    $request->merge(['s_tag_id' => $tags]);
-                }
-            }
-
-            // ===== TAMBAH LOGGING DI SINI =====
-            Log::info('=== DEBUG TAGS INPUT ===');
-            Log::info('Original Input:', ['input' => $request->input('s_tag_id')]);
-            Log::info('Is Array?', ['is_array' => is_array($request->input('s_tag_id'))]);
-            Log::info('Count:', ['count' => is_array($request->input('s_tag_id')) ? count($request->input('s_tag_id')) : 0]);
-            Log::info('Values:', ['values' => $request->input('s_tag_id')]);
-            // ===== END LOGGING =====
-
-
-
-            // ===== TAMBAH LOGGING SETELAH VALIDASI =====
-            Log::info('=== AFTER VALIDATION ===');
-            Log::info('Validated Tags:', ['tags' => $data['s_tag_id']]);
-            Log::info('Count:', ['count' => count($data['s_tag_id'])]);
+            // Validasi awal TANPA validasi exists untuk tag
+            $data = $request->validate([
+                'title' => 'required|string|max:255',
+                'content' => 'nullable|string',
+                's_tag_id' => 'required|array|min:1',
+                's_tag_id.*' => 'required|string|max:255', // ❌ HAPUS: exists:s_tags,id
+                's_category_id' => 'required|string|max:255',
+                's_menu_id' => 'required|string|max:255',
+                'is_published' => 'nullable|boolean',
+            ]);
 
             Log::debug('news.store input', $request->all());
 
@@ -219,41 +187,56 @@ class NewsAdminController extends Controller
             $news->is_published = $request->boolean('is_published');
             $news->save();
 
-            // Process tags and create news_logs entries - loop setiap tag
-            if (!empty($request->s_tag_id) && is_array($request->s_tag_id)) {
-                foreach ($request->s_tag_id as $tagInput) {
+            // Process tags and create news_logs entries
+            if (!empty($data['s_tag_id']) && is_array($data['s_tag_id'])) {
+                foreach ($data['s_tag_id'] as $tagInput) {
                     $tagInput = trim($tagInput);
 
                     if (empty($tagInput)) {
                         continue;
                     }
 
-                    // Check if tag exists by ID
+                    $tagId = null;
+
+                    // Check if input is UUID (existing tag ID)
                     if (preg_match('/^[0-9a-fA-F\-]{36}$/', $tagInput)) {
+                        // It's a UUID, check if exists
                         $tag = Tag::where('id', $tagInput)->first();
-                        if (!$tag) {
-                            throw new \Exception("Tag dengan ID {$tagInput} tidak ditemukan");
+                        if ($tag) {
+                            $tagId = $tag->id;
+                        } else {
+                            // UUID not found, skip
+                            Log::warning("Tag ID not found: {$tagInput}");
+                            continue;
                         }
-                        $tagId = $tagInput;
                     } else {
-                        // Find by name case-insensitive or create jika belum exist
+                        // It's a tag name (new or existing)
+                        // Find existing tag by name (case insensitive)
                         $tag = Tag::whereRaw('LOWER(name) = ?', [strtolower($tagInput)])->first();
+
                         if (!$tag) {
-                            // CREATE tag baru
+                            // Create new tag
                             $tag = new Tag();
                             $tag->id = (string) Str::uuid();
                             $tag->name = $tagInput;
                             $tag->save();
+
+                            Log::info("Created new tag: {$tagInput} with ID: {$tag->id}");
                         }
+
                         $tagId = $tag->id;
                     }
 
-                    // CREATE news_log entry (PERBAIKAN DI SINI)
-                    $newsLog = new NewsLog();
-                    $newsLog->id = (string) Str::uuid();
-                    $newsLog->s_news_id = $newsId;  // ← UBAH: Link ke news yang baru dibuat
-                    $newsLog->s_tags_id = $tagId;
-                    $newsLog->save();
+                    // Create news_log entry
+                    if ($tagId) {
+                        $newsLog = new NewsLog();
+                        $newsLog->id = (string) Str::uuid();
+                        $newsLog->s_news_id = $newsId;
+                        $newsLog->s_tags_id = $tagId;
+                        $newsLog->save();
+
+                        Log::info("Created news_log for news {$newsId} with tag {$tagId}");
+                    }
                 }
             }
 
@@ -264,8 +247,14 @@ class NewsAdminController extends Controller
         } catch (\Exception $e) {
             // Rollback transaction on error
             DB::rollBack();
-            Log::error('news.store failed', ['message' => $e->getMessage(), 'trace' => $e->getTraceAsString()]);
-            return redirect()->back()->with('error', 'Gagal membuat berita: ' . $e->getMessage())->withInput();
+            Log::error('news.store failed', [
+                'message' => $e->getMessage(),
+                'trace' => $e->getTraceAsString(),
+                'input' => $request->all()
+            ]);
+            return redirect()->back()
+                ->with('error', 'Gagal membuat berita: ' . $e->getMessage())
+                ->withInput();
         }
     }
     public function edit($id)
