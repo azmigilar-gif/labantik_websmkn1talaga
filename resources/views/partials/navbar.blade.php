@@ -28,18 +28,10 @@
                         $position = array_search($m->name, $menuOrder);
                         if ($position !== false) {
                             $orderedMenus[$position] = $m;
-                    // Pisahkan menu "Aplikasi Kedinasan" dari menu lainnya
-                    $aplikasiKedinasan = null;
-                    $otherMenus = [];
-
-                    foreach ($menus as $m) {
-                        if (strtolower($m->name) === 'aplikasi kedinasan' || $m->slug === 'aplikasi-kedinasan') {
-                            $aplikasiKedinasan = $m;
                         } else {
                             $otherMenus[] = $m;
                         }
                     }
-<<<<<<< HEAD
 
                     // Sort ordered menus berdasarkan key
                     ksort($orderedMenus);
@@ -50,12 +42,6 @@
 
                 {{-- Tampilkan semua menu dengan urutan yang benar --}}
                 @foreach ($sortedMenus as $m)
-=======
-                @endphp
-
-                {{-- Tampilkan menu lain terlebih dahulu --}}
-                @foreach ($otherMenus as $m)
->>>>>>> d480411b36f14a4c4d8becf210de3d80f4d28120
                     <li class="dropdown relative">
                         @if ($m->submenus && $m->submenus->count() > 0)
                             <!-- Menu dengan Submenu (Split Dropdown Button) -->
@@ -114,68 +100,6 @@
                         @endif
                     </li>
                 @endforeach
-
-                {{-- Tampilkan "Aplikasi Kedinasan" di paling akhir --}}
-                @if ($aplikasiKedinasan)
-                    <li class="dropdown relative">
-                        @if ($aplikasiKedinasan->submenus && $aplikasiKedinasan->submenus->count() > 0)
-                            <!-- Menu dengan Submenu (Split Dropdown Button) -->
-                            <div class="flex items-center justify-between md:justify-start md:gap-0">
-                                @php
-                                    $isExternalLink = preg_match('/^https?:\/\//', $aplikasiKedinasan->slug);
-                                    $menuUrl = $isExternalLink
-                                        ? $aplikasiKedinasan->slug
-                                        : url('/#' . $aplikasiKedinasan->slug);
-                                @endphp
-
-                                <a href="{{ $menuUrl }}"
-                                    @if ($isExternalLink) target="_blank" rel="noopener noreferrer" @endif
-                                    class="nav-link text-15 hover:text-custom-500 [&.active]:text-custom-500 dark:hover:text-custom-500 dark:[&.active]:text-custom-500 block px-4 py-2.5 font-medium text-slate-800 transition-all duration-300 ease-linear md:inline-block md:px-3 md:py-0.5 dark:text-zinc-200">
-                                    {{ $aplikasiKedinasan->name }}
-                                </a>
-                                <button type="button"
-                                    class="dropdown-toggle-custom hover:text-custom-500 dark:hover:text-custom-500 mr-2 flex items-center justify-center p-0 text-slate-800 transition-all duration-300 md:h-auto md:px-0 md:py-0.5 dark:text-zinc-200">
-                                    <i data-lucide="chevron-down" class="inline-block size-4"></i>
-                                </button>
-                            </div>
-
-                            <!-- Dropdown Menu -->
-                            <ul
-                                class="dropdown-menu-custom absolute z-[1000] mt-2 hidden min-w-[10rem] list-none rounded-md bg-white py-2 text-left shadow-lg dark:bg-zinc-600">
-                                @foreach ($aplikasiKedinasan->submenus as $submenu)
-                                    <li>
-                                        @php
-                                            $isSubmenuExternal = preg_match('/^https?:\/\//', $submenu->url);
-                                            $submenuUrl = $isSubmenuExternal
-                                                ? $submenu->url
-                                                : url('sub/' . $submenu->url);
-                                        @endphp
-
-                                        <a href="{{ $submenuUrl }}"
-                                            @if ($isSubmenuExternal) target="_blank" rel="noopener noreferrer" @endif
-                                            class="dropdown-item hover:text-custom-500 dark:hover:text-custom-500 block whitespace-nowrap bg-transparent px-4 py-2 font-normal text-slate-600 hover:bg-slate-100 dark:text-zinc-100 dark:hover:bg-zinc-500">
-                                            {{ $submenu->name }}
-                                        </a>
-                                    </li>
-                                @endforeach
-                            </ul>
-                        @else
-                            <!-- Menu Biasa (Tanpa Submenu) -->
-                            @php
-                                $isExternalLink = preg_match('/^https?:\/\//', $aplikasiKedinasan->slug);
-                                $menuUrl = $isExternalLink
-                                    ? $aplikasiKedinasan->slug
-                                    : url('/#' . $aplikasiKedinasan->slug);
-                            @endphp
-
-                            <a href="{{ $menuUrl }}"
-                                @if ($isExternalLink) target="_blank" rel="noopener noreferrer" @endif
-                                class="nav-link text-15 hover:text-custom-500 [&.active]:text-custom-500 dark:hover:text-custom-500 dark:[&.active]:text-custom-500 block px-4 py-2.5 font-medium text-slate-800 transition-all duration-300 ease-linear md:inline-block md:px-3 md:py-0.5 dark:text-zinc-200">
-                                {{ $aplikasiKedinasan->name }}
-                            </a>
-                        @endif
-                    </li>
-                @endif
             </ul>
         </div>
 
