@@ -19,19 +19,19 @@ class SubmenuController extends Controller
             's_menu_id' => 'required|exists:s_menus,id',
             'name' => 'required|string|max:255',
             'url' => 'nullable|string|max:255',
-            's_view_name_id' => 'nullable|exists:s_view, id',
-            's_model_key_id' => 'required|exists:s_model_key, id',
-            's_redirect_to_id' => 'nullable|exists:s_redirect, id',
+            // 's_view_name_id' => 'nullable|exists:s_view, id',
+            // 's_model_key_id' => 'nullable|exists:s_model_key, id',
+            // 's_redirect_to_id' => 'nullable|exists:s_redirect, id',
         ]);
 
         S_Submenu::create([
             'id' => (string) Str::uuid(),
             's_menu_id' => $request->s_menu_id,
             'name' => $request->name,
-            'url' => $request->name . '-page',
-            's_view_name_id' => $request->s_view_name_id,
-            's_model_key_id' => $request->s_model_key_id,
-            's_redirect_to_id' => $request->s_redirect_to_id,
+            'url' => $request->url ?? $request->name . '-page',
+            // 's_view_name_id' => $request->s_view_name_id,
+            // 's_model_key_id' => $request->s_model_key_id,
+            // 's_redirect_to_id' => $request->s_redirect_to_id,
         ]);
 
         return back()->with('success', 'Submenu berhasil ditambahkan.');
@@ -51,15 +51,15 @@ class SubmenuController extends Controller
         $request->validate([
             'name' => 'required|string|max:255',
             'url' => 'nullable|string|max:255',
-            's_view_name_id' => 'nullable|exists:s_view,id',
-            's_model_key_id' => 'required|exists:s_model_key,id',
-            's_redirect_to_id' => 'nullable|exists:s_redirect,id',
+            // 's_view_name_id' => 'nullable|exists:s_view,id',
+            // 's_model_key_id' => 'nullable|exists:s_model_key,id',
+            // 's_redirect_to_id' => 'nullable|exists:s_redirect,id',
         ]);
 
         $submenu = S_Submenu::findOrFail($id);
         $submenu->update([
             'name' => $request->name,
-            'url' => $request->name . '-page',
+            'url' => $request->url ?? $request->name . '-page',
             's_view_name_id' => $request->s_view_name_id,
             's_model_key_id' => $request->s_model_key_id,
             's_redirect_to_id' => $request->s_redirect_to_id,
