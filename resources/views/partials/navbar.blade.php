@@ -15,7 +15,33 @@
                     <a href="{{ url('/#home') }}"
                         class="nav-link text-15 hover:text-custom-500 [&.active]:text-custom-500 dark:hover:text-custom-500 dark:[&.active]:text-custom-500 block px-4 py-2.5 font-medium text-slate-800 transition-all duration-300 ease-linear md:inline-block md:px-3 md:py-0.5 dark:text-zinc-200">Home</a>
                 </li>
-                @foreach ($menus as $m)
+
+                @php
+                    // Definisikan urutan menu yang diinginkan
+                    $menuOrder = ['Profil Sekolah', 'Berita', 'Program Keahlian', 'Ekstrakurikuler', 'Kontak'];
+
+                    // Pisahkan menu berdasarkan urutan
+                    $orderedMenus = [];
+                    $otherMenus = [];
+
+                    foreach ($menus as $m) {
+                        $position = array_search($m->name, $menuOrder);
+                        if ($position !== false) {
+                            $orderedMenus[$position] = $m;
+                        } else {
+                            $otherMenus[] = $m;
+                        }
+                    }
+
+                    // Sort ordered menus berdasarkan key
+                    ksort($orderedMenus);
+
+                    // Gabungkan: ordered menus + other menus (menu lain muncul setelah Kontak)
+                    $sortedMenus = array_merge($orderedMenus, $otherMenus);
+                @endphp
+
+                {{-- Tampilkan semua menu dengan urutan yang benar --}}
+                @foreach ($sortedMenus as $m)
                     <li class="dropdown relative">
                         @if ($m->submenus && $m->submenus->count() > 0)
                             <!-- Menu dengan Submenu (Split Dropdown Button) -->
@@ -42,7 +68,16 @@
                                 class="dropdown-menu-custom absolute z-[1000] mt-2 hidden min-w-[10rem] list-none rounded-md bg-white py-2 text-left shadow-lg dark:bg-zinc-600">
                                 @foreach ($m->submenus as $submenu)
                                     <li>
-                                        <a href="{{ url('sub/' . $submenu->url) }}"
+                                        @php
+                                            // Cek apakah URL submenu adalah external link
+                                            $isSubmenuExternal = preg_match('/^https?:\/\//', $submenu->url);
+                                            $submenuUrl = $isSubmenuExternal
+                                                ? $submenu->url
+                                                : url('sub/' . $submenu->url);
+                                        @endphp
+
+                                        <a href="{{ $submenuUrl }}"
+                                            @if ($isSubmenuExternal) target="_blank" rel="noopener noreferrer" @endif
                                             class="dropdown-item hover:text-custom-500 dark:hover:text-custom-500 block whitespace-nowrap bg-transparent px-4 py-2 font-normal text-slate-600 hover:bg-slate-100 dark:text-zinc-100 dark:hover:bg-zinc-500">
                                             {{ $submenu->name }}
                                         </a>
