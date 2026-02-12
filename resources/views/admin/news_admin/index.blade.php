@@ -120,7 +120,7 @@
                                     <div class="max-h-[calc(theme('height.screen')_-_180px)] overflow-y-auto p-4">
                                         <h5 class="text-16 mb-3">Daftar Tag</h5>
                                         <div class="relative overflow-x-auto">
-                                            <table class="w-full text-left" id="rowBorder">
+                                            <table table id="hoverableTable" class="hover group" style="width:100%">
                                                 <thead class="dark:bg-zink-600 bg-slate-100">
                                                     <tr>
                                                         <th class="px-4 py-3 font-semibold">No</th>
@@ -257,7 +257,7 @@
                                     <div class="max-h-[calc(theme('height.screen')_-_180px)] overflow-y-auto p-4">
                                         <h5 class="text-16 mb-3">Daftar Kategori</h5>
                                         <div class="relative overflow-x-auto">
-                                            <table class="w-full text-left" id="rowBorder">
+                                            <table table id="borderedTable" class="bordered group" style="width:100%">
                                                 <thead class="dark:bg-zink-600 bg-slate-100">
                                                     <tr>
                                                         <th class="px-4 py-3 font-semibold">No</th>
@@ -503,10 +503,6 @@
                                     @endforeach
                                 </tbody>
                             </table>
-
-                            <div class="mt-4">
-                                {{ $news->links() }}
-                            </div>
                         @else
                             <!-- Empty state -->
                             <div class="py-12 text-center">

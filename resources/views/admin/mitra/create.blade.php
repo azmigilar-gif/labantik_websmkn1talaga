@@ -19,17 +19,21 @@
                     <div class="grid grid-cols-12 gap-6">
                         <div class="col-span-12 md:col-span-8">
                             <label class="mb-2 block text-sm font-medium">Nama</label>
-                            <input type="text" name="name" class="block w-full rounded border-gray-200 p-3 shadow-sm"
+                            <input type="text" name="name"
+                                class="form-input border-slate-200 dark:border-zink-500 focus:outline-none focus:border-custom-500 disabled:bg-slate-100 dark:disabled:bg-zink-600 disabled:border-slate-300 dark:disabled:border-zink-500 dark:disabled:text-zink-200 disabled:text-slate-500 dark:text-zink-100 dark:bg-zink-700 dark:focus:border-custom-800 placeholder:text-slate-400 dark:placeholder:text-zink-200"
                                 placeholder="Nama mitra">
                         </div>
 
                         <div class="col-span-12 md:col-span-4">
                             <label class="mb-2 block text-sm font-medium">Foto</label>
-                            <input type="file" name="photo" accept="image/*">
+                            <input type="file"
+                                class="cursor-pointer form-file form-file-sm border-slate-200 dark:border-zink-500 focus:outline-none focus:border-custom-500"
+                                name="photo" accept="image/*">
                         </div>
 
                         <div class="col-span-12 mt-4 text-right">
-                                                        <button type="submit" class="btn bg-custom-500 border-custom-500 hover:bg-custom-600 hover:border-custom-600 focus:bg-custom-600 focus:border-custom-600 focus:ring-custom-100 active:bg-custom-600 active:border-custom-600 active:ring-custom-100 dark:ring-custom-400/20 text-white hover:text-white focus:text-white focus:ring active:text-white active:ring">Simpan</button>
+                            <button type="submit"
+                                class="btn bg-custom-500 border-custom-500 hover:bg-custom-600 hover:border-custom-600 focus:bg-custom-600 focus:border-custom-600 focus:ring-custom-100 active:bg-custom-600 active:border-custom-600 active:ring-custom-100 dark:ring-custom-400/20 text-white hover:text-white focus:text-white focus:ring active:text-white active:ring">Simpan</button>
 
                             <a href="{{ route('admin.mitra.index') }}"
                                 class="ml-2 inline-block rounded border px-4 py-2">Batal</a>

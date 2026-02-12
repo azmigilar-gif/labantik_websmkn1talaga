@@ -58,9 +58,10 @@
             </div>
 
             <div class="bg-white dark:bg-zink-700 border-b border-slate-200 dark:border-zink-500 shadow-md">
-                <nav class="container mx-auto flex items-center justify-between h-20 px-10" id="navbar">
-                    <div class="container 2xl:max-w-[87.5rem] px-4 mx-auto flex items-center self-center w-full">
-                        <div class="shrink-0">
+                <nav class="container mx-auto h-20 px-4 2xl:max-w-[87.5rem]" id="navbar-preview">
+                    <div class="flex items-center w-full h-full">
+                        <!-- Logo - Fixed Width -->
+                        <div class="shrink-0" style="width: 180px;">
                             <a href="#!">
                                 <img src="{{ asset('assets/images/logosmk.png') }}" alt=""
                                     class="block h-12 dark:hidden">
@@ -68,31 +69,87 @@
                                     class="hidden h-12 dark:block">
                             </a>
                         </div>
-                        <div class="mx-auto">
-                            <ul id="navbar7"
-                                class="absolute inset-x-0 z-20 items-center hidden py-3 bg-white shadow-lg dark:bg-zink-600 dark:md:bg-transparent md:z-0 navbar-menu rounded-b-md md:shadow-none md:flex top-full ltr:ml-auto rtl:mr-auto md:relative md:bg-transparent md:rounded-none md:top-auto md:py-0">
-                                @foreach ($menus as $menu)
-                                    <li class="dropdown relative">
-                                        @if ($menu->submenus && $menu->submenus->count() > 0)
-                                            <!-- Menu dengan Submenu (Dropdown Split Button) -->
-                                            <div class="flex items-center">
-                                                <a href="#{{ $menu->slug }}"
-                                                    class="ltr:rounded-r-none rtl:rounded-l-none block md:inline-block px-4 md:px-3 py-2.5 md:py-0.5 text-15 font-medium text-slate-800 transition-all duration-300 ease-linear hover:text-custom-500 dark:text-zink-100 dark:hover:text-custom-500">
-                                                    {{ $menu->name }}
+
+                        <!-- Menu - Centered -->
+                        <div class="flex-1 flex justify-center">
+                            <ul class="flex items-center">
+                                <li>
+                                    <a href="javascript:void(0)"
+                                        class="nav-link-preview text-15 hover:text-custom-500 block px-4 py-2.5 font-medium text-slate-800 transition-all duration-300 ease-linear md:inline-block md:px-3 md:py-0.5 dark:text-zinc-200">Home</a>
+                                </li>
+
+                                @php
+                                    // Definisikan urutan menu yang diinginkan
+                                    $menuOrder = [
+                                        'Profil Sekolah',
+                                        'Berita',
+                                        'Program Keahlian',
+                                        'Ekstrakurikuler',
+                                        'Kontak',
+                                    ];
+
+                                    // Pisahkan menu berdasarkan urutan
+                                    $orderedMenus = [];
+                                    $otherMenus = [];
+
+                                    foreach ($menus as $m) {
+                                        $position = array_search($m->name, $menuOrder);
+                                        if ($position !== false) {
+                                            $orderedMenus[$position] = $m;
+                                        } else {
+                                            $otherMenus[] = $m;
+                                        }
+                                    }
+
+                                    // Sort ordered menus berdasarkan key
+                                    ksort($orderedMenus);
+
+                                    // Gabungkan: ordered menus + other menus
+                                    $sortedMenus = array_merge($orderedMenus, $otherMenus);
+                                @endphp
+
+                                {{-- Tampilkan semua menu dengan urutan yang benar --}}
+                                @foreach ($sortedMenus as $m)
+                                    <li class="dropdown-preview relative">
+                                        @if ($m->submenus && $m->submenus->count() > 0)
+                                            <!-- Menu dengan Submenu (Split Dropdown Button) -->
+                                            <div class="flex items-center justify-start gap-0">
+                                                @php
+                                                    // Cek apakah slug dimulai dengan http:// atau https://
+                                                    $isExternalLink = preg_match('/^https?:\/\//', $m->slug);
+                                                    $menuUrl = $isExternalLink ? $m->slug : 'javascript:void(0)';
+                                                @endphp
+
+                                                <a href="{{ $menuUrl }}"
+                                                    @if ($isExternalLink) target="_blank" rel="noopener noreferrer" @endif
+                                                    class="nav-link-preview text-15 hover:text-custom-500 dark:hover:text-custom-500 block px-4 py-2.5 font-medium text-slate-800 transition-all duration-300 ease-linear md:inline-block md:px-3 md:py-0.5 dark:text-zinc-200">
+                                                    {{ $m->name }}
                                                 </a>
-                                                <button type="button" data-bs-toggle="dropdown" aria-expanded="false"
-                                                    class="dropdown-toggle ltr:rounded-l-none rtl:rounded-r-none flex items-center justify-center size-[37.5px] p-0 text-slate-800 hover:text-custom-500 dark:text-zink-100 dark:hover:text-custom-500 transition-all duration-300">
+                                                <button type="button"
+                                                    class="dropdown-toggle-preview hover:text-custom-500 dark:hover:text-custom-500 mr-2 flex items-center justify-center p-0 text-slate-800 transition-all duration-300 md:h-auto md:px-0 md:py-0.5 dark:text-zinc-200">
                                                     <i data-lucide="chevron-down" class="inline-block size-4"></i>
                                                 </button>
                                             </div>
 
                                             <!-- Dropdown Menu -->
                                             <ul
-                                                class="dropdown-menu absolute left-0 z-[1000] py-2 mt-2 text-left list-none bg-white rounded-md shadow-lg dark:bg-zink-600 min-w-[10rem] hidden">
-                                                @foreach ($menu->submenus as $submenu)
+                                                class="dropdown-menu-preview absolute z-[1000] mt-2 hidden min-w-[10rem] list-none rounded-md bg-white py-2 text-left shadow-lg dark:bg-zinc-600">
+                                                @foreach ($m->submenus as $submenu)
                                                     <li>
-                                                        <a href="#{{ $submenu->url }}"
-                                                            class="block px-4 py-2 font-normal text-slate-600 bg-transparent dropdown-item whitespace-nowrap hover:bg-slate-100 hover:text-custom-500 dark:text-zink-100 dark:hover:bg-zink-500 dark:hover:text-custom-500">
+                                                        @php
+                                                            // Cek apakah URL submenu adalah external link
+                                                            $isSubmenuExternal = preg_match(
+                                                                '/^https?:\/\//',
+                                                                $submenu->url,
+                                                            );
+                                                            $submenuUrl = $isSubmenuExternal
+                                                                ? $submenu->url
+                                                                : 'javascript:void(0)';
+                                                        @endphp
+
+                                                        <a href="{{ $submenuUrl }}"
+                                                            @if ($isSubmenuExternal) target="_blank" rel="noopener noreferrer" @endif
+                                                            class="dropdown-item hover:text-custom-500 dark:hover:text-custom-500 block whitespace-nowrap bg-transparent px-4 py-2 font-normal text-slate-600 hover:bg-slate-100 dark:text-zinc-100 dark:hover:bg-zinc-500">
                                                             {{ $submenu->name }}
                                                         </a>
                                                     </li>
@@ -100,14 +157,27 @@
                                             </ul>
                                         @else
                                             <!-- Menu Biasa (Tanpa Submenu) -->
-                                            <a href="#{{ $menu->slug }}"
-                                                class="block md:inline-block px-4 md:px-3 py-2.5 md:py-0.5 text-15 font-medium text-slate-800 transition-all duration-300 ease-linear hover:text-custom-500 active dark:text-zink-100 dark:hover:text-custom-500">
-                                                {{ $menu->name }}
+                                            @php
+                                                // Cek apakah slug dimulai dengan http:// atau https://
+                                                $isExternalLink = preg_match('/^https?:\/\//', $m->slug);
+                                                $menuUrl = $isExternalLink ? $m->slug : 'javascript:void(0)';
+                                            @endphp
+
+                                            <a href="{{ $menuUrl }}"
+                                                @if ($isExternalLink) target="_blank" rel="noopener noreferrer" @endif
+                                                class="nav-link-preview text-15 hover:text-custom-500 dark:hover:text-custom-500 block px-4 py-2.5 font-medium text-slate-800 transition-all duration-300 ease-linear md:inline-block md:px-3 md:py-0.5 dark:text-zinc-200">
+                                                {{ $m->name }}
                                             </a>
                                         @endif
                                     </li>
                                 @endforeach
                             </ul>
+                        </div>
+
+                        <!-- Right Section - Fixed Width (sama dengan logo) -->
+                        <div class="flex items-center justify-end" style="width: 180px;">
+                            <!-- Placeholder untuk keseimbangan visual -->
+                            <div class="w-full"></div>
                         </div>
                     </div>
                 </nav>
@@ -159,7 +229,8 @@
                                                         data-modal-target="addSubmenuModal{{ $m->id }}"
                                                         class="flex items-center justify-center transition-all duration-200 ease-linear rounded-md size-8 edit-item-btn bg-slate-100 text-slate-500 hover:text-custom-500 hover:bg-custom-100 dark:bg-zink-600 dark:text-zink-200 dark:hover:bg-custom-500/20 dark:hover:text-custom-500"><i
                                                             data-lucide="plus" class="size-4"></i></a>
-                                                    <a href="#!" data-modal-target="editMenuModal{{ $m->id }}"
+                                                    <a href="#!"
+                                                        data-modal-target="editMenuModal{{ $m->id }}"
                                                         class="flex items-center justify-center transition-all duration-200 ease-linear rounded-md size-8 edit-item-btn bg-slate-100 text-slate-500 hover:text-custom-500 hover:bg-custom-100 dark:bg-zink-600 dark:text-zink-200 dark:hover:bg-custom-500/20 dark:hover:text-custom-500"><i
                                                             data-lucide="pencil" class="size-4"></i></a>
                                                     <a href="#!" data-modal-target="deleteModal{{ $m->id }}"
@@ -691,6 +762,52 @@
 
             // Initialize
             showStep(currentStep);
+        });
+    </script>
+
+    <script>
+        document.addEventListener('DOMContentLoaded', function() {
+            // Dropdown handler untuk preview navbar
+            const dropdownsPreview = document.querySelectorAll('.dropdown-preview');
+
+            dropdownsPreview.forEach(dropdown => {
+                const toggle = dropdown.querySelector('.dropdown-toggle-preview');
+                const menu = dropdown.querySelector('.dropdown-menu-preview');
+
+                if (toggle && menu) {
+                    toggle.addEventListener('click', function(e) {
+                        e.preventDefault();
+                        e.stopPropagation();
+
+                        // Close dropdown lain
+                        document.querySelectorAll('.dropdown-menu-preview').forEach(m => {
+                            if (m !== menu) {
+                                m.classList.add('hidden');
+                            }
+                        });
+
+                        // Toggle current dropdown
+                        const isHidden = menu.classList.contains('hidden');
+                        menu.classList.toggle('hidden');
+
+                        // Posisi ke kiri
+                        if (isHidden) {
+                            menu.style.left = 'auto';
+                            menu.style.right = '0';
+                            menu.style.transform = 'none';
+                        }
+                    });
+                }
+            });
+
+            // Close dropdown saat klik di luar
+            document.addEventListener('click', function(e) {
+                if (!e.target.closest('.dropdown-preview')) {
+                    document.querySelectorAll('.dropdown-menu-preview').forEach(menu => {
+                        menu.classList.add('hidden');
+                    });
+                }
+            });
         });
     </script>
 @endsection

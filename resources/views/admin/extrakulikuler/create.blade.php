@@ -21,7 +21,8 @@
                     <div class="grid grid-cols-12 gap-6">
                         <div class="col-span-12 md:col-span-4">
                             <label class="block text-sm font-medium mb-2">Menu</label>
-                            <select name="s_menu_id" class="block w-full rounded border-gray-200 shadow-sm p-3">
+                            <select name="s_menu_id"
+                                class="form-select border-slate-200 dark:border-zink-500 focus:outline-none focus:border-custom-500 disabled:bg-slate-100 dark:disabled:bg-zink-600 disabled:border-slate-300 dark:disabled:border-zink-500 dark:disabled:text-zink-200 disabled:text-slate-500 dark:text-zink-100 dark:bg-zink-700 dark:focus:border-custom-800 placeholder:text-slate-400 dark:placeholder:text-zink-200">
                                 <option value="">Pilih Menu</option>
                                 @if (!empty($menus))
                                     @foreach ($menus as $m)
@@ -35,7 +36,8 @@
 
                         <div class="col-span-12 md:col-span-8">
                             <label class="block text-sm font-medium mb-2">Nama</label>
-                            <input type="text" name="name" class="block w-full rounded border-gray-200 shadow-sm p-3"
+                            <input type="text" name="name"
+                                class="form-input border-slate-200 dark:border-zink-500 focus:outline-none focus:border-custom-500 disabled:bg-slate-100 dark:disabled:bg-zink-600 disabled:border-slate-300 dark:disabled:border-zink-500 dark:disabled:text-zink-200 disabled:text-slate-500 dark:text-zink-100 dark:bg-zink-700 dark:focus:border-custom-800 placeholder:text-slate-400 dark:placeholder:text-zink-200"
                                 placeholder="Nama ekstrakulikuler">
                         </div>
 

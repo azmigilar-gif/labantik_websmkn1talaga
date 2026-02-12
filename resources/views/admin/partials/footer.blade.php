@@ -10,8 +10,10 @@
                     </div>
                     <div class="hidden lg:block">
                         <div class="ltr:text-right rtl:text-left">
-                            Design & Develop by Labantik x ICT SMKN 1 Talaga
-                        </div>
+                            Engineered by <a href="#!"
+                                class="text-slate-800 underline dark:text-zinc-100">Labantik</a>,
+                            Supported by <a href="#!" class="text-slate-800 underline dark:text-zinc-100">ICT SMKN 1
+                                Talaga</a>. </div>
                     </div>
                 </div>
             </div>

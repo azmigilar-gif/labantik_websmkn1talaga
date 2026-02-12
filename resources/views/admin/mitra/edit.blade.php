@@ -21,12 +21,15 @@
                         <div class="col-span-12 md:col-span-8">
                             <label class="mb-2 block text-sm font-medium">Nama</label>
                             <input type="text" name="name" value="{{ old('name', $m->name) }}"
-                                class="block w-full rounded border-gray-200 p-3 shadow-sm" placeholder="Nama mitra">
+                                class="form-input border-slate-200 dark:border-zink-500 focus:outline-none focus:border-custom-500 disabled:bg-slate-100 dark:disabled:bg-zink-600 disabled:border-slate-300 dark:disabled:border-zink-500 dark:disabled:text-zink-200 disabled:text-slate-500 dark:text-zink-100 dark:bg-zink-700 dark:focus:border-custom-800 placeholder:text-slate-400 dark:placeholder:text-zink-200"
+                                placeholder="Nama mitra">
                         </div>
 
                         <div class="col-span-12 md:col-span-4">
                             <label class="mb-2 block text-sm font-medium">Foto</label>
-                            <input type="file" name="photo" accept="image/*">
+                            <input type="file"
+                                class="cursor-pointer form-file form-file-sm border-slate-200 dark:border-zink-500 focus:outline-none focus:border-custom-500"
+                                name="photo" accept="image/*">
                         </div>
 
                         <div class="col-span-12 mt-4 text-right">

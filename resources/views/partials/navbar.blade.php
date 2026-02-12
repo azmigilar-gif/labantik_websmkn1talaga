@@ -1,16 +1,18 @@
 <nav class="navbar fixed inset-x-0 top-0 z-50 flex h-20 items-center justify-center border-b border-slate-200 py-3 dark:border-zinc-800 [&.is-sticky]:bg-white [&.is-sticky]:shadow-lg [&.is-sticky]:shadow-slate-200/25 dark:[&.is-sticky]:bg-zinc-900 dark:[&.is-sticky]:shadow-zinc-700/30"
     id="navbar">
     <div class="container mx-auto flex w-full items-center self-center px-4 2xl:max-w-[87.5rem]">
-        <div class="shrink-0">
+        <!-- Logo - Fixed Width -->
+        <div class="shrink-0" style="width: 180px;">
             <a href="#!">
                 <img src="{{ asset('assets/images/logosmk.png') }}" alt="" class="block h-12 dark:hidden">
                 <img src="{{ asset('assets/images/logosmk.png') }}" alt="" class="hidden h-12 dark:block">
             </a>
         </div>
 
-        <div class="mx-auto">
+        <!-- Menu - Centered -->
+        <div class="flex-1 flex justify-center">
             <ul id="navbar7"
-                class="navbar-menu absolute inset-x-0 top-full z-20 mt-px hidden items-center rounded-b-md bg-white py-3 shadow-lg md:relative md:top-auto md:z-0 md:mt-0 md:flex md:rounded-none md:bg-transparent md:py-0 md:shadow-none ltr:ml-auto rtl:mr-auto dark:bg-zinc-800 dark:md:bg-transparent">
+                class="navbar-menu absolute inset-x-0 top-full z-20 mt-px hidden items-center rounded-b-md bg-white py-3 shadow-lg md:relative md:top-auto md:z-0 md:mt-0 md:flex md:rounded-none md:bg-transparent md:py-0 md:shadow-none dark:bg-zinc-800 dark:md:bg-transparent">
                 <li>
                     <a href="{{ url('/#home') }}"
                         class="nav-link text-15 hover:text-custom-500 [&.active]:text-custom-500 dark:hover:text-custom-500 dark:[&.active]:text-custom-500 block px-4 py-2.5 font-medium text-slate-800 transition-all duration-300 ease-linear md:inline-block md:px-3 md:py-0.5 dark:text-zinc-200">Home</a>
@@ -103,11 +105,31 @@
             </ul>
         </div>
 
-        <div class="navbar-toggale-button md:hidden ltr:ml-auto rtl:mr-auto">
-            <button type="button"
-                class="btn bg-custom-500 border-custom-500 hover:bg-custom-600 hover:border-custom-600 focus:bg-custom-600 focus:border-custom-600 focus:ring-custom-100 active:bg-custom-600 active:border-custom-600 active:ring-custom-100 dark:ring-custom-400/20 flex size-[37.5px] items-center justify-center p-0 text-white hover:text-white focus:text-white focus:ring active:text-white active:ring">
-                <i data-lucide="menu"></i>
-            </button>
+        <!-- Right Section - Fixed Width (sama dengan logo) -->
+        <div class="flex items-center justify-end gap-2" style="width: 180px;">
+            <!-- Tombol Dashboard (hanya muncul jika sudah login) -->
+            @auth
+                <!-- Desktop: dengan text dan icon -->
+                <a href="{{ route('admin.dashboard') }}"
+                    class="bg-white text-custom-500 btn border-custom-500 hover:text-white hover:bg-custom-600 hover:border-custom-600 focus:text-white focus:bg-custom-600 focus:border-custom-600 focus:ring focus:ring-custom-100 active:text-white active:bg-custom-600 active:border-custom-600 active:ring active:ring-custom-100 dark:bg-zink-700 dark:hover:bg-custom-500 dark:ring-custom-400/20 dark:focus:bg-custom-500 hidden md:flex items-center gap-2 px-4 py-2">
+                    <i data-lucide="layout-dashboard" class="size-4"></i>
+                    <span>Dashboard</span>
+                </a>
+
+                <!-- Mobile: icon only -->
+                <a href="{{ route('admin.dashboard') }}"
+                    class="bg-white text-custom-500 btn border-custom-500 hover:text-white hover:bg-custom-600 hover:border-custom-600 focus:text-white focus:bg-custom-600 focus:border-custom-600 focus:ring focus:ring-custom-100 active:text-white active:bg-custom-600 active:border-custom-600 active:ring active:ring-custom-100 dark:bg-zink-700 dark:hover:bg-custom-500 dark:ring-custom-400/20 dark:focus:bg-custom-500 md:hidden flex size-[37.5px] items-center justify-center p-0">
+                    <i data-lucide="layout-dashboard" class="size-4"></i>
+                </a>
+            @endauth
+
+            <!-- Tombol Menu Toggle (Mobile) -->
+            <div class="navbar-toggale-button md:hidden">
+                <button type="button"
+                    class="btn bg-custom-500 border-custom-500 hover:bg-custom-600 hover:border-custom-600 focus:bg-custom-600 focus:border-custom-600 focus:ring-custom-100 active:bg-custom-600 active:border-custom-600 active:ring-custom-100 dark:ring-custom-400/20 flex size-[37.5px] items-center justify-center p-0 text-white hover:text-white focus:text-white focus:ring active:text-white active:ring">
+                    <i data-lucide="menu"></i>
+                </button>
+            </div>
         </div>
     </div>
 </nav>

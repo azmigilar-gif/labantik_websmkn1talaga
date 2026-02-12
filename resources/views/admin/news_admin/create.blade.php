@@ -57,7 +57,7 @@
                             <label class="mb-2 block text-sm font-medium text-gray-700">Kategori</label>
 
                             <select name="s_category_id"
-                                class="block w-full rounded {{ $errors->has('s_category_id') ? 'border-red-500' : 'border-gray-200' }} p-3 shadow-sm">
+                                class="form-select border-slate-200 dark:border-zink-500 focus:outline-none focus:border-custom-500 disabled:bg-slate-100 dark:disabled:bg-zink-600 disabled:border-slate-300 dark:disabled:border-zink-500 dark:disabled:text-zink-200 disabled:text-slate-500 dark:text-zink-100 dark:bg-zink-700 dark:focus:border-custom-800 placeholder:text-slate-400 dark:placeholder:text-zink-200">
                                 <option value="">Pilih Kategori</option>
                                 @if (!empty($categories))
                                     @foreach ($categories as $cat)
@@ -77,7 +77,7 @@
                         <div class="col-span-12 md:col-span-4">
                             <label class="mb-2 block text-sm font-medium text-gray-700">Menu</label>
                             <select name="s_menu_id"
-                                class="block w-full rounded {{ $errors->has('s_menu_id') ? 'border-red-500' : 'border-gray-200' }} p-3 shadow-sm">
+                                class="form-select border-slate-200 dark:border-zink-500 focus:outline-none focus:border-custom-500 disabled:bg-slate-100 dark:disabled:bg-zink-600 disabled:border-slate-300 dark:disabled:border-zink-500 dark:disabled:text-zink-200 disabled:text-slate-500 dark:text-zink-100 dark:bg-zink-700 dark:focus:border-custom-800 placeholder:text-slate-400 dark:placeholder:text-zink-200">
                                 <option value="">Pilih Menu</option>
                                 @if (!empty($menus))
                                     @foreach ($menus as $m)
@@ -111,12 +111,12 @@
                                 <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
                             @enderror
                         </div>
-                        <div class="col-span-12 md:col-span-8">
+                        <div class="col-span-12 md:col-span-6">
                             <label class="mb-2 block text-sm font-semibold text-gray-700">Topik Artikel (AI)</label>
 
                             <div class="relative flex items-center gap-2">
                                 <input type="text" id="ai-topic"
-                                    class="w-full rounded-lg border border-gray-300 bg-gray-50 px-4 py-3 pr-12 text-sm focus:border-purple-500 focus:ring-purple-500"
+                                    class="form-input border-slate-200 dark:border-zink-500 focus:outline-none focus:border-custom-500 disabled:bg-slate-100 dark:disabled:bg-zink-600 disabled:border-slate-300 dark:disabled:border-zink-500 dark:disabled:text-zink-200 disabled:text-slate-500 dark:text-zink-100 dark:bg-zink-700 dark:focus:border-custom-800 placeholder:text-slate-400 dark:placeholder:text-zink-200"
                                     placeholder="Contoh: Prestasi Juara LKS Tingkat Provinsi">
 
                                 <button type="button" id="btn-ai-generate"
@@ -139,10 +139,10 @@
 
 
 
-                        <div class="col-span-12 md:col-span-8">
+                        <div class="col-span-12 md:col-span-6">
                             <label class="mb-2 block text-sm font-medium text-gray-700">Judul</label>
                             <input type="text" name="title" value="{{ old('title') }}"
-                                class="block w-full rounded {{ $errors->has('title') ? 'border-red-500' : 'border-gray-200' }} p-3 shadow-sm"
+                                class="form-input border-slate-200 dark:border-zink-500 focus:outline-none focus:border-custom-500 disabled:bg-slate-100 dark:disabled:bg-zink-600 disabled:border-slate-300 dark:disabled:border-zink-500 dark:disabled:text-zink-200 disabled:text-slate-500 dark:text-zink-100 dark:bg-zink-700 dark:focus:border-custom-800 placeholder:text-slate-400 dark:placeholder:text-zink-200"
                                 placeholder="Tentukan judul di sini">
                             @error('title')
                                 <p class="mt-1 text-sm text-red-600">{{ $message }}</p>
