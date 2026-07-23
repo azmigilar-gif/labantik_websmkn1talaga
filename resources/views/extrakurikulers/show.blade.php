@@ -41,13 +41,19 @@
                         @endif
 
                         <!-- Description Content -->
-                        <div class="text-secondary mt-3" style="font-size: 15px; line-height: 1.8;">
+                        <div class="text-secondary mt-3 ql-editor" style="font-size: 15px; line-height: 1.8; padding: 0;">
                             @if ($e && $e->description)
-                                {!! nl2br(e($e->description)) !!}
+                                {!! $e->description !!}
                             @else
                                 <p class="text-muted italic">Deskripsi belum tersedia untuk kegiatan ekstrakurikuler ini.</p>
                             @endif
                         </div>
+
+                        @push('scripts')
+                            <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
+                            <script src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
+                            <link href="https://cdn.quilljs.com/1.3.7/quill.snow.css" rel="stylesheet">
+                        @endpush
 
                         <!-- Back Button & Meta info -->
                         <div class="mt-5 pt-4 border-top d-flex justify-content-between align-items-center">

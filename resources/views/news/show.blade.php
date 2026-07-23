@@ -85,9 +85,15 @@
                         </style>
 
                         <!-- Content -->
-                        <div class="rich-content">
+                        <div class="rich-content ql-editor" style="padding: 0;">
                             {!! $news->content !!}
                         </div>
+
+                        @push('scripts')
+                            <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
+                            <script src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
+                            <link href="https://cdn.quilljs.com/1.3.7/quill.snow.css" rel="stylesheet">
+                        @endpush
 
                     </div>
                 </main>

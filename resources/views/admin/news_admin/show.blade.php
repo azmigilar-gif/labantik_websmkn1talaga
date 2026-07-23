@@ -13,9 +13,15 @@
                     <span>Tanggal: {{ $news->created_at->format('d M Y') }}</span>
                 </div>
 
-                <div class="prose max-w-none">
+                <div class="prose max-w-none ql-editor" style="padding: 1rem;">
                     {!! $news->content !!}
                 </div>
+
+                @push('scripts')
+                    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
+                    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
+                    <link href="https://cdn.quilljs.com/1.3.7/quill.snow.css" rel="stylesheet">
+                @endpush
 
                 <div class="mt-6 flex items-center justify-between border-t pt-4">
                     <a href="{{ route('admin.news.index') }}" style="background: gray; color white"

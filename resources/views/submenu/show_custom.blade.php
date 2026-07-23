@@ -64,7 +64,7 @@
                             }
                         </style>
 
-                        <div class="custom-page-content">
+                        <div class="custom-page-content ql-editor" style="padding: 0;">
                             @if(!empty($submenu->content))
                                 {!! $submenu->content !!}
                             @else
@@ -74,6 +74,12 @@
                                 </div>
                             @endif
                         </div>
+
+                        @push('scripts')
+                            <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
+                            <script src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
+                            <link href="https://cdn.quilljs.com/1.3.7/quill.snow.css" rel="stylesheet">
+                        @endpush
 
                         <div class="mt-5 pt-4 border-top d-flex justify-content-between align-items-center">
                             <a href="{{ url('/') }}" class="btn btn-outline-primary px-4" style="border-radius: 6px; font-weight: 600;">

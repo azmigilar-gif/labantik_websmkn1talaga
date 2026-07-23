@@ -208,6 +208,8 @@
     <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/choices.js/public/assets/styles/choices.min.css">
     <script src="https://cdn.jsdelivr.net/npm/choices.js/public/assets/scripts/choices.min.js"></script>
 
+    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
+    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
     <link href="https://cdn.quilljs.com/1.3.7/quill.snow.css" rel="stylesheet">
     <script src="https://cdn.quilljs.com/1.3.7/quill.min.js"></script>
 
@@ -388,21 +390,16 @@
             textarea.style.display = 'none';
 
             var toolbarOptions = [
+                [{ 'font': [] }, { 'size': [] }],
                 ['bold', 'italic', 'underline', 'strike'],
-                [{
-                    'header': 1
-                }, {
-                    'header': 2
-                }],
-                [{
-                    'list': 'ordered'
-                }, {
-                    'list': 'bullet'
-                }],
-                [{
-                    'align': []
-                }],
-                ['link', 'image'],
+                [{ 'color': [] }, { 'background': [] }],
+                [{ 'script': 'sub'}, { 'script': 'super' }],
+                [{ 'header': [1, 2, 3, 4, 5, 6, false] }, 'blockquote', 'code-block'],
+                [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+                [{ 'indent': '-1'}, { 'indent': '+1' }],
+                [{ 'direction': 'rtl' }],
+                [{ 'align': [] }],
+                ['link', 'image', 'video', 'formula'],
                 ['clean']
             ];
 

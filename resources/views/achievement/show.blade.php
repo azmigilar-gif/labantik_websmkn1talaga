@@ -39,9 +39,15 @@
                         @endif
 
                         <!-- Description -->
-                        <div class="text-slate-700" style="line-height: 1.8; font-size: 16px; color: #475569;">
-                            <p style="white-space: pre-line;">{{ $achievement->description }}</p>
+                        <div class="text-slate-700 ql-editor" style="line-height: 1.8; font-size: 16px; color: #475569; padding: 0;">
+                            {!! $achievement->description !!}
                         </div>
+
+                        @push('scripts')
+                            <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
+                            <script src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
+                            <link href="https://cdn.quilljs.com/1.3.7/quill.snow.css" rel="stylesheet">
+                        @endpush
 
                         <hr class="my-4 text-muted">
                         <a href="{{ route('public.achievements.index') }}" class="btn btn-outline-secondary px-4 py-2" style="border-radius: 6px; font-weight: 600;">

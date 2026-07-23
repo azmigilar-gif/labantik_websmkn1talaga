@@ -15,8 +15,14 @@
 
                 <div class="mb-4">
                     <label class="mb-2 block text-sm font-medium">Deskripsi</label>
-                    <div class="prose max-w-none rounded border bg-white p-4">{!! nl2br(e($core->sDescription->description ?? 'Belum ada deskripsi untuk keahlian ini.')) !!}</div>
+                    <div class="prose max-w-none rounded border bg-white p-4 ql-editor" style="padding: 1rem;">{!! $core->sDescription->description ?? 'Belum ada deskripsi untuk keahlian ini.' !!}</div>
                 </div>
+
+                @push('scripts')
+                    <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
+                    <script src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
+                    <link href="https://cdn.quilljs.com/1.3.7/quill.snow.css" rel="stylesheet">
+                @endpush
 
                 <div class="text-right">
                     @if ($core->sDescription)

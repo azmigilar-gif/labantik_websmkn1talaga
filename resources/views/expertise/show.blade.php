@@ -24,13 +24,19 @@
                         <p class="text-muted mb-4" style="font-size: 14px; font-weight: 500;">Slug: {{ $core->slug }}</p>
 
                         <!-- Description Content -->
-                        <div class="text-secondary mt-3" style="font-size: 15px; line-height: 1.8;">
+                        <div class="text-secondary mt-3 ql-editor" style="font-size: 15px; line-height: 1.8; padding: 0;">
                             @if ($s && $s->description)
-                                {!! nl2br(e($s->description)) !!}
+                                {!! $s->description !!}
                             @else
                                 <p class="text-muted italic">Deskripsi belum tersedia untuk kompetensi keahlian ini.</p>
                             @endif
                         </div>
+
+                        @push('scripts')
+                            <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
+                            <script src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
+                            <link href="https://cdn.quilljs.com/1.3.7/quill.snow.css" rel="stylesheet">
+                        @endpush
 
                         <!-- Back Button -->
                         <div class="mt-5 pt-3 border-top">

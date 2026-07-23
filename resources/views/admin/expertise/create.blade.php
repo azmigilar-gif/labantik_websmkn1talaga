@@ -64,6 +64,8 @@
     </div>
     @push('scripts')
         <!-- Quill editor (free, no jQuery). Custom image upload handler that posts to your expertise.upload.image route -->
+        <link rel="stylesheet" href="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.css">
+        <script src="https://cdn.jsdelivr.net/npm/katex@0.16.8/dist/katex.min.js"></script>
         <link href="https://cdn.quilljs.com/1.3.7/quill.snow.css" rel="stylesheet">
         <script src="https://cdn.quilljs.com/1.3.7/quill.min.js"></script>
         <script>
@@ -78,25 +80,16 @@
                 textarea.style.display = 'none';
 
                 var toolbarOptions = [
+                    [{ 'font': [] }, { 'size': [] }],
                     ['bold', 'italic', 'underline', 'strike'],
-                    [{
-                        'header': 1
-                    }, {
-                        'header': 2
-                    }, {
-                        'header': 3
-                    }, {
-                        'header': 4
-                    }],
-                    [{
-                        'list': 'ordered'
-                    }, {
-                        'list': 'bullet'
-                    }],
-                    [{
-                        'align': []
-                    }],
-                    ['link', 'image'],
+                    [{ 'color': [] }, { 'background': [] }],
+                    [{ 'script': 'sub'}, { 'script': 'super' }],
+                    [{ 'header': [1, 2, 3, 4, 5, 6, false] }, 'blockquote', 'code-block'],
+                    [{ 'list': 'ordered'}, { 'list': 'bullet' }],
+                    [{ 'indent': '-1'}, { 'indent': '+1' }],
+                    [{ 'direction': 'rtl' }],
+                    [{ 'align': [] }],
+                    ['link', 'image', 'video', 'formula'],
                     ['clean']
                 ];
 
