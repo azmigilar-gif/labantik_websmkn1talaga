@@ -9,6 +9,10 @@ class UploadController extends Controller
 {
     public function upload(Request $request)
     {
+        $request->validate([
+            'upload' => 'required|image|max:3072',
+        ]);
+
         if ($request->hasFile('upload')) {
             $file = $request->file('upload');
             $filename = time() . '_' . $file->getClientOriginalName();

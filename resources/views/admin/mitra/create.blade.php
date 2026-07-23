@@ -29,6 +29,7 @@
                             <input type="file"
                                 class="cursor-pointer form-file form-file-sm border-slate-200 dark:border-zink-500 focus:outline-none focus:border-custom-500"
                                 name="photo" accept="image/*">
+                            <span class="text-xs text-slate-500 mt-1 block">Maksimal ukuran file: 2 MB</span>
                         </div>
 
                         <div class="col-span-12 mt-4 text-right">

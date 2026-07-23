@@ -10,18 +10,18 @@
                     class="h-header group-data-[layout=horizontal]:ltr::pl-0 hidden items-center justify-center px-5 text-center group-data-[layout=horizontal]:md:flex group-data-[layout=horizontal]:rtl:pr-0">
                     <a href="index.html">
                         <span class="hidden">
-                            <img src="assets/images/logo.png" alt="" class="mx-auto h-6">
+                            <img src="{{ asset('assets/images/logo.png') }}" alt="" class="mx-auto h-6">
                         </span>
                         <span class="group-data-[topbar=brand]:hidden group-data-[topbar=dark]:hidden">
-                            <img src="assets/images/logo-dark.png" alt="" class="mx-auto h-6">
+                            <img src="{{ asset('assets/images/logo-dark.png') }}" alt="" class="mx-auto h-6">
                         </span>
                     </a>
                     <a href="index.html" class="hidden group-data-[topbar=brand]:block group-data-[topbar=dark]:block">
                         <span class="group-data-[topbar=brand]:hidden group-data-[topbar=dark]:hidden">
-                            <img src="assets/images/logo.png" alt="" class="mx-auto h-6">
+                            <img src="{{ asset('assets/images/logo.png') }}" alt="" class="mx-auto h-6">
                         </span>
                         <span class="group-data-[topbar=brand]:block group-data-[topbar=dark]:block">
-                            <img src="assets/images/logo-light.png" alt="" class="mx-auto h-6">
+                            <img src="{{ asset('assets/images/logo-light.png') }}" alt="" class="mx-auto h-6">
                         </span>
                     </a>
                 </div>

@@ -36,6 +36,7 @@
                                 <thead>
                                     <tr>
                                         <th class="p-2 text-left">No</th>
+                                        <th class="p-2 text-left">Foto</th>
                                         <th class="p-2 text-left">Profile Sekolah</th>
                                         <th class="p-2 text-left">Dibuat oleh</th>
                                         <th class="p-2 text-left">Diupdate oleh</th>
@@ -46,8 +47,15 @@
                                     @foreach ($profiles as $p)
                                         <tr>
                                             <td class="p-2">{{ $loop->iteration }}</td>
+                                            <td class="p-2">
+                                                @if($p->photo)
+                                                    <img src="{{ asset($p->photo) }}" alt="" class="h-10 w-10 object-cover rounded shadow-sm">
+                                                @else
+                                                    <span class="text-slate-400 italic" style="font-size: 11px;">(Tidak ada foto)</span>
+                                                @endif
+                                            </td>
                                             <td class="p-2 whitespace-pre-wrap">
-                                                {{ Str::limit($p->content, 90, '...') ?? '-' }}
+                                                {!! Str::limit(strip_tags($p->content), 90, '...') ?? '-' !!}
                                             </td>
                                             <td class="p-2">{{ $p->createdBy->name ?? '-' }}</td>
                                             <td class="p-2">{{ $p->updatedBy->name ?? '-' }}</td>
@@ -78,7 +86,7 @@
                                                     class="max-h-[calc(theme('height.screen')_-_180px)] overflow-y-auto p-4">
                                                     <form id="edit-form"
                                                         action="{{ route('admin.profiles.update', $p->id) }}"
-                                                        method="POST">
+                                                        method="POST" enctype="multipart/form-data">
                                                         @csrf
                                                         @method('PUT')
 
@@ -96,6 +104,17 @@
                                                                     </option>
                                                                 @endforeach
                                                             </select>
+                                                        </div>
+
+                                                        <div class="mt-3 xl:col-span-6">
+                                                            <label for="edit_photo_{{ $p->id }}" class="mb-2 inline-block text-base font-medium">Foto Profil/Thumbnail</label>
+                                                            @if($p->photo)
+                                                                <div class="mb-2">
+                                                                    <img src="{{ asset($p->photo) }}" alt="Foto Profil" class="h-20 rounded shadow-sm">
+                                                                </div>
+                                                            @endif
+                                                            <input type="file" id="edit_photo_{{ $p->id }}" name="photo" class="form-input dark:border-zink-500 focus:border-custom-500 border-slate-200" accept="image/*">
+                                                            <span class="text-xs text-slate-500 mt-1 block">Maksimal ukuran file: 2 MB</span>
                                                         </div>
 
                                                         <!-- Ganti bagian textarea di modal edit -->
@@ -188,7 +207,7 @@
                         </div>
                         <div class="max-h-[calc(theme('height.screen')_-_180px)] overflow-y-auto p-4">
                             <form class="create-form" id="create-form" action="{{ route('admin.profiles.store') }}"
-                                method="POST">
+                                method="POST" enctype="multipart/form-data">
                                 @csrf
                                 <div class="xl:col-span-6">
                                     <label for="menus" class="mb-2 inline-block text-base font-medium">Menu</label>
@@ -206,6 +225,12 @@
                                             <option value="">(Tidak ada menu)</option>
                                         @endif
                                     </select>
+                                </div>
+ 
+                                <div class="mt-3 xl:col-span-6">
+                                    <label for="add_photo" class="mb-2 inline-block text-base font-medium">Foto Profil/Thumbnail</label>
+                                    <input type="file" id="add_photo" name="photo" class="form-input dark:border-zink-500 focus:border-custom-500 border-slate-200" accept="image/*">
+                                    <span class="text-xs text-slate-500 mt-1 block">Maksimal ukuran file: 2 MB</span>
                                 </div>
                                 <div class="xl:col-span-6">
                                     <label for="slugInput" class="mb-2 inline-block text-base font-medium">Profile

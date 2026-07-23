@@ -27,7 +27,7 @@ class BackgroundController extends Controller
     public function store(Request $request)
     {
         $request->validate([
-            'photo' => 'required|image|max:5120', // max 5MB
+            'photo' => 'required|image|max:3072', // max 3MB
         ]);
 
         $file = $request->file('photo');

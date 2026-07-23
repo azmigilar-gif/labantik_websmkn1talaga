@@ -99,96 +99,88 @@
                                         </div><!--end add Employee-->
                                         <div id="editSubmenusModal{{ $m->id }}" modal-center=""
                                             class="fixed flex flex-col hidden transition-all duration-300 ease-in-out left-2/4 z-drawer -translate-x-2/4 -translate-y-2/4 show">
-                                            <div class="w-screen md:w-[30rem] bg-white shadow rounded-md dark:bg-zink-600">
-                                                <div
-                                                    class="flex items-center justify-between p-4 border-b dark:border-zink-500">
-                                                    <h5 class="text-16" id="addEmployeeLabel">Edit Sub Menu</h5>
-                                                </div>
-                                                <div
-                                                    class="max-h-[calc(theme('height.screen')_-_180px)] p-4 overflow-y-auto">
-                                                    <form class="update-form"
-                                                        action="{{ route('admin.submenus.update', $m->id) }}"
-                                                        method="POST">
-                                                        @csrf
-                                                        @method('PUT')
-                                                        <input type="hidden" name="s_menu_id" value="{{ $m->s_menu_id }}">
+                                             <div class="w-[90%] md:w-[35rem] bg-white shadow rounded-md dark:bg-zink-600">
+                                                 <div
+                                                     class="flex items-center justify-between p-4 border-b dark:border-zink-500">
+                                                     <h5 class="text-16" id="addEmployeeLabel">Edit Sub Menu</h5>
+                                                     <button data-modal-close="editSubmenusModal{{ $m->id }}" class="text-slate-400 hover:text-red-500">
+                                                         <i data-lucide="x" class="size-5"></i>
+                                                     </button>
+                                                 </div>
+                                                 <div class="max-h-[calc(theme('height.screen')_-_180px)] p-6 overflow-y-auto">
+                                                     <form class="update-submenu-form"
+                                                         action="{{ route('admin.submenus.update', $m->id) }}"
+                                                         method="POST">
+                                                         @csrf
+                                                         @method('PUT')
+                                                         <input type="hidden" name="s_menu_id" value="{{ $m->s_menu_id }}">
 
-                                                        <div>
-                                                            <label for="phoneNumberInput"
-                                                                class="inline-block mb-2 text-base font-medium">Nama Sub
-                                                                Menu</label>
-                                                            <input type="text" name="name"
-                                                                value="{{ $m->name }}"
-                                                                class="form-input border-slate-200 dark:border-zink-500 focus:outline-none focus:border-custom-500 disabled:bg-slate-100 dark:disabled:bg-zink-600 disabled:border-slate-300 dark:disabled:border-zink-500 dark:disabled:text-zink-200 disabled:text-slate-500 dark:text-zink-100 dark:bg-zink-700 dark:focus:border-custom-800 placeholder:text-slate-400 dark:placeholder:text-zink-200"
-                                                                placeholder="Masukkan Nama Sub Menu" required="">
-                                                        </div>
+                                                         <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+                                                             <div>
+                                                                 <label class="inline-block mb-2 text-base font-medium">Nama Sub Menu</label>
+                                                                 <input type="text" name="name"
+                                                                     value="{{ $m->name }}"
+                                                                     class="form-input border-slate-200 dark:border-zink-500 focus:outline-none focus:border-custom-500 dark:text-zink-100 dark:bg-zink-700"
+                                                                     placeholder="Masukkan Nama Sub Menu" required>
+                                                             </div>
+                                                             <div>
+                                                                 <label class="inline-block mb-2 text-base font-medium">Tipe Sub Menu</label>
+                                                                 <select name="type" id="type-select-edit-{{ $m->id }}" onchange="toggleEditSubmenuFields('{{ $m->id }}')"
+                                                                     class="form-select border-slate-200 dark:border-zink-500 focus:outline-none focus:border-custom-500 dark:text-zink-100 dark:bg-zink-700">
+                                                                     <option value="custom" {{ ($m->type ?? 'custom') == 'custom' ? 'selected' : '' }}>Halaman Kustom (Tulis Konten)</option>
+                                                                     <option value="url" {{ ($m->type ?? '') == 'url' ? 'selected' : '' }}>Link Eksternal / Redirect</option>
+                                                                     <option value="module" {{ ($m->type ?? '') == 'module' ? 'selected' : '' }}>Modul Bawaan Sistem</option>
+                                                                 </select>
+                                                             </div>
+                                                         </div>
 
-                                                        <div class="mt-3">
-                                                            <label for="edit-model-key-{{ $m->id }}"
-                                                                class="inline-block mb-2 text-base font-medium">Nama Model
-                                                                Key</label>
-                                                            <select
-                                                                class="form-select border-slate-200 dark:border-zink-500 focus:outline-none focus:border-custom-500 disabled:bg-slate-100 dark:disabled:bg-zink-600 disabled:border-slate-300 dark:disabled:border-zink-500 dark:disabled:text-zink-200 disabled:text-slate-500 dark:text-zink-100 dark:bg-zink-700 dark:focus:border-custom-800 placeholder:text-slate-400 dark:placeholder:text-zink-200"
-                                                                name="s_model_key_id"
-                                                                id="edit-model-key-{{ $m->id }}" required>
-                                                                <option value="">Pilih Nama Model Key</option>
-                                                                @foreach ($modelKey as $model)
-                                                                    <option value="{{ $model->id }}"
-                                                                        {{ $m->s_model_key_id == $model->id ? 'selected' : '' }}>
-                                                                        {{ $model->name }}
-                                                                    </option>
-                                                                @endforeach
-                                                            </select>
-                                                        </div>
+                                                         <!-- Tipe: Halaman Kustom -->
+                                                         <div id="custom-section-edit-{{ $m->id }}" class="mt-4 type-section-edit-{{ $m->id }}">
+                                                             <div class="mb-3">
+                                                                 <label class="inline-block mb-2 text-base font-medium">URL Slug</label>
+                                                                 <input type="text" name="url" value="{{ $m->url }}"
+                                                                     class="form-input border-slate-200 dark:border-zink-500 focus:outline-none focus:border-custom-500 dark:text-zink-100 dark:bg-zink-700"
+                                                                     placeholder="Contoh: sejarah-sekolah">
+                                                             </div>
+                                                             <div class="mb-3">
+                                                                 <label class="inline-block mb-2 text-base font-medium">Konten Halaman</label>
+                                                                 <textarea name="content" id="quill-textarea-edit-{{ $m->id }}" class="submenu-quill-textarea hidden">{{ $m->content }}</textarea>
+                                                             </div>
+                                                         </div>
 
-                                                        <div class="mt-3">
-                                                            <label for="edit-view-name-{{ $m->id }}"
-                                                                class="inline-block mb-2 text-base font-medium">Nama
-                                                                View</label>
-                                                            <select
-                                                                class="form-select border-slate-200 dark:border-zink-500 focus:outline-none focus:border-custom-500 disabled:bg-slate-100 dark:disabled:bg-zink-600 disabled:border-slate-300 dark:disabled:border-zink-500 dark:disabled:text-zink-200 disabled:text-slate-500 dark:text-zink-100 dark:bg-zink-700 dark:focus:border-custom-800 placeholder:text-slate-400 dark:placeholder:text-zink-200"
-                                                                name="s_view_name_id"
-                                                                id="edit-view-name-{{ $m->id }}">
-                                                                <option value="">Pilih Nama View</option>
-                                                                @foreach ($viewName as $view)
-                                                                    <option value="{{ $view->id }}"
-                                                                        {{ $m->s_view_name_id == $view->id ? 'selected' : '' }}>
-                                                                        {{ $view->name }}
-                                                                    </option>
-                                                                @endforeach
-                                                            </select>
-                                                        </div>
+                                                         <!-- Tipe: Link Eksternal -->
+                                                         <div id="url-section-edit-{{ $m->id }}" class="mt-4 type-section-edit-{{ $m->id }}" style="display: none;">
+                                                             <label class="inline-block mb-2 text-base font-medium">Link URL Tujuan</label>
+                                                             <input type="text" name="external_url" value="{{ $m->external_url }}"
+                                                                 class="form-input border-slate-200 dark:border-zink-500 focus:outline-none focus:border-custom-500 dark:text-zink-100 dark:bg-zink-700 placeholder:text-slate-400"
+                                                                 placeholder="Masukkan URL (Contoh: https://google.com atau /news)">
+                                                         </div>
 
-                                                        <div class="mt-3">
-                                                            <label for="edit-redirect-to-{{ $m->id }}"
-                                                                class="inline-block mb-2 text-base font-medium">Nama
-                                                                Redirect Ke</label>
-                                                            <select
-                                                                class="form-select border-slate-200 dark:border-zink-500 focus:outline-none focus:border-custom-500 disabled:bg-slate-100 dark:disabled:bg-zink-600 disabled:border-slate-300 dark:disabled:border-zink-500 dark:disabled:text-zink-200 disabled:text-slate-500 dark:text-zink-100 dark:bg-zink-700 dark:focus:border-custom-800 placeholder:text-slate-400 dark:placeholder:text-zink-200"
-                                                                name="s_redirect_to_id"
-                                                                id="edit-redirect-to-{{ $m->id }}">
-                                                                <option value="">Pilih Nama Redirect Ke</option>
-                                                                @foreach ($redirectTo as $red)
-                                                                    <option value="{{ $red->id }}"
-                                                                        {{ $m->s_redirect_to_id == $red->id ? 'selected' : '' }}>
-                                                                        {{ $red->name }}
-                                                                    </option>
-                                                                @endforeach
-                                                            </select>
-                                                        </div>
+                                                         <!-- Tipe: Modul Bawaan -->
+                                                         <div id="module-section-edit-{{ $m->id }}" class="mt-4 type-section-edit-{{ $m->id }}" style="display: none;">
+                                                             <label class="inline-block mb-2 text-base font-medium">Pilih Halaman / Modul</label>
+                                                             <select name="module_name"
+                                                                 class="form-select border-slate-200 dark:border-zink-500 focus:outline-none focus:border-custom-500 dark:text-zink-100 dark:bg-zink-700">
+                                                                 <option value="news" {{ $m->module_name == 'news' ? 'selected' : '' }}>Daftar Berita Sekolah (Public News)</option>
+                                                                 <option value="gallery" {{ $m->module_name == 'gallery' ? 'selected' : '' }}>Galeri Foto Kegiatan (Public Gallery)</option>
+                                                                 <option value="profil" {{ $m->module_name == 'profil' ? 'selected' : '' }}>Profil Sekolah (Home - Bagian Profil)</option>
+                                                                 <option value="visi-misi" {{ $m->module_name == 'visi-misi' ? 'selected' : '' }}>Visi & Misi (Home - Bagian Visi Misi)</option>
+                                                                 <option value="expertise" {{ $m->module_name == 'expertise' ? 'selected' : '' }}>Kompetensi Keahlian (Home - Bagian Jurusan)</option>
+                                                                 <option value="ekskul" {{ $m->module_name == 'ekskul' ? 'selected' : '' }}>Ekstrakurikuler (Home - Bagian Ekskul)</option>
+                                                                 <option value="contact" {{ $m->module_name == 'contact' ? 'selected' : '' }}>Hubungi Kami (Home - Bagian Kontak)</option>
+                                                             </select>
+                                                         </div>
 
-                                                        <div class="flex justify-end gap-2 mt-4">
-                                                            <button type="reset" id="close-modal"
-                                                                data-modal-close="editSubmenusModal{{ $m->id }}"
-                                                                class="text-red-500 bg-white btn hover:text-red-500 hover:bg-red-100 focus:text-red-500 focus:bg-red-100 active:text-red-500 active:bg-red-100 dark:bg-zink-600 dark:hover:bg-red-500/10 dark:focus:bg-red-500/10 dark:active:bg-red-500/10">Cancel</button>
-                                                            <button type="submit" id="addNew"
-                                                                class="text-white btn bg-custom-500 border-custom-500 hover:text-white hover:bg-custom-600 hover:border-custom-600 focus:text-white focus:bg-custom-600 focus:border-custom-600 focus:ring focus:ring-custom-100 active:text-white active:bg-custom-600 active:border-custom-600 active:ring active:ring-custom-100 dark:ring-custom-400/20">Update
-                                                                Sub Menu</button>
-                                                        </div>
-                                                    </form>
-                                                </div>
-                                            </div>
-                                        </div><!--end edit Employee-->
+                                                         <div class="flex justify-end gap-2 mt-6 pt-4 border-t dark:border-zink-500">
+                                                             <button type="button" data-modal-close="editSubmenusModal{{ $m->id }}"
+                                                                 class="text-red-500 bg-white btn hover:text-red-500 hover:bg-red-100 focus:text-red-500 focus:bg-red-100 active:text-red-500 active:bg-red-100 dark:bg-zink-600 dark:hover:bg-red-500/10">Batal</button>
+                                                             <button type="submit"
+                                                                 class="text-white btn bg-custom-500 border-custom-500 hover:text-white hover:bg-custom-600 hover:border-custom-600 focus:text-white focus:bg-custom-600 focus:border-custom-600 focus:ring focus:ring-custom-100 active:text-white active:bg-custom-600 active:border-custom-600 active:ring active:ring-custom-100 dark:ring-custom-400/20">Update Sub Menu</button>
+                                                         </div>
+                                                     </form>
+                                                 </div>
+                                             </div>
+                                         </div><!--end edit Employee-->
 
                                         <div id="deleteModal{{ $m->id }}" modal-center=""
                                             class="fixed flex flex-col hidden transition-all duration-300 ease-in-out left-2/4 z-drawer -translate-x-2/4 -translate-y-2/4 show">
@@ -281,3 +273,167 @@
         </div>
     </div>
 @endsection
+
+@push('scripts')
+    <link href="https://cdn.quilljs.com/1.3.7/quill.snow.css" rel="stylesheet">
+    <script src="https://cdn.quilljs.com/1.3.7/quill.min.js"></script>
+    <script>
+        // Konfigurasi toolbar Quill
+        var toolbarOptions = [
+            ['bold', 'italic', 'underline', 'strike'],
+            [{ 'header': 1 }, { 'header': 2 }],
+            [{ 'list': 'ordered' }, { 'list': 'bullet' }],
+            [{ 'align': [] }],
+            ['link', 'image'],
+            ['clean']
+        ];
+
+        // Fungsi untuk inisialisasi Quill editor
+        function initQuillEditor(textareaId, containerId) {
+            var textarea = document.getElementById(textareaId);
+            if (!textarea || textarea.dataset.quillInitialized) return null;
+
+            var quillContainer = document.createElement('div');
+            quillContainer.id = containerId;
+            quillContainer.style.height = '200px';
+            textarea.parentNode.insertBefore(quillContainer, textarea);
+            textarea.style.display = 'none';
+
+            var quill = new Quill('#' + containerId, {
+                modules: {
+                    toolbar: {
+                        container: toolbarOptions,
+                        handlers: {
+                            image: function() {
+                                imageHandler(quill);
+                            }
+                        }
+                    }
+                },
+                theme: 'snow'
+            });
+
+            if (textarea.value) {
+                quill.root.innerHTML = textarea.value;
+            }
+
+            quill.on('text-change', function() {
+                textarea.value = quill.root.innerHTML;
+            });
+
+            var form = textarea.closest('form');
+            if (form) {
+                form.addEventListener('submit', function(e) {
+                    textarea.value = quill.root.innerHTML;
+                });
+            }
+
+            textarea.dataset.quillInitialized = 'true';
+            return quill;
+        }
+
+        // Image handler
+        function imageHandler(quill) {
+            var input = document.createElement('input');
+            input.setAttribute('type', 'file');
+            input.setAttribute('accept', 'image/*');
+            input.click();
+
+            input.onchange = function() {
+                var file = input.files[0];
+                if (!file) return;
+
+                var formData = new FormData();
+                formData.append('upload', file);
+
+                var xhr = new XMLHttpRequest();
+                var url = '{{ route('admin.news.upload.image') }}';
+                xhr.open('POST', url, true);
+                xhr.setRequestHeader('X-CSRF-TOKEN', '{{ csrf_token() }}');
+
+                xhr.onreadystatechange = function() {
+                    if (xhr.readyState === 4) {
+                        if (xhr.status >= 200 && xhr.status < 300) {
+                            try {
+                                var resp = JSON.parse(xhr.responseText);
+                                if (resp && resp.url) {
+                                    var width = prompt('Masukkan lebar gambar (pixel):\n\nContoh: 300, 400, 500', '300');
+                                    if (width !== null && width.trim() !== '') {
+                                        width = parseInt(width);
+                                        if (!isNaN(width) && width > 0) {
+                                            var range = quill.getSelection(true);
+                                            quill.insertEmbed(range.index, 'image', resp.url);
+                                            var imgElement = quill.root.querySelector('img[src="' + resp.url + '"]');
+                                            if (imgElement) {
+                                                imgElement.style.width = width + 'px';
+                                                imgElement.style.maxWidth = '100%';
+                                                imgElement.style.height = 'auto';
+                                            }
+                                            quill.setSelection(range.index + 1);
+                                        } else {
+                                            alert('Lebar harus berupa angka positif!');
+                                        }
+                                    }
+                                } else {
+                                    alert('Upload failed: invalid response');
+                                }
+                            } catch (e) {
+                                alert('Upload failed: ' + e.message);
+                            }
+                        } else {
+                            alert('Upload failed: ' + xhr.status);
+                        }
+                    }
+                };
+
+                xhr.onerror = function() {
+                    alert('Upload failed due to network error');
+                };
+                xhr.send(formData);
+            };
+        }
+
+        // Toggle Fields
+        function toggleEditSubmenuFields(submenuId) {
+            const selectEl = document.getElementById('type-select-edit-' + submenuId);
+            if (!selectEl) return;
+            const type = selectEl.value;
+
+            // Hide all sections in this modal
+            document.getElementById('custom-section-edit-' + submenuId).style.display = 'none';
+            document.getElementById('url-section-edit-' + submenuId).style.display = 'none';
+            document.getElementById('module-section-edit-' + submenuId).style.display = 'none';
+
+            // Show selected section
+            if (type === 'custom') {
+                document.getElementById('custom-section-edit-' + submenuId).style.display = 'block';
+                // Initialize Quill when section is shown if not already initialized
+                const textarea = document.getElementById('quill-textarea-edit-' + submenuId);
+                if (textarea && !textarea.dataset.quillInitialized) {
+                    initQuillEditor('quill-textarea-edit-' + submenuId, 'quill-container-edit-' + submenuId);
+                }
+            } else if (type === 'url') {
+                document.getElementById('url-section-edit-' + submenuId).style.display = 'block';
+            } else if (type === 'module') {
+                document.getElementById('module-section-edit-' + submenuId).style.display = 'block';
+            }
+        }
+
+        document.addEventListener('DOMContentLoaded', function() {
+            // Initialize Quill for the default custom section of edit modal when opened
+            document.body.addEventListener('click', function(e) {
+                var trigger = e.target.closest('[data-modal-target^="editSubmenusModal"]');
+                if (trigger) {
+                    var modalId = trigger.getAttribute('data-modal-target');
+                    setTimeout(function() {
+                        var modal = document.getElementById(modalId);
+                        if (modal) {
+                            var submenuId = modalId.replace('editSubmenusModal', '');
+                            toggleEditSubmenuFields(submenuId);
+                        }
+                    }, 300);
+                }
+            });
+        });
+    </script>
+@endpush

@@ -37,6 +37,10 @@ class ExpertiseController extends Controller
             return response()->json(['error' => ['message' => 'No image uploaded']], 400);
         }
 
+        $request->validate([
+            $fileField => 'required|image|max:3072',
+        ]);
+
         $image = $request->file($fileField);
         if (!$image->isValid()) {
             Log::error('expertise.uploadImage invalid upload', ['error' => $image->getErrorMessage()]);

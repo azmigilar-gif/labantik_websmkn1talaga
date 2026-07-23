@@ -1,188 +1,178 @@
 @extends('layouts.app')
 
-@section('title', 'SMKN 1 Talaga')
+@section('title', 'Index Berita - SMKN 1 Talaga')
 
 @section('content')
-    <div class="group-data-[sidebar-size=sm]:min-h-sm group-data-[sidebar-size=sm]:relative">
-        <div class="group-data-[sidebar-size=sm]:min-h-sm dark:bg-zink-800 relative min-h-screen bg-slate-50">
-            <div
-                class="group-data-[sidebar-size=lg]:ltr:md:ml-vertical-menu group-data-[sidebar-size=lg]:rtl:md:mr-vertical-menu group-data-[sidebar-size=md]:ltr:ml-vertical-menu-md group-data-[sidebar-size=md]:rtl:mr-vertical-menu-md group-data-[sidebar-size=sm]:ltr:ml-vertical-menu-sm group-data-[sidebar-size=sm]:rtl:mr-vertical-menu-sm px-4 pb-[calc(theme('spacing.header')_*_0.8)] pt-4 group-data-[layout=horizontal]:mx-auto group-data-[layout=horizontal]:max-w-screen-2xl group-data-[layout=horizontal]:px-0 group-data-[layout=horizontal]:px-3 group-data-[layout=horizontal]:group-data-[navbar=hidden]:pt-4 group-data-[navbar=bordered]:pt-6 group-data-[navbar=hidden]:pt-0 group-data-[layout=horizontal]:md:pt-6 group-data-[layout=horizontal]:group-data-[sidebar-size=lg]:ltr:md:ml-auto group-data-[layout=horizontal]:group-data-[sidebar-size=lg]:rtl:md:mr-auto">
-                <div class="container-fluid group-data-[content=boxed]:max-w-boxed mx-auto">
-
-                    <!-- Breadcrumb -->
-                    <div class="flex flex-col gap-2 py-20 md:flex-row md:items-center print:hidden">
-                        <div class="grow">
-                            <h5 class="text-16">Index Berita</h5>
-                        </div>
-                        <ul class="flex shrink-0 items-center gap-2 text-sm font-normal">
-                            <li
-                                class="before:font-remix dark:text-zink-200 relative before:absolute before:-top-[3px] before:text-[18px] before:text-slate-400 before:content-['\ea54'] ltr:pr-4 ltr:before:-right-1 rtl:pl-4 rtl:before:-left-1">
-                                <a href="/" class="dark:text-zink-200 text-slate-400">Landing Page</a>
-                            </li>
-                            <li class="dark:text-zink-100 text-slate-700">
-                                Index Berita
-                            </li>
-                        </ul>
-                    </div>
-
-                    <!-- Filter Dropdown -->
-                    <div class="mb-5">
-                        <div class="dropdown relative inline-block">
-                            <button type="button"
-                                class="dropdown-toggle btn border-slate-500 bg-slate-500 text-white hover:bg-slate-600 focus:bg-slate-600 inline-flex items-center gap-2"
-                                id="dropdownMenuForm" data-bs-toggle="dropdown">
-                                <i data-lucide="filter" class="size-4"></i>
-                                <span>Filter Kategori</span>
-                                <i data-lucide="chevron-down" class="size-4"></i>
-                            </button>
-
-                            <div class="dropdown-menu absolute z-50 mt-1 hidden w-56 rounded-md bg-white shadow-lg border border-slate-200 py-1"
-                                aria-labelledby="dropdownMenuForm">
-                                <!-- All Categories Option -->
-                                <a href="{{ route('news.index') }}"
-                                    class="block px-4 py-2 text-sm text-slate-700 hover:bg-slate-100 transition-colors {{ !request('category') ? 'bg-slate-50 font-medium' : '' }}">
-                                    <i data-lucide="layout-grid" class="inline-block size-4 mr-2 text-slate-500"></i>
-                                    Semua Kategori
-                                </a>
-
-                                <div class="border-t border-slate-200 my-1"></div>
-
-                                <!-- Category Options -->
-                                @foreach ($categories as $cat)
-                                    <a href="{{ route('news.index', ['category' => $cat->id]) }}"
-                                        class="block px-4 py-2 text-sm text-slate-700 hover:bg-slate-100 transition-colors {{ request('category') == $cat->id ? 'bg-slate-50 font-medium' : '' }}">
-                                        <i data-lucide="tag" class="inline-block size-4 mr-2 text-slate-500"></i>
-                                        {{ ucfirst($cat->name) }}
-                                    </a>
-                                @endforeach
-                            </div>
-                        </div>
-                    </div>
-
-                    <!-- News Grid -->
-                    <div class="mb-5 grid grid-cols-1 gap-x-5 gap-y-5 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-                        @foreach ($news as $item)
-                            <a href="{{ route('news.show', $item->id) }}" class="block group">
-                                <div
-                                    class="flex h-[450px] flex-col overflow-hidden mt-5 rounded-lg bg-white shadow-md transition-all duration-300 hover:shadow-xl hover:-translate-y-1">
-
-                                    <!-- Image Container -->
-                                    <div class="relative h-48 flex-shrink-0 overflow-hidden bg-gray-100">
-                                        @php
-                                            $firstImgSrc = null;
-                                            if (!empty($item->content)) {
-                                                if (
-                                                    preg_match('/<img[^>]+src="([^">]+)"/i', $item->content, $matches)
-                                                ) {
-                                                    $firstImgSrc = $matches[1];
-                                                }
-                                            }
-                                        @endphp
-
-                                        <img src="{{ $firstImgSrc ?? asset('assets/images/default-news.png') }}"
-                                            alt="{{ $item->title }}"
-                                            class="h-full w-full object-cover transition-transform duration-300 group-hover:scale-110"
-                                            loading="lazy" />
-                                    </div>
-
-                                    <!-- Content Container -->
-                                    <div class="flex min-h-0 flex-1 flex-col overflow-hidden p-4">
-
-                                        <!-- Title -->
-                                        <h3
-                                            class="mb-3 h-14 flex-shrink-0 overflow-hidden text-lg font-semibold leading-tight text-gray-900 group-hover:text-slate-700 transition-colors">
-                                            <span class="line-clamp-2">{{ $item->title }}</span>
-                                        </h3>
-
-                                        <!-- Meta Information -->
-                                        <div class="min-h-0 flex-1 overflow-hidden">
-                                            <div class="flex flex-col gap-2 text-sm text-gray-600">
-
-                                                <!-- Category -->
-                                                @if ($item->category)
-                                                    <div class="flex items-start gap-2">
-                                                        <i data-lucide="tag"
-                                                            class="size-4 flex-shrink-0 text-slate-500 mt-0.5"></i>
-                                                        <span
-                                                            class="px-2.5 py-0.5 text-xs inline-block font-medium rounded border bg-custom-100 border-custom-200 text-custom-500 dark:bg-custom-500/20 dark:border-custom-500/20">{{ $item->category->name }}</span>
-                                                    </div>
-                                                @endif
-
-                                                <!-- Date -->
-                                                <div class="flex items-start gap-2">
-                                                    <i data-lucide="calendar"
-                                                        class="size-4 flex-shrink-0 text-slate-500 mt-0.5"></i>
-                                                    <span
-                                                        class="truncate">{{ $item->created_at->format('l, d F Y') }}</span>
-                                                </div>
-
-                                                <!-- Author -->
-                                                @if ($item->created_by && $item->createdBy)
-                                                    <div class="flex items-start gap-2">
-                                                        <i data-lucide="user"
-                                                            class="size-4 flex-shrink-0 text-slate-500 mt-0.5"></i>
-                                                        <span class="truncate">{{ $item->createdBy->name }}</span>
-                                                    </div>
-                                                @endif
-
-                                                <!-- Preview -->
-                                                <div class="flex items-start gap-2">
-                                                    <i data-lucide="file-text"
-                                                        class="size-4 flex-shrink-0 text-slate-500 mt-0.5"></i>
-                                                    <span class="line-clamp-3 min-w-0 flex-1">
-                                                        {{ Str::limit(strip_tags($item->content), 100, '...') }}
-                                                    </span>
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </div>
-                            </a>
-                        @endforeach
-                    </div>
-
-                    <!-- Pagination -->
-                    <div class="mb-5 flex flex-col items-center md:flex-row">
-                        <div class="mb-4 grow md:mb-0">
-                            <p class="dark:text-zink-200 text-slate-500">
-                                Menampilkan <b>{{ $news->firstItem() }}</b> sampai <b>{{ $news->lastItem() }}</b> dari
-                                <b>{{ $news->total() }}</b> hasil
-                            </p>
-                        </div>
-                        <ul class="flex shrink-0 flex-wrap items-center gap-2">
-
-                            <!-- Previous Button -->
-                            <li>
-                                <a href="{{ $news->previousPageUrl() }}"
-                                    class="dark:bg-zink-700 dark:border-zink-500 dark:text-zink-200 hover:text-custom-500 dark:hover:text-custom-500 hover:bg-custom-100 dark:hover:bg-custom-500/10 focus:bg-custom-50 dark:focus:bg-custom-500/10 focus:text-custom-500 dark:focus:text-custom-500 {{ $news->onFirstPage() ? 'disabled cursor-not-allowed text-slate-400 dark:text-zink-300' : 'cursor-pointer' }} inline-flex h-8 items-center justify-center rounded border border-slate-200 bg-white px-3 text-slate-500 transition-all duration-150 ease-linear">
-                                    <i class="mr-1 size-4 rtl:rotate-180" data-lucide="chevron-left"></i>
-                                    Prev
-                                </a>
-                            </li>
-
-                            <!-- Page Numbers -->
-                            @foreach ($news->getUrlRange(1, $news->lastPage()) as $page => $url)
-                                <li>
-                                    <a href="{{ $url }}"
-                                        class="dark:bg-zink-700 dark:border-zink-500 dark:text-zink-200 hover:text-custom-500 dark:hover:text-custom-500 hover:bg-custom-100 dark:hover:bg-custom-500/10 focus:bg-custom-50 dark:focus:bg-custom-500/10 focus:text-custom-500 dark:focus:text-custom-500 {{ $page == $news->currentPage() ? 'active' : '' }} [&.active]:bg-custom-500 dark:[&.active]:bg-custom-500 [&.active]:border-custom-500 dark:[&.active]:border-custom-500 inline-flex size-8 cursor-pointer items-center justify-center rounded border border-slate-200 bg-white text-slate-500 transition-all duration-150 ease-linear [&.active]:text-white dark:[&.active]:text-white">
-                                        {{ $page }}
-                                    </a>
-                                </li>
-                            @endforeach
-
-                            <!-- Next Button -->
-                            <li>
-                                <a href="{{ $news->nextPageUrl() }}"
-                                    class="dark:bg-zink-700 dark:border-zink-500 dark:text-zink-200 hover:text-custom-500 dark:hover:text-custom-500 hover:bg-custom-100 dark:hover:bg-custom-500/10 focus:bg-custom-50 dark:focus:bg-custom-500/10 focus:text-custom-500 dark:focus:text-custom-500 {{ !$news->hasMorePages() ? 'disabled cursor-not-allowed text-slate-400 dark:text-zink-300' : 'cursor-pointer' }} inline-flex h-8 items-center justify-center rounded border border-slate-200 bg-white px-3 text-slate-500 transition-all duration-150 ease-linear">
-                                    Next
-                                    <i class="ml-1 size-4 rtl:rotate-180" data-lucide="chevron-right"></i>
-                                </a>
-                            </li>
-                        </ul>
-                    </div>
-
+    <section class="py-5" style="background-color: #f8fafc; min-height: 80vh; padding-top: 140px !important;">
+        <div class="container my-5">
+            
+            <!-- Breadcrumbs -->
+            <div class="row align-items-center mb-4">
+                <div class="col-md-6 mb-3 mb-md-0">
+                    <h1 style="font-weight: 800; font-size: 28px; color: #0f172a; margin: 0;">Index Berita</h1>
+                </div>
+                <div class="col-md-6 text-md-end">
+                    <nav aria-label="breadcrumb" class="d-inline-block">
+                        <ol class="breadcrumb m-0" style="font-size: 14px;">
+                            <li class="breadcrumb-item"><a href="{{ url('/') }}" class="text-decoration-none text-muted"><i class="bi bi-house-door-fill me-1"></i>Beranda</a></li>
+                            <li class="breadcrumb-item active text-primary" aria-current="page" style="font-weight: 600;">Berita</li>
+                        </ol>
+                    </nav>
                 </div>
             </div>
+
+            <!-- Filter Dropdown -->
+            <div class="d-flex align-items-center justify-content-between mb-4 flex-wrap gap-3">
+                <div class="dropdown">
+                    <button class="btn btn-primary dropdown-toggle px-3 py-2" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false" style="font-weight: 600; border-radius: 6px;">
+                        <i class="bi bi-funnel-fill me-1"></i> Filter Kategori
+                    </button>
+                    <ul class="dropdown-menu shadow-sm" aria-labelledby="dropdownMenuButton" style="border-radius: 8px;">
+                        <li>
+                            <a class="dropdown-item py-2 {{ !request('category') ? 'active bg-primary' : '' }}" href="{{ route('news.index') }}">
+                                <i class="bi bi-grid-fill me-2"></i> Semua Kategori
+                            </a>
+                        </li>
+                        <li><hr class="dropdown-divider"></li>
+                        @foreach ($categories as $cat)
+                            <li>
+                                <a class="dropdown-item py-2 {{ request('category') == $cat->id ? 'active bg-primary' : '' }}" href="{{ route('news.index', ['category' => $cat->id]) }}">
+                                    <i class="bi bi-tag-fill me-2"></i> {{ ucfirst($cat->name) }}
+                                </a>
+                            </li>
+                        @endforeach
+                    </ul>
+                </div>
+
+                <div class="text-muted" style="font-size: 14px;">
+                    Menampilkan <b>{{ $news->firstItem() ?? 0 }}</b> sampai <b>{{ $news->lastItem() ?? 0 }}</b> dari <b>{{ $news->total() ?? 0 }}</b> berita
+                </div>
+            </div>
+
+            <!-- News Grid -->
+            <div class="row g-4">
+                @if($news->count() === 0)
+                    <div class="col-12 text-center py-5">
+                        <i class="bi bi-newspaper text-muted" style="font-size: 64px;"></i>
+                        <p class="text-muted mt-3 italic" style="font-size: 16px;">Belum ada berita yang diterbitkan untuk kategori ini.</p>
+                    </div>
+                @else
+                    @foreach ($news as $item)
+                     @php
+                            $newsPhoto = null;
+                            if (!empty($item->photo)) {
+                                $p = $item->photo;
+                                if (filter_var($p, FILTER_VALIDATE_URL)) {
+                                    $newsPhoto = $p;
+                                } elseif (preg_match('#^assets/#', $p) || preg_match('#^public/assets/#', $p)) {
+                                    $newsPhoto = asset(preg_replace('#^public/#', '', $p));
+                                } else {
+                                    $rel = preg_replace('#^storage/#', '', $p);
+                                    $newsPhoto = route('public.files', ['path' => $rel]);
+                                }
+                            } else {
+                                if (!empty($item->content) && preg_match('/<img[^>]+src="([^">]+)"/i', $item->content, $matches)) {
+                                    $newsPhoto = $matches[1];
+                                } else {
+                                    $newsPhoto = asset('assets/images/default-news.png');
+                                }
+                            }
+
+                            // Clean editor markup/spaces for a proper preview
+                            $cleanedContent = strip_tags($item->content);
+                            $cleanedContent = html_entity_decode($cleanedContent);
+                            $cleanedContent = str_replace(["\xc2\xa0", '&nbsp;'], ' ', $cleanedContent);
+                            $cleanedContent = preg_replace('/\s+/', ' ', $cleanedContent);
+                            $cleanedContent = trim($cleanedContent);
+                        @endphp
+                        <div class="col-lg-4 col-md-6">
+                            <div class="card h-100 border shadow-sm rounded-4 overflow-hidden bg-white d-flex flex-column justify-content-between" style="transition: transform 0.3s ease;">
+                                <div>
+                                    <div class="position-relative" style="height: 200px; overflow: hidden;">
+                                        <img src="{{ $newsPhoto }}" alt="{{ $item->title }}" class="w-100 h-100 object-fit-cover hover-scale" style="transition: all 0.5s;" onerror="this.src='{{ asset('assets/images/default-news.png') }}'">
+                                    </div>
+                                    <div class="p-4">
+                                        <div class="d-flex align-items-center text-muted mb-2 gap-3" style="font-size: 12px;">
+                                            <div>
+                                                <i class="bi bi-calendar3 me-1 text-primary"></i>
+                                                <span>{{ \Carbon\Carbon::parse($item->created_at)->locale('id')->isoFormat('D MMM YYYY') }}</span>
+                                            </div>
+                                            @if ($item->created_by && $item->createdBy)
+                                                <div>
+                                                    <i class="bi bi-person-fill me-1 text-primary"></i>
+                                                    <span>{{ $item->createdBy->name }}</span>
+                                                </div>
+                                            @endif
+                                        </div>
+                                        @if ($item->category)
+                                            <div class="mb-2">
+                                                <span class="badge bg-primary text-white" style="font-size: 10px; padding: 4px 8px;">
+                                                    {{ $item->category->name }}
+                                                </span>
+                                            </div>
+                                        @endif
+                                        <h5 class="line-clamp-2" style="font-size: 16px; font-weight: 700; color: #0f172a; line-height: 1.4; margin-bottom: 10px;">
+                                            {{ $item->title }}
+                                        </h5>
+                                        <p class="text-muted line-clamp-3 mb-0" style="font-size: 13px; line-height: 1.6;">
+                                            {{ Str::limit($cleanedContent, 120, '...') }}
+                                        </p>
+                                    </div>
+                                </div>
+                                <div class="px-4 pb-4 mt-auto">
+                                    <a href="{{ route('news.show', $item->id) }}" class="btn btn-outline-primary btn-sm w-100 py-2" style="border-radius: 6px; font-weight: 600;">
+                                        Baca Artikel
+                                    </a>
+                                </div>
+                            </div>
+                        </div>
+                    @endforeach
+                @endif
+            </div>
+
+            <!-- Pagination -->
+            @if($news->lastPage() > 1)
+                <div class="d-flex justify-content-center mt-5">
+                    <nav aria-label="Page navigation">
+                        <ul class="pagination shadow-sm m-0" style="border-radius: 8px; overflow: hidden;">
+                            <li class="page-item {{ $news->onFirstPage() ? 'disabled' : '' }}">
+                                <a class="page-link py-2.5 px-3" href="{{ $news->previousPageUrl() }}" aria-label="Previous">
+                                    <span aria-hidden="true"><i class="bi bi-chevron-left"></i> Prev</span>
+                                </a>
+                            </li>
+                            @foreach ($news->getUrlRange(1, $news->lastPage()) as $page => $url)
+                                <li class="page-item {{ $page == $news->currentPage() ? 'active' : '' }}">
+                                    <a class="page-link py-2.5 px-3" href="{{ $url }}">{{ $page }}</a>
+                                </li>
+                            @endforeach
+                            <li class="page-item {{ !$news->hasMorePages() ? 'disabled' : '' }}">
+                                <a class="page-link py-2.5 px-3" href="{{ $news->nextPageUrl() }}" aria-label="Next">
+                                    <span aria-hidden="true">Next <i class="bi bi-chevron-right"></i></span>
+                                </a>
+                            </li>
+                        </ul>
+                    </nav>
+                </div>
+            @endif
+
         </div>
-    </div>
+    </section>
+
+    <style>
+        .hover-scale:hover {
+            transform: scale(1.08);
+        }
+        .line-clamp-2 {
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+        .line-clamp-3 {
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+    </style>
 @endsection

@@ -28,7 +28,7 @@ class MitraController extends Controller
     {
         $data = $request->validate([
             'name' => 'required|string|max:255',
-            'photo' => 'nullable|image|max:4096',
+            'photo' => 'nullable|image|max:2048',
             's_menu_id' => 'nullable|string|max:255',
         ]);
 
@@ -73,7 +73,7 @@ class MitraController extends Controller
         $m = S_Mitra::findOrFail($id);
         $data = $request->validate([
             'name' => 'required|string|max:255',
-            'photo' => 'nullable|image|max:4096',
+            'photo' => 'nullable|image|max:2048',
             's_menu_id' => 'nullable|string|max:255',
         ]);
 

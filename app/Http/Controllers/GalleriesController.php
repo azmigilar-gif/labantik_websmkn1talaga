@@ -9,14 +9,21 @@ use Illuminate\Support\Str;
 
 class GalleriesController extends Controller
 {
-    public function index()
+    public function index(Request $request)
     {
         $menus = S_Menu::latest()->get();
 
-        $galleries = Gallery::latest()->paginate(6);
+        $query = Gallery::query();
+
+        if ($request->has('type') && ! empty($request->type)) {
+            $query->where('type', $request->type);
+        }
+
+        $galleries = $query->latest()->paginate(12)->withQueryString();
 
         return view('galleries.index', compact('galleries', 'menus'));
     }
+
     public function show($id)
     {
 
@@ -40,14 +47,14 @@ class GalleriesController extends Controller
                 $backUrl = route('galleries.index');
             }
             // came from site root / (landing page)
-            elseif ($prevPath === '/' || Str::startsWith($previous, url('/') . '#')) {
+            elseif ($prevPath === '/' || Str::startsWith($previous, url('/').'#')) {
                 $backUrl = url('/');
             }
             // internal other page -> allow returning there (but avoid looping to same show)
             else {
                 $appHost = parse_url(config('app.url') ?: request()->getSchemeAndHttpHost(), PHP_URL_HOST);
                 $prevHost = parse_url($previous, PHP_URL_HOST);
-                $currentPath = '/' . trim(request()->path(), '/');
+                $currentPath = '/'.trim(request()->path(), '/');
                 if (($prevHost === $appHost || is_null($prevHost)) && trim($prevPath, '/') !== trim($currentPath, '/')) {
                     $backUrl = $previous;
                 }
@@ -57,4 +64,3 @@ class GalleriesController extends Controller
         return view('galleries.show', compact('galleries', 'menus', 'backUrl'));
     }
 }
-

@@ -3,246 +3,131 @@
 @section('title', 'Galeri - SMKN 1 Talaga')
 
 @section('content')
-    <div class="group-data-[sidebar-size=sm]:min-h-sm group-data-[sidebar-size=sm]:relative">
-        <div class="group-data-[sidebar-size=sm]:min-h-sm dark:bg-zink-800 relative min-h-screen bg-slate-50">
-            <div
-                class="group-data-[sidebar-size=lg]:ltr:md:ml-vertical-menu group-data-[sidebar-size=lg]:rtl:md:mr-vertical-menu group-data-[sidebar-size=md]:ltr:ml-vertical-menu-md group-data-[sidebar-size=md]:rtl:mr-vertical-menu-md group-data-[sidebar-size=sm]:ltr:ml-vertical-menu-sm group-data-[sidebar-size=sm]:rtl:mr-vertical-menu-sm px-4 pb-[calc(theme('spacing.header')_*_0.8)] pt-4 group-data-[layout=horizontal]:mx-auto group-data-[layout=horizontal]:max-w-screen-2xl group-data-[layout=horizontal]:px-0 group-data-[layout=horizontal]:px-3 group-data-[layout=horizontal]:group-data-[navbar=hidden]:pt-4 group-data-[navbar=bordered]:pt-6 group-data-[navbar=hidden]:pt-0 group-data-[layout=horizontal]:md:pt-6 group-data-[layout=horizontal]:group-data-[sidebar-size=lg]:ltr:md:ml-auto group-data-[layout=horizontal]:group-data-[sidebar-size=lg]:rtl:md:mr-auto">
-                <div class="container-fluid group-data-[content=boxed]:max-w-boxed mx-auto">
+    <section class="py-5" style="background-color: #f8fafc; min-height: 80vh; padding-top: 100px !important;">
+        <div class="container my-5">
+            
+            <!-- Breadcrumbs -->
+            <div class="row align-items-center mb-4">
+                <div class="col-md-6 mb-3 mb-md-0">
+                    <h1 style="font-weight: 800; font-size: 28px; color: #0f172a; margin: 0;">Galeri Sekolah</h1>
+                </div>
+                <div class="col-md-6 text-md-end">
+                    <nav aria-label="breadcrumb" class="d-inline-block">
+                        <ol class="breadcrumb m-0" style="font-size: 14px;">
+                            <li class="breadcrumb-item"><a href="{{ url('/') }}" class="text-decoration-none text-muted"><i class="bi bi-house-door-fill me-1"></i>Beranda</a></li>
+                            <li class="breadcrumb-item active text-primary" aria-current="page" style="font-weight: 600;">Galeri</li>
+                        </ol>
+                    </nav>
+                </div>
+            </div>
 
-                    <div class="flex flex-col gap-2 py-20 md:flex-row md:items-center print:hidden">
-                        <div class="grow">
-                            <h5 class="text-16">Galeri</h5>
+            <!-- Filter Section -->
+            <div class="d-flex align-items-center justify-content-between mb-4 flex-wrap gap-3">
+                <div class="dropdown">
+                    <button class="btn btn-primary dropdown-toggle px-3 py-2" type="button" id="dropdownMenuButton" data-bs-toggle="dropdown" aria-expanded="false" style="font-weight: 600; border-radius: 6px;">
+                        <i class="bi bi-funnel-fill me-1"></i> Tipe Galeri
+                    </button>
+                    <ul class="dropdown-menu shadow-sm" aria-labelledby="dropdownMenuButton" style="border-radius: 8px;">
+                        <li>
+                            <a class="dropdown-item py-2 {{ !request('type') ? 'active bg-primary' : '' }}" href="{{ route('galleries.index') }}">
+                                Semua Media
+                            </a>
+                        </li>
+                        <li><hr class="dropdown-divider"></li>
+                        <li>
+                            <a class="dropdown-item py-2 {{ request('type') == 'photo' ? 'active bg-primary' : '' }}" href="{{ route('galleries.index', ['type' => 'photo']) }}">
+                                <i class="bi bi-image me-2"></i> Foto
+                            </a>
+                        </li>
+                        <li>
+                            <a class="dropdown-item py-2 {{ request('type') == 'video' ? 'active bg-primary' : '' }}" href="{{ route('galleries.index', ['type' => 'video']) }}">
+                                <i class="bi bi-play-circle me-2"></i> Video
+                            </a>
+                        </li>
+                    </ul>
+                </div>
+            </div>
+
+            <!-- Gallery Grid -->
+            <div class="row g-4">
+                @forelse ($galleries as $item)
+                    @php
+                        $mediaUrl = null;
+                        if (!empty($item->file_path)) {
+                            $mediaUrl = asset($item->file_path);
+                        } elseif ($item->embed_html && preg_match('/src="([^"]+)"/i', $item->embed_html, $matches)) {
+                            $mediaUrl = $matches[1];
+                        } else {
+                            $mediaUrl = asset('assets/images/default-news.png');
+                        }
+                    @endphp
+                    <div class="col-lg-3 col-md-6 col-sm-12">
+                        <div class="card h-100 border-0 shadow-sm rounded-4 overflow-hidden bg-white" style="transition: all 0.3s ease;">
+                            <div class="position-relative overflow-hidden" style="aspect-ratio: 1/1;">
+                                @if ($item->type == 'photo')
+                                    <a href="{{ $mediaUrl }}" class="glightbox" data-gallery="gallery-all" data-title="{{ $item->title }}">
+                                        <img src="{{ $mediaUrl }}" alt="{{ $item->title }}" class="w-100 h-100 object-fit-cover hover-scale" style="transition: all 0.5s;" onerror="this.src='{{ asset('assets/images/default-news.png') }}'">
+                                    </a>
+                                @else
+                                    <div class="w-100 h-100 position-relative">
+                                        @if($item->embed_html)
+                                            {!! preg_replace('/width="\d+"/', 'width="100%"', preg_replace('/height="\d+"/', 'height="100%"', $item->embed_html)) !!}
+                                        @endif
+                                    </div>
+                                @endif
+                            </div>
+                            <div class="p-3">
+                                <h6 class="text-dark mb-1 text-truncate" style="font-weight: 700;">{{ $item->title }}</h6>
+                                <p class="text-muted text-truncate mb-2" style="font-size: 12px;">{{ $item->description }}</p>
+                                <div class="text-muted mb-2" style="font-size: 11px;">
+                                    <i class="bi bi-calendar3 me-1"></i> {{ $item->created_at->format('d M Y') }}
+                                </div>
+                                <div class="d-flex justify-content-between align-items-center">
+                                    <span class="badge {{ $item->type == 'photo' ? 'bg-primary' : 'bg-danger' }}" style="font-size: 10px; padding: 3px 8px;">
+                                        {{ $item->type == 'photo' ? 'Foto' : 'Video' }}
+                                    </span>
+                                    @if(Route::has('galleries.show'))
+                                        <a href="{{ route('galleries.show', $item->id) }}" class="text-primary text-decoration-none font-weight-bold" style="font-size: 12px;">Detail <i class="bi bi-arrow-right"></i></a>
+                                    @endif
+                                </div>
+                            </div>
                         </div>
-                        <ul class="flex shrink-0 items-center gap-2 text-sm font-normal">
-                            <li
-                                class="before:font-remix dark:text-zink-200 relative before:absolute before:-top-[3px] before:text-[18px] before:text-slate-400 before:content-['\ea54'] ltr:pr-4 ltr:before:-right-1 rtl:pl-4 rtl:before:-left-1">
-                                <a href="/" class="dark:text-zink-200 text-slate-400">Landing Page</a>
+                    </div>
+                @empty
+                    <div class="col-12 text-center py-5">
+                        <i class="bi bi-images text-muted" style="font-size: 64px;"></i>
+                        <p class="text-muted mt-3 italic" style="font-size: 16px;">Belum ada media di galeri saat ini.</p>
+                    </div>
+                @endforelse
+            </div>
+
+            <!-- Pagination -->
+            @if(method_exists($galleries, 'lastPage') && $galleries->lastPage() > 1)
+                <div class="d-flex justify-content-center mt-5">
+                    <nav aria-label="Page navigation">
+                        <ul class="pagination shadow-sm m-0" style="border-radius: 8px; overflow: hidden;">
+                            <li class="page-item {{ $galleries->onFirstPage() ? 'disabled' : '' }}">
+                                <a class="page-link py-2.5 px-3" href="{{ $galleries->previousPageUrl() }}">Prev</a>
                             </li>
-                            <li class="dark:text-zink-100 text-slate-700">
-                                Galeri
+                            @foreach ($galleries->getUrlRange(1, $galleries->lastPage()) as $page => $url)
+                                <li class="page-item {{ $page == $galleries->currentPage() ? 'active' : '' }}">
+                                    <a class="page-link py-2.5 px-3" href="{{ $url }}">{{ $page }}</a>
+                                </li>
+                            @endforeach
+                            <li class="page-item {{ !$galleries->hasMorePages() ? 'disabled' : '' }}">
+                                <a class="page-link py-2.5 px-3" href="{{ $galleries->nextPageUrl() }}">Next</a>
                             </li>
                         </ul>
-                    </div>
-
-                    {{-- Filter Section --}}
-                    <div class="mb-5 grid grid-cols-1 gap-5 lg:grid-cols-12">
-                        <div class="dropdown relative">
-                            <button type="button" class="dropdown-toggle btn border-slate-500 bg-slate-500 text-white"
-                                id="dropdownMenuForm" data-bs-toggle="dropdown">
-                                Filter <i data-lucide="sliders-horizontal" class="ml-1 inline-block size-4"></i>
-                            </button>
-
-                            <ul class="dropdown-menu absolute z-50 mt-1 hidden min-w-max rounded-md bg-white p-4 shadow-md"
-                                aria-labelledby="dropdownMenuForm">
-                                <form action="{{ route('galleries.index') }}" method="GET">
-                                    <div class="mb-3">
-                                        <label class="mb-2 inline-block text-base font-medium">Tipe</label>
-                                        <select name="type" class="form-input border-slate-200 focus:border-slate-500">
-                                            <option value="">Semua</option>
-                                            <option value="photo" {{ request('type') == 'photo' ? 'selected' : '' }}>
-                                                Foto
-                                            </option>
-                                            <option value="video" {{ request('type') == 'video' ? 'selected' : '' }}>
-                                                Video
-                                            </option>
-                                        </select>
-                                    </div>
-
-                                    <div class="text-right">
-                                        <button type="submit"
-                                            class="btn bg-green-500 px-3 py-1 text-white hover:bg-green-600">
-                                            Terapkan <i data-lucide="move-right" class="ml-1 inline-block size-3"></i>
-                                        </button>
-                                    </div>
-                                </form>
-                            </ul>
-                        </div>
-                    </div>
-
-                    {{-- Gallery Grid --}}
-                    <div class="mb-5 grid grid-cols-1 gap-x-5 gap-y-6 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4">
-                        @forelse ($galleries as $item)
-                            <a href="{{ route('galleries.show', $item->id) }}"
-                                class="card cursor-pointer transition-all duration-300 hover:-translate-y-1 hover:shadow-xl">
-                                <div class="card-body p-0">
-                                    <div class="group/gallery relative overflow-hidden rounded-t-md bg-slate-100">
-
-                                        {{-- Render actual embed as preview --}}
-                                        @if ($item->embed_html)
-                                            @if ($item->type == 'photo')
-                                                {{-- Instagram Preview --}}
-                                                <div class="relative"
-                                                    style="aspect-ratio:1/1; overflow:hidden; pointer-events: none;">
-                                                    <div style="transform: scale(1); transform-origin: center;">
-                                                        {!! $item->embed_html !!}
-                                                    </div>
-                                                    {{-- Overlay untuk klik --}}
-                                                    <div class="absolute inset-0 z-10"></div>
-                                                </div>
-                                            @elseif ($item->type == 'video')
-                                                {{-- YouTube Preview --}}
-                                                @php
-                                                    $host = parse_url($item->embed_url, PHP_URL_HOST) ?: '';
-                                                    $host = preg_replace('/^www\./', '', strtolower($host));
-
-                                                    if (
-                                                        str_contains($host, 'youtube') ||
-                                                        str_contains($host, 'youtu.be')
-                                                    ) {
-                                                        if (
-                                                            preg_match(
-                                                                '/youtu\.be\/([^\?&\/]+)/i',
-                                                                $item->embed_url,
-                                                                $m,
-                                                            )
-                                                        ) {
-                                                            $videoId = $m[1];
-                                                        } elseif (
-                                                            preg_match('/[\?&]v=([^\?&\/]+)/i', $item->embed_url, $m)
-                                                        ) {
-                                                            $videoId = $m[1];
-                                                        } elseif (
-                                                            preg_match('/embed\/([^\?&\/]+)/i', $item->embed_url, $m)
-                                                        ) {
-                                                            $videoId = $m[1];
-                                                        } else {
-                                                            $videoId = null;
-                                                        }
-                                                    } else {
-                                                        $videoId = null;
-                                                    }
-                                                @endphp
-
-                                                <div class="relative" style="aspect-ratio:16/9; overflow:hidden;">
-                                                    @if ($videoId)
-                                                        <img src="https://img.youtube.com/vi/{{ $videoId }}/maxresdefault.jpg"
-                                                            alt="{{ $item->title }}" class="h-full w-full object-cover"
-                                                            onerror="this.src='https://img.youtube.com/vi/{{ $videoId }}/hqdefault.jpg'">
-                                                        {{-- Play Button Overlay --}}
-                                                        <div
-                                                            class="absolute inset-0 flex items-center justify-center bg-black/20 transition-all group-hover/gallery:bg-black/40">
-                                                            <div
-                                                                class="rounded-full bg-red-600 p-4 transition-transform group-hover/gallery:scale-110">
-                                                                <i data-lucide="play"
-                                                                    class="h-8 w-8 fill-white text-white"></i>
-                                                            </div>
-                                                        </div>
-                                                    @else
-                                                        <img src="{{ asset('assets/images/default-news.png') }}"
-                                                            alt="{{ $item->title }}" class="h-full w-full object-cover">
-                                                    @endif
-                                                </div>
-                                            @endif
-                                        @else
-                                            {{-- Default Image --}}
-                                            <div class="relative" style="aspect-ratio:16/9; overflow:hidden;">
-                                                <img src="{{ asset('assets/images/default-news.png') }}"
-                                                    alt="{{ $item->title }}" class="h-full w-full object-cover">
-                                            </div>
-                                        @endif
-
-                                        {{-- Hover Overlay --}}
-                                        <div
-                                            class="absolute inset-0 z-20 bg-gradient-to-t from-gray-900 via-gray-900/50 to-transparent opacity-0 transition-all duration-300 ease-linear group-hover/gallery:opacity-100">
-                                        </div>
-                                        <div
-                                            class="absolute bottom-0 left-3 right-3 z-30 pb-3 opacity-0 transition-all duration-300 ease-linear group-hover/gallery:opacity-100">
-                                            <h5 class="line-clamp-2 text-sm font-medium text-white">{{ $item->title }}
-                                            </h5>
-                                        </div>
-
-                                        {{-- Type Badge --}}
-                                        <div class="absolute right-3 top-3 z-30">
-                                            @if ($item->type == 'photo')
-                                                <span
-                                                    class="inline-flex items-center gap-1 rounded-full bg-blue-500 px-2.5 py-1 text-xs font-medium text-white shadow-lg">
-                                                    <i data-lucide="image" class="h-3 w-3"></i> Foto
-                                                </span>
-                                            @elseif ($item->type == 'video')
-                                                <span
-                                                    class="inline-flex items-center gap-1 rounded-full bg-red-500 px-2.5 py-1 text-xs font-medium text-white shadow-lg">
-                                                    <i data-lucide="video" class="h-3 w-3"></i> Video
-                                                </span>
-                                            @endif
-                                        </div>
-                                    </div>
-
-                                    {{-- Card Content --}}
-                                    <div class="p-4">
-                                        <div
-                                            class="dark:text-zink-200 mb-2 flex items-start justify-between text-xs text-slate-500">
-                                            <p>{{ $item->created_at->diffForHumans() }}</p>
-                                            @if ($item->created_by)
-                                                <p class="text-right">{{ '@' . ($item->createdBy->name ?? 'Unknown') }}</p>
-                                            @endif
-                                        </div>
-
-                                        <h6
-                                            class="dark:text-zink-100 mb-2 line-clamp-2 text-base font-semibold text-slate-800">
-                                            {{ $item->title }}
-                                        </h6>
-
-                                        @if ($item->description)
-                                            <p
-                                                class="dark:text-zink-300 line-clamp-2 text-sm leading-relaxed text-slate-600">
-                                                {{ Str::limit(strip_tags($item->description), 80, '...') }}
-                                            </p>
-                                        @endif
-                                    </div>
-                                </div>
-                            </a>
-                        @empty
-                            <div class="col-span-full py-12 text-center">
-                                <i data-lucide="image-off" class="mx-auto mb-4 h-16 w-16 text-slate-400"></i>
-                                <p class="text-slate-500">Tidak ada galeri yang tersedia</p>
-                            </div>
-                        @endforelse
-                    </div>
-
-                    {{-- Pagination --}}
-                    @if ($galleries->hasPages())
-                        <div class="mb-5 flex flex-col items-center md:flex-row">
-                            <div class="mb-4 grow md:mb-0">
-                                <p class="dark:text-zink-200 text-slate-500">
-                                    Showing <b>{{ $galleries->firstItem() }}</b> to <b>{{ $galleries->lastItem() }}</b>
-                                    of
-                                    <b>{{ $galleries->total() }}</b> Results
-                                </p>
-                            </div>
-                            <ul class="flex shrink-0 flex-wrap items-center gap-2">
-                                {{-- Previous Button --}}
-                                <li>
-                                    <a href="{{ $galleries->previousPageUrl() }}"
-                                        class="dark:bg-zink-700 dark:border-zink-500 dark:text-zink-200 hover:text-custom-500 dark:hover:text-custom-500 hover:bg-custom-100 dark:hover:bg-custom-500/10 focus:bg-custom-50 dark:focus:bg-custom-500/10 focus:text-custom-500 dark:focus:text-custom-500 {{ $galleries->onFirstPage() ? 'disabled cursor-not-allowed text-slate-400 dark:text-zink-300' : 'cursor-pointer' }} inline-flex h-8 items-center justify-center rounded border border-slate-200 bg-white px-3 text-slate-500 transition-all duration-150 ease-linear">
-                                        <i class="mr-1 size-4 rtl:rotate-180" data-lucide="chevron-left"></i> Prev
-                                    </a>
-                                </li>
-
-                                {{-- Page Numbers --}}
-                                @foreach ($galleries->getUrlRange(1, $galleries->lastPage()) as $page => $url)
-                                    <li>
-                                        <a href="{{ $url }}"
-                                            class="dark:bg-zink-700 dark:border-zink-500 dark:text-zink-200 hover:text-custom-500 dark:hover:text-custom-500 hover:bg-custom-100 dark:hover:bg-custom-500/10 focus:bg-custom-50 dark:focus:bg-custom-500/10 focus:text-custom-500 dark:focus:text-custom-500 {{ $page == $galleries->currentPage() ? 'active' : '' }} [&.active]:bg-custom-500 dark:[&.active]:bg-custom-500 [&.active]:border-custom-500 dark:[&.active]:border-custom-500 inline-flex size-8 cursor-pointer items-center justify-center rounded border border-slate-200 bg-white text-slate-500 transition-all duration-150 ease-linear [&.active]:text-white dark:[&.active]:text-white">
-                                            {{ $page }}
-                                        </a>
-                                    </li>
-                                @endforeach
-
-                                {{-- Next Button --}}
-                                <li>
-                                    <a href="{{ $galleries->nextPageUrl() }}"
-                                        class="dark:bg-zink-700 dark:border-zink-500 dark:text-zink-200 hover:text-custom-500 dark:hover:text-custom-500 hover:bg-custom-100 dark:hover:bg-custom-500/10 focus:bg-custom-50 dark:focus:bg-custom-500/10 focus:text-custom-500 dark:focus:text-custom-500 {{ !$galleries->hasMorePages() ? 'disabled cursor-not-allowed text-slate-400 dark:text-zink-300' : 'cursor-pointer' }} inline-flex h-8 items-center justify-center rounded border border-slate-200 bg-white px-3 text-slate-500 transition-all duration-150 ease-linear">
-                                        Next <i class="ml-1 size-4 rtl:rotate-180" data-lucide="chevron-right"></i>
-                                    </a>
-                                </li>
-                            </ul>
-                        </div>
-                    @endif
-
+                    </nav>
                 </div>
-                <!-- container-fluid -->
-            </div>
-            <!-- End Page-content -->
+            @endif
+
         </div>
-    </div>
+    </section>
+
+    <style>
+        .hover-scale:hover {
+            transform: scale(1.08);
+        }
+    </style>
 @endsection

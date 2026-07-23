@@ -8,7 +8,7 @@
 
             <div class="flex flex-col gap-2 py-4 md:flex-row md:items-center print:hidden">
                 <div class="grow">
-                    <h5 class="text-16">Dashboard</h5>
+                    <h5 class="text-16">Visi & Misi</h5>
                 </div>
                 <ul class="flex items-center gap-2 text-sm font-normal shrink-0">
                     <li
@@ -319,7 +319,7 @@
             </div>
         </div>
     </div>
-    <textarea id="missionInput" rows="8" class="form-input w-full"></textarea>
+
 
     <script>
         const textarea = document.getElementById('missionInput');

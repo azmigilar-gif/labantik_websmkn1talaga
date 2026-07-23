@@ -1,11 +1,10 @@
 <?php
 
-namespace App\Http\Controllers\admin;
+namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
 use App\Models\S_News;
 use Carbon\Carbon;
-use Illuminate\Http\Request;
 
 class DashboardController extends Controller
 {
@@ -13,10 +12,34 @@ class DashboardController extends Controller
     {
 
         $weeksData = $this->getNewsStatisticsByWeek();
-        $countNews = S_News::all()->count();
+        $countNews = S_News::count();
         $countNewsPending = S_News::where('approve', 'waiting')->count();
         $countNewsApprove = S_News::where('approve', 'approve')->count();
-        return view('admin.dashboard', compact('weeksData', 'countNews', 'countNewsApprove', 'countNewsPending'));
+        $countExtrakurikuler = \App\Models\S_Extrakulikuler::count();
+        $countMitra = \App\Models\S_Mitra::count();
+        $countGallery = \App\Models\Gallery::count();
+        $countMenu = \App\Models\S_Menu::count();
+
+        // Core school entities
+        $countStudents = \App\Models\RefStudent::whereHas('academicYears', function ($query) {
+            $query->where('status', 'Active');
+        })->count();
+        $countEmployees = \App\Models\CoreEmployee::count();
+        $countConcentrations = \App\Models\CoreExpertiseConcentration::count();
+
+        return view('admin.dashboard', compact(
+            'weeksData',
+            'countNews',
+            'countNewsApprove',
+            'countNewsPending',
+            'countExtrakurikuler',
+            'countMitra',
+            'countGallery',
+            'countMenu',
+            'countStudents',
+            'countEmployees',
+            'countConcentrations'
+        ));
     }
 
     private function getNewsStatisticsByWeek()
@@ -54,7 +77,6 @@ class DashboardController extends Controller
                 ->whereBetween('created_at', [$startOfWeek, $endOfWeek])
                 ->count();
 
-
             $pendingCount = S_News::where('approve', 'waiting')
                 ->whereBetween('created_at', [$startOfWeek, $endOfWeek])
                 ->count();
@@ -66,7 +88,7 @@ class DashboardController extends Controller
         return [
             'weeks' => $weeks,
             'published' => $published,
-            'pending' => $pending
+            'pending' => $pending,
         ];
     }
 }

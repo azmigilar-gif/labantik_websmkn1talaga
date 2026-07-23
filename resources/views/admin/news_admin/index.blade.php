@@ -503,6 +503,9 @@
                                     @endforeach
                                 </tbody>
                             </table>
+                            <div class="mt-4">
+                                {{ $news->links() }}
+                            </div>
                         @else
                             <!-- Empty state -->
                             <div class="py-12 text-center">

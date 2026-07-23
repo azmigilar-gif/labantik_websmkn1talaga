@@ -1,28 +1,28 @@
 <?php
 
-use App\Http\Controllers\Admin\SubmenuController;
-use App\Http\Controllers\NewsController;
-use Illuminate\Support\Facades\Route;
-use App\Http\Controllers\LandingPageController;
-use App\Http\Controllers\ExpertiseController;
-use App\Http\Controllers\PublicFileController;
-use App\Http\Controllers\auth\AuthenticationUserController;
-use App\Http\Controllers\Admin\CategoriesController;
-use App\Http\Controllers\Admin\MenuController;
-use App\Http\Controllers\Admin\NewsAdminController;
-use App\Http\Controllers\Admin\ExtrakulikulerController;
-use App\Http\Controllers\Admin\MitraController;
-use App\Http\Controllers\Admin\ContactController;
-use App\Http\Controllers\Admin\ProfileController;
-use App\Http\Controllers\Admin\VisionMissionController;
-use App\Http\Controllers\Admin\UploadController;
-use App\Http\Controllers\GalleriesController;
 use App\Http\Controllers\Admin\BackgroundController;
-use App\Http\Controllers\admin\DashboardController;
+use App\Http\Controllers\Admin\CategoriesController;
+use App\Http\Controllers\Admin\ContactController;
+use App\Http\Controllers\Admin\DashboardController;
+use App\Http\Controllers\Admin\ExtrakulikulerController;
+use App\Http\Controllers\Admin\MenuController;
+use App\Http\Controllers\Admin\MitraController;
+use App\Http\Controllers\Admin\NewsAdminController;
+use App\Http\Controllers\Admin\ProfileController;
+use App\Http\Controllers\Admin\SubmenuController;
 use App\Http\Controllers\Admin\TagsController;
+use App\Http\Controllers\Admin\UploadController;
+use App\Http\Controllers\Admin\VisionMissionController;
+use App\Http\Controllers\auth\AuthenticationUserController;
+use App\Http\Controllers\ExpertiseController;
 use App\Http\Controllers\ExtracuricullarsController;
+use App\Http\Controllers\GalleriesController;
+use App\Http\Controllers\LandingPageController;
+use App\Http\Controllers\NewsController;
+use App\Http\Controllers\PublicFileController;
 use App\Http\controllers\ReportController;
-use App\Http\Controllers\Admin\GeminiController;
+use Illuminate\Support\Facades\Route;
+
 // Route homepage/landing page
 Route::get('/', [LandingPageController::class, 'index'])->name('landingpage');
 
@@ -31,6 +31,9 @@ Route::get('/news/{id}', [NewsController::class, 'show'])->name('news.show');
 
 Route::get('/galleries', [GalleriesController::class, 'index'])->name('galleries.index');
 Route::get('/galleries/{id}', [GalleriesController::class, 'show'])->name('galleries.show');
+
+Route::get('/prestasi', [App\Http\Controllers\PublicAchievementController::class, 'index'])->name('public.achievements.index');
+Route::get('/prestasi/{id}', [App\Http\Controllers\PublicAchievementController::class, 'show'])->name('public.achievements.show');
 
 Route::get('/ekstrakurikulers/{id}', [ExtracuricullarsController::class, 'show'])->name('ekstrakurikulers.show');
 
@@ -78,6 +81,10 @@ Route::middleware(['auth'])->prefix('adminkrituga')->name('admin.')->group(funct
     Route::get('background', [BackgroundController::class, 'index'])->name('background.index');
     Route::post('background', [BackgroundController::class, 'store'])->name('background.store');
     Route::delete('background', [BackgroundController::class, 'destroy'])->name('background.destroy');
+
+    // Hero & Badges Settings
+    Route::get('hero-settings', [App\Http\Controllers\Admin\HeroSettingController::class, 'edit'])->name('hero-settings.edit');
+    Route::put('hero-settings', [App\Http\Controllers\Admin\HeroSettingController::class, 'update'])->name('hero-settings.update');
     // Mitra (partner) resource for admin CRUD
     Route::resource('mitra', MitraController::class);
     Route::resource('contacts', ContactController::class);
@@ -88,11 +95,10 @@ Route::middleware(['auth'])->prefix('adminkrituga')->name('admin.')->group(funct
     Route::resource('visionmissions', VisionMissionController::class);
     Route::resource('profiles', ProfileController::class);
     Route::resource('galleries', App\Http\Controllers\Admin\GalleryController::class);
+    Route::resource('achievement', App\Http\Controllers\Admin\AchievementController::class);
     // Admin management for expertise descriptions
     // Route upload image HARUS di atas route {id}
     Route::post('expertise/upload/image', [App\Http\Controllers\Admin\ExpertiseController::class, 'uploadImage'])->name('expertise.upload.image');
-
-    Route::post('submenu/addConfiguration', [SubmenuController::class, 'addConfiguration'])->name('submenu.addConfiguration');
     // Route CRUD
     Route::get('expertise', [App\Http\Controllers\Admin\ExpertiseController::class, 'index'])->name('expertise.index');
     Route::get('expertise/create', [App\Http\Controllers\Admin\ExpertiseController::class, 'create'])->name('expertise.create');
@@ -116,6 +122,5 @@ Route::get('sub/{url}', [LandingPageController::class, 'show']);
 // Route::get('reports/page', [ReportController::class, 'index'])->name('reports.index');
 // API endpoint: return tag name and number of distinct news using that tag
 Route::get('/reports/tag-counts', [App\Http\controllers\ReportController::class, 'tagCounts'])->name('report.tag-counts');
-
 
 Route::post('/api/ai/ask', [App\Http\Controllers\Admin\GeminiController::class, 'ask']);

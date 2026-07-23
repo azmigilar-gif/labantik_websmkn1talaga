@@ -3,9 +3,8 @@
 namespace App\Http\Controllers;
 
 use App\Models\S_Categories;
-use App\Models\S_News;
 use App\Models\S_Menu;
-use Illuminate\Support\Str;
+use App\Models\S_News;
 use Illuminate\Http\Request;
 
 class NewsController extends Controller
@@ -25,6 +24,23 @@ class NewsController extends Controller
             $newsQuery->where('s_category_id', $request->category);
         }
 
+        // Filter pencarian kata kunci jika diisi
+        if ($request->filled('search')) {
+            $search = $request->search;
+            $newsQuery->where(function ($q) use ($search) {
+                $q->where('title', 'like', "%{$search}%")
+                    ->orWhere('content', 'like', "%{$search}%");
+            });
+        }
+
+        // Filter tag jika dipilih
+        if ($request->filled('tag')) {
+            $tagId = $request->tag;
+            $newsQuery->whereHas('tags', function ($q) use ($tagId) {
+                $q->where('s_tags.id', $tagId);
+            });
+        }
+
         $news = $newsQuery->latest()->paginate(12)->withQueryString();
 
         return view('news.index', compact('news', 'menus', 'categories'));
@@ -37,8 +53,6 @@ class NewsController extends Controller
 
         // provide menus for navbar (landing page uses this as well)
         $menus = S_Menu::latest()->get();
-
-
 
         return view('news.show', compact('news', 'menus'));
     }

@@ -16,58 +16,135 @@
                     </li>
                 </ul>
             </div>
-            <div class="grid grid-cols-12 gap-x-5 2xl:grid-cols-12">
-                <div class="card col-span-12 2xl:col-span-4 2xl:row-span-2">
+            <div class="grid grid-cols-12 gap-x-5">
+                <!-- Card 1: Siswa Aktif -->
+                <div class="card col-span-12 md:col-span-6 lg:col-span-3">
+                    <div class="card-body flex items-center gap-4">
+                        <div class="flex size-12 items-center justify-center rounded-lg bg-sky-100 text-sky-500 dark:bg-sky-500/20">
+                            <i data-lucide="users" class="size-6"></i>
+                        </div>
+                        <div>
+                            <h5 class="mb-1 text-slate-800 dark:text-zink-50"><span class="counter-value" data-target="{{ $countStudents }}">0</span></h5>
+                            <p class="text-sm text-slate-500 dark:text-zink-200">Siswa Aktif</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Card 2: Guru & Staf -->
+                <div class="card col-span-12 md:col-span-6 lg:col-span-3">
+                    <div class="card-body flex items-center gap-4">
+                        <div class="flex size-12 items-center justify-center rounded-lg bg-purple-100 text-purple-500 dark:bg-purple-500/20">
+                            <i data-lucide="users" class="size-6"></i>
+                        </div>
+                        <div>
+                            <h5 class="mb-1 text-slate-800 dark:text-zink-50"><span class="counter-value" data-target="{{ $countEmployees }}">0</span></h5>
+                            <p class="text-sm text-slate-500 dark:text-zink-200">Guru & Staf</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Card 3: Jurusan Keahlian -->
+                <div class="card col-span-12 md:col-span-6 lg:col-span-3">
+                    <div class="card-body flex items-center gap-4">
+                        <div class="flex size-12 items-center justify-center rounded-lg bg-pink-100 text-pink-500 dark:bg-pink-500/20">
+                            <i data-lucide="award" class="size-6"></i>
+                        </div>
+                        <div>
+                            <h5 class="mb-1 text-slate-800 dark:text-zink-50"><span class="counter-value" data-target="{{ $countConcentrations }}">0</span></h5>
+                            <p class="text-sm text-slate-500 dark:text-zink-200">Jurusan Keahlian</p>
+                        </div>
+                    </div>
+                </div>
+
+                <!-- Card 4: Mitra Kerja -->
+                <div class="card col-span-12 md:col-span-6 lg:col-span-3">
+                    <div class="card-body flex items-center gap-4">
+                        <div class="flex size-12 items-center justify-center rounded-lg bg-blue-100 text-blue-500 dark:bg-blue-500/20">
+                            <i data-lucide="briefcase" class="size-6"></i>
+                        </div>
+                        <div>
+                            <h5 class="mb-1 text-slate-800 dark:text-zink-50"><span class="counter-value" data-target="{{ $countMitra }}">0</span></h5>
+                            <p class="text-sm text-slate-500 dark:text-zink-200">Mitra Kerjasama</p>
+                        </div>
+                    </div>
+                </div>
+            </div>
+
+            <div class="grid grid-cols-12 gap-x-5 mt-5">
+                <!-- Chart Section -->
+                <div class="card col-span-12 lg:col-span-8">
                     <div class="card-body">
                         <div class="mb-3 flex items-center">
                             <h6 class="text-15 grow">Statistik Status Berita</h6>
                         </div>
                         <div id="newsStatisticsChart" class="apex-charts" dir="ltr"></div>
                     </div>
-                </div><!--end col-->
-                <div class="card col-span-12 md:col-span-6 lg:col-span-3 2xl:col-span-2">
-                    <div class="card-body text-center">
-                        <div
-                            class="bg-custom-100 text-custom-500 dark:bg-custom-500/20 mx-auto flex size-14 items-center justify-center rounded-full">
-                            <i data-lucide="newspaper"></i>
+                </div>
+
+                <!-- Ringkasan Sistem -->
+                <div class="card col-span-12 lg:col-span-4">
+                    <div class="card-body">
+                        <h6 class="text-15 mb-4">Ringkasan Konten Web</h6>
+                        <div class="flex flex-col gap-4">
+                            <!-- Total Berita -->
+                            <div class="flex items-center justify-between p-3 rounded-lg bg-sky-50 dark:bg-sky-500/10">
+                                <div class="flex items-center gap-3">
+                                    <div class="flex size-10 items-center justify-center rounded-full bg-sky-100 text-sky-600 dark:bg-sky-500/20">
+                                        <i data-lucide="newspaper" class="size-5"></i>
+                                    </div>
+                                    <div>
+                                        <h6 class="text-sm font-semibold text-slate-700 dark:text-zink-100">Total Berita</h6>
+                                        <p class="text-xs text-slate-500">{{ $countNewsApprove }} Tayang • {{ $countNewsPending }} Pending</p>
+                                    </div>
+                                </div>
+                                <span class="text-lg font-bold text-sky-600"><span class="counter-value" data-target="{{ $countNews }}">0</span></span>
+                            </div>
+
+                            <!-- Galeri Media -->
+                            <div class="flex items-center justify-between p-3 rounded-lg bg-pink-50 dark:bg-pink-500/10">
+                                <div class="flex items-center gap-3">
+                                    <div class="flex size-10 items-center justify-center rounded-full bg-pink-100 text-pink-600 dark:bg-pink-500/20">
+                                        <i data-lucide="image" class="size-5"></i>
+                                    </div>
+                                    <div>
+                                        <h6 class="text-sm font-semibold text-slate-700 dark:text-zink-100">Galeri Media</h6>
+                                        <p class="text-xs text-slate-500">Dokumentasi foto & video</p>
+                                    </div>
+                                </div>
+                                <span class="text-lg font-bold text-pink-600"><span class="counter-value" data-target="{{ $countGallery }}">0</span></span>
+                            </div>
+
+                            <!-- Ekstrakurikuler -->
+                            <div class="flex items-center justify-between p-3 rounded-lg bg-purple-50 dark:bg-purple-500/10">
+                                <div class="flex items-center gap-3">
+                                    <div class="flex size-10 items-center justify-center rounded-full bg-purple-100 text-purple-600 dark:bg-purple-500/20">
+                                        <i data-lucide="trophy" class="size-5"></i>
+                                    </div>
+                                    <div>
+                                        <h6 class="text-sm font-semibold text-slate-700 dark:text-zink-100">Ekstrakurikuler</h6>
+                                        <p class="text-xs text-slate-500">Minat bakat siswa</p>
+                                    </div>
+                                </div>
+                                <span class="text-lg font-bold text-purple-600"><span class="counter-value" data-target="{{ $countExtrakurikuler }}">0</span></span>
+                            </div>
+
+                            <!-- Menu Navigasi -->
+                            <div class="flex items-center justify-between p-3 rounded-lg bg-slate-50 dark:bg-slate-500/10">
+                                <div class="flex items-center gap-3">
+                                    <div class="flex size-10 items-center justify-center rounded-full bg-slate-100 text-slate-600 dark:bg-slate-500/20">
+                                        <i data-lucide="menu" class="size-5"></i>
+                                    </div>
+                                    <div>
+                                        <h6 class="text-sm font-semibold text-slate-700 dark:text-zink-100">Menu Navigasi</h6>
+                                        <p class="text-xs text-slate-500">Struktur navigasi web</p>
+                                    </div>
+                                </div>
+                                <span class="text-lg font-bold text-slate-600"><span class="counter-value" data-target="{{ $countMenu }}">0</span></span>
+                            </div>
                         </div>
-                        <h5 class="mb-2 mt-4"><span class="counter-value" data-target="{{ $countNews }}">0</span></h5>
-                        <p class="dark:text-zink-200 text-slate-500">Total Berita</p>
                     </div>
-                </div><!--end col-->
-                <div class="card col-span-12 md:col-span-6 lg:col-span-3 2xl:col-span-2">
-                    <div class="card-body text-center">
-                        <div
-                            class="mx-auto flex size-14 items-center justify-center rounded-full bg-purple-100 text-purple-500 dark:bg-purple-500/20">
-                            <i data-lucide="list-checks"></i>
-                        </div>
-                        <h5 class="mb-2 mt-4"><span class="counter-value" data-target="{{ $countNewsApprove }}">0</span>
-                        </h5>
-                        <p class="dark:text-zink-200 text-slate-500">Total Berita Terupload</p>
-                    </div>
-                </div><!--end col-->
-                <div class="card col-span-12 md:col-span-6 lg:col-span-3 2xl:col-span-2">
-                    <div class="card-body text-center">
-                        <div
-                            class="mx-auto flex size-14 items-center justify-center rounded-full bg-green-100 text-green-500 dark:bg-green-500/20">
-                            <i data-lucide="circle-dashed"></i>
-                        </div>
-                        <h5 class="mb-2 mt-4"><span class="counter-value" data-target="{{ $countNewsPending }}">0</span>
-                        </h5>
-                        <p class="dark:text-zink-200 text-slate-500">Total Berita Pending</p>
-                    </div>
-                </div><!--end col-->
-                {{-- <div class="card col-span-12 md:col-span-6 lg:col-span-3 2xl:col-span-2">
-                    <div class="card-body text-center">
-                        <div
-                            class="mx-auto flex size-14 items-center justify-center rounded-full bg-red-100 text-red-500 dark:bg-red-500/20">
-                            <i data-lucide="package-x"></i>
-                        </div>
-                        <h5 class="mb-2 mt-4"><span class="counter-value" data-target="3519">0</span></h5>
-                        <p class="dark:text-zink-200 text-slate-500">Cancelled</p>
-                    </div>
-                </div><!--end col--> --}}
-            </div><!--end grid-->
+                </div>
+            </div>
         </div>
         <!-- container-fluid -->
     </div>

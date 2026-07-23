@@ -16,112 +16,131 @@
                 }
             }
         }
+
+        // Background / Hero Image resolution logic
+        $heroImage = null;
+        $foundAssetBackground = null;
+        $matches = @glob(public_path('assets/images/background.*')) ?: [];
+        if (!empty($matches)) {
+            $foundAssetBackground = 'assets/images/' . basename($matches[0]);
+        }
+
+        if ($foundAssetBackground) {
+            $heroImage = $foundAssetBackground;
+        } elseif (!empty($heroProfile->photo)) {
+            $heroImage = $heroProfile->photo;
+        } else {
+            $heroImage = 'assets/images/background.png';
+        }
+
+        if (filter_var($heroImage, FILTER_VALIDATE_URL)) {
+            $heroImageUrl = $heroImage;
+        } elseif (preg_match('#^assets/#', $heroImage) || preg_match('#^public/assets/#', $heroImage)) {
+            $heroImageUrl = asset(preg_replace('#^public/#', '', $heroImage));
+        } else {
+            $rel = preg_replace('#^storage/#', '', $heroImage);
+            $heroImageUrl = route('public.files', ['path' => $rel]);
+        }
     @endphp
 
-    <section class="relative pb-28 pt-44 xl:pb-36 xl:pt-52" id="home" style="min-height:100vh;">
-        <div class="bg-custom-500 absolute left-0 top-0 z-10 size-64 opacity-10 blur-3xl"></div>
-        <div class="absolute bottom-0 right-0 z-10 size-64 bg-purple-500/10 blur-3xl"></div>
-        @php
-            // Prefer an uploaded background file saved to public/assets/images/background.*
-            $heroImage = null;
-            $foundAssetBackground = null;
-            // glob will look for any extension (jpg, png, webp, etc.)
-            $matches = @glob(public_path('assets/images/background.*')) ?: [];
-            if (!empty($matches)) {
-                // use the first match and build an assets-relative path
-                $foundAssetBackground = 'assets/images/' . basename($matches[0]);
-            }
-
-            if ($foundAssetBackground) {
-                $heroImage = $foundAssetBackground;
-            } elseif (!empty($heroProfile->photo)) {
-                $heroImage = $heroProfile->photo;
-            } else {
-                $heroImage = 'assets/images/background.png';
-            }
-            // If stored as full URL or assets path, build correct url
-            if (filter_var($heroImage, FILTER_VALIDATE_URL)) {
-                $heroImageUrl = $heroImage;
-            } elseif (preg_match('#^assets/#', $heroImage) || preg_match('#^public/assets/#', $heroImage)) {
-                $heroImageUrl = asset(preg_replace('#^public/#', '', $heroImage));
-            } else {
-                // treat as storage path
-                $rel = preg_replace('#^storage/#', '', $heroImage);
-                $heroImageUrl = route('public.files', ['path' => $rel]);
-            }
-        @endphp
-
-        <!-- Full-bleed background layer (covers entire viewport width) -->
-        <div class="hero-bleed absolute inset-0"
-            style="background-image: url('{{ $heroImageUrl }}'); background-repeat:no-repeat; background-position: center right; background-size: cover; z-index:0; opacity:0.5;">
-            <!-- optional overlay for contrast -->
-        </div>
-        <div class="container mx-auto px-4 2xl:max-w-[87.5rem]" style="position:relative; z-index:1;">
-            <div class="grid grid-cols-12 items-center gap-5 2xl:grid-cols-12">
-
-                <div class="col-span-12 xl:col-span-5 2xl:col-span-5">
-                    <style>
-                        .hero-bg {
-                            background-repeat: no-repeat;
-                            background-position: right center;
-                            background-size: cover;
-                            min-height: 30vh;
-                            display: flex;
-                            align-items: center;
-                        }
-
-                        /* Keep text at fixed sizes but constrain width so it doesn't stretch with viewport */
-                        .hero-content {
-                            max-width: 720px;
-                            width: 100%;
-                        }
-
-                        @media (max-width: 1024px) {
-                            .hero-bg {
-                                /* move background toward center on medium/smaller screens */
-                                background-position: center center;
-                                background-size: cover;
-                            }
-                        }
-
-                        @media (max-width: 480px) {
-                            .hero-bg {
-                                /* ensure background still covers on very small screens */
-                                background-position: center top;
-                                background-size: cover;
-                                padding-top: 3.5rem;
-                                padding-bottom: 3.5rem;
-                            }
-                        }
-                    </style>
-
-                    <div class="hero-bg rounded-lg bg-transparent p-1" style="background:transparent;">
-                        <div class="hero-content">
-                            <h1 class="mb-4 !leading-normal lg:text-5xl 2xl:text-6xl dark:text-zinc-100"
-                                data-aos="fade-right" data-aos-delay="300"> Selamat Datang di Website Resmi SMKN 1 Talaga
-                            </h1>
-                            <p class="mb-7 text-lg dark:text-zinc-400" data-aos="fade-right" data-aos-delay="600"> SMKN 1
-                                Talaga adalah Sekolah Menengah Kejuruan Negeri di Talaga, Majalengka, Jawa Barat yang
-                                membekali siswa dengan keterampilan praktis.</p>
-                            <div class="flex items-center gap-2" data-aos="fade-right" data-aos-delay="800">
-                                <a href="#{{ $profileMenu->slug ?? 'section-profil' }}"
-                                    class="text-15 btn from-custom-500 hover:to-custom-500 border-0 bg-gradient-to-r to-purple-500 px-8 py-3 text-white hover:from-purple-500 hover:text-white">Lihat
-                                    Profil <i data-lucide="arrow-down"
-                                        class="inline-block size-4 align-middle ltr:ml-1 rtl:mr-1"></i></a>
+    <!-- Hero Section -->
+    <section id="home" class="hero section">
+        <div class="container" data-aos="fade-up" data-aos-delay="100">
+            <div class="row align-items-center">
+                <div class="col-lg-6">
+                    <div class="hero-content">
+                        <div class="trust-badges mb-4" data-aos="fade-right" data-aos-delay="200">
+                            <div class="badge-item">
+                                <i class="bi bi-shield-check text-primary"></i>
+                                <span>{{ $heroSettings->trust_badge_1 }}</span>
                             </div>
+                            <div class="badge-item">
+                                <i class="bi bi-award text-primary"></i>
+                                <span>{{ $heroSettings->trust_badge_2 }}</span>
+                            </div>
+                            <div class="badge-item">
+                                <i class="bi bi-flower1 text-primary"></i>
+                                <span>{{ $heroSettings->trust_badge_3 }}</span>
+                            </div>
+                        </div>
+
+                        <h1 data-aos="fade-right" data-aos-delay="300" style="font-size: 42px; font-weight: 800; line-height: 1.2; margin-bottom: 20px;">
+                            {!! str_replace('SMKN 1 Talaga', '<span class="highlight text-primary">SMKN 1 Talaga</span>', e($heroSettings->hero_title)) !!}
+                        </h1>
+
+                        <p class="hero-description" data-aos="fade-right" data-aos-delay="400" style="color: #64748b; font-size: 16px; line-height: 1.7; margin-bottom: 30px;">
+                            {{ $heroSettings->hero_description }}
+                        </p>
+
+                        <div class="hero-stats mb-4" data-aos="fade-right" data-aos-delay="500">
+                            <div class="stat-item">
+                                <h3><span data-purecounter-start="0" data-purecounter-end="{{ $mitraCount }}" data-purecounter-duration="2" class="purecounter"></span>+</h3>
+                                <p>Mitra Industri</p>
+                            </div>
+                            <div class="stat-item">
+                                <h3><span data-purecounter-start="0" data-purecounter-end="{{ $studentCount }}" data-purecounter-duration="2" class="purecounter"></span>+</h3>
+                                <p>Siswa Aktif</p>
+                            </div>
+                            <div class="stat-item">
+                                <h3><span data-purecounter-start="0" data-purecounter-end="{{ $employeeCount }}" data-purecounter-duration="2" class="purecounter"></span>+</h3>
+                                <p>Guru & Staf</p>
+                            </div>
+                        </div>
+
+                        <div class="hero-actions d-flex gap-3 align-items-center" data-aos="fade-right" data-aos-delay="600">
+                            <a href="#{{ $profileMenu->slug ?? 'section-profil' }}" class="btn btn-primary btn-lg px-4 py-3" style="border-radius: 8px; font-weight: 600;">Lihat Profil <i class="bi bi-arrow-down ms-2"></i></a>
+                            @if(!empty($contact->no_telp))
+                                <div class="emergency-contact ms-2 d-none d-sm-flex align-items-center">
+                                    <div class="emergency-icon bg-primary-light p-2 rounded-circle me-2" style="background-color: rgba(13, 110, 253, 0.1);">
+                                        <i class="bi bi-telephone-fill text-primary" style="font-size: 18px;"></i>
+                                    </div>
+                                    <div class="emergency-info">
+                                        <small class="text-muted d-block" style="font-size: 11px;">Informasi Sekolah</small>
+                                        <strong style="font-size: 14px;">{{ $contact->no_telp }}</strong>
+                                    </div>
+                                </div>
+                            @endif
                         </div>
                     </div>
                 </div>
 
-                <div class="col-span-12 xl:col-span-7 2xl:col-span-6 2xl:col-start-8">
-                    <div class="relative mt-10 xl:mt-0">
-                        <div class="font-tourney absolute -top-20 text-center text-slate-100 lg:text-[10rem] xl:-right-40 2xl:text-[14rem] dark:text-zinc-800/60"
-                            data-aos="zoom-in-down" data-aos-delay="1400"></div>
+                <div class="col-lg-6 mt-5 mt-lg-0">
+                    <div class="hero-visual" data-aos="fade-left" data-aos-delay="400">
+                        <div class="main-image position-relative">
+                            <img src="{{ $heroImageUrl }}" alt="SMKN 1 Talaga" class="img-fluid rounded-4 shadow-lg w-100" style="object-fit: cover; aspect-ratio: 4/3;">
+                            <!-- Card 1: PPDB Online (Bottom Left, inside image) -->
+                            <div class="floating-card rating-card shadow p-3 rounded-3 bg-white" style="position: absolute; bottom: 20px !important; left: 20px !important; max-width: 220px; z-index: 10; border: 1px solid #f1f5f9;">
+                                <div class="d-flex align-items-center gap-2">
+                                    <div class="card-icon bg-success-light p-2 rounded-circle" style="background-color: rgba(25, 135, 84, 0.1); width: 40px; height: 40px; display: flex; align-items: center; justify-content: center;">
+                                        <i class="bi bi-patch-check-fill text-success" style="font-size: 18px;"></i>
+                                    </div>
+                                    <div class="card-content text-start">
+                                        <h6 class="m-0" style="font-size: 13px; font-weight: 700;">{{ $heroSettings->badge_1_title }}</h6>
+                                        <small class="text-muted" style="font-size: 11px;">{{ $heroSettings->badge_1_subtitle }}</small>
+                                    </div>
+                                </div>
+                            </div>
+                            
+                            <!-- Card 2: 85%+ Terserap (Top Right, pushed down below header) -->
+                            <div class="floating-card appointment-card shadow p-3 rounded-3 bg-white" style="position: absolute; top: 120px !important; right: 20px !important; max-width: 180px; z-index: 10; border: 1px solid #f1f5f9;">
+                                <div class="card-content text-center">
+                                    <div class="rating-stars mb-1 text-warning" style="font-size: 12px;">
+                                        <i class="bi bi-star-fill"></i>
+                                        <i class="bi bi-star-fill"></i>
+                                        <i class="bi bi-star-fill"></i>
+                                        <i class="bi bi-star-fill"></i>
+                                        <i class="bi bi-star-fill"></i>
+                                    </div>
+                                    <h6 class="m-0" style="font-size: 14px; font-weight: 700; color: #1e3a8a;">{{ $heroSettings->badge_2_title }}</h6>
+                                    <small class="text-muted" style="font-size: 11px;">{{ $heroSettings->badge_2_subtitle }}</small>
+                                </div>
+                            </div>
+                        </div>
                     </div>
                 </div>
             </div>
         </div>
-    </section><!--end -->
+    </section><!-- End Hero Section -->
 
     @php
         $visionMenu = $menus->firstWhere('slug', 'section-visimisi');
@@ -130,374 +149,149 @@
         $newsMenu = $menus->firstWhere('slug', 'section-berita');
         $extrakurikulerMenu = $menus->firstWhere('slug', 'section-ekskul');
         $galleryMenu = $menus->firstWhere('slug', 'section-gallery');
-
     @endphp
 
-    {{-- Profil Sekolah --}}
+    <!-- Profil Sekolah Section -->
     @if ($profileMenu)
         @foreach ($profiles as $p)
             @if ($p->menu && $p->menu->id === $profileMenu->id)
-                <section class="relative py-24 pb-16 xl:py-32 xl:pb-20" id="{{ $p->menu->slug }}">
-                    <div class="container mx-auto px-4 2xl:max-w-[87.5rem]">
-                        <div class="mx-auto text-center xl:max-w-3xl">
-                            <h1 class="mb-6 capitalize leading-normal">Profil<span
-                                    class="relative mx-2 inline-block px-2 before:absolute before:-inset-1 before:block before:-skew-y-6 before:rounded-md before:bg-sky-50 before:backdrop-blur-xl dark:before:bg-sky-500/20"><span
-                                        class="relative text-sky-500">SMKN 1 Talaga</span></span></h1>
-
-                            <div class="profile-container">
-                                @php
-                                    $plain = trim(strip_tags($p->content ?? ''));
-                                    $cut = 220; // character cutoff for summary
-                                @endphp
-
-                                <div class="dark:text-zink-200 profile-summary text-lg text-slate-500"
-                                    style="display:inline-block; max-width:100%; word-break:break-word;">
-                                    @php $summary = \Illuminate\Support\Str::limit($plain, $cut); @endphp
-                                    <span style="display:inline">{{ $summary }}</span>
-                                    @if (mb_strlen($plain) > $cut)
-                                        <a href="{{ route('profiles.show', $p->id) }}"
-                                            class="profile-readmore dark:text-zink-200 text-lg text-slate-500 hover:underline"
-                                            style="white-space:nowrap; margin-left:.5rem; display:inline;"
-                                            aria-label="Baca selengkapnya tentang profil sekolah">Selengkapnya</a>
-                                    @endif
+                @php
+                    $profilePhoto = null;
+                    if(!empty($p->photo)) {
+                        if (filter_var($p->photo, FILTER_VALIDATE_URL)) {
+                            $profilePhoto = $p->photo;
+                        } elseif (preg_match('#^assets/#', $p->photo) || preg_match('#^public/#', $p->photo)) {
+                            $profilePhoto = asset(preg_replace('#^public/#', '', $p->photo));
+                        } else {
+                            $rel = preg_replace('#^storage/#', '', $p->photo);
+                            $profilePhoto = route('public.files', ['path' => $rel]);
+                        }
+                    } else {
+                        $profilePhoto = $heroImageUrl;
+                    }
+                @endphp
+                <section id="{{ $p->menu->slug }}" class="home-about section" style="background-color: #ffffff; padding: 80px 0;">
+                    <div class="container" data-aos="fade-up" data-aos-delay="100">
+                        <div class="row align-items-center">
+                            <div class="col-lg-6 mb-5 mb-lg-0" data-aos="fade-right" data-aos-delay="300">
+                                <div class="about-visual position-relative">
+                                    <div class="main-image">
+                                        <img src="{{ $profilePhoto }}" alt="Fasilitas SMKN 1 Talaga" class="img-fluid rounded-4 shadow-sm w-100" style="object-fit: cover; aspect-ratio: 4/3;">
+                                    </div>
+                                    <div class="floating-card bg-white p-3 rounded-3 shadow-sm d-flex align-items-center gap-2" style="position: absolute; bottom: 20px; right: 20px; max-width: 250px; z-index: 10;">
+                                        <div class="icon bg-primary-light p-2 rounded-circle" style="background-color: rgba(13, 110, 253, 0.1);">
+                                            <i class="bi bi-mortarboard-fill text-primary" style="font-size: 20px;"></i>
+                                        </div>
+                                        <div class="card-text">
+                                            <h6 class="m-0" style="font-size: 14px; font-weight: 700;">{{ $heroSettings->badge_3_title }}</h6>
+                                            <small class="text-muted" style="font-size: 11px;">{{ $heroSettings->badge_3_subtitle }}</small>
+                                        </div>
+                                    </div>
                                 </div>
                             </div>
-                        </div><!--end container-->
-                </section><!--end -->
+
+                            <div class="col-lg-6" data-aos="fade-left" data-aos-delay="200">
+                                <div class="about-content">
+                                    <h2 class="section-heading" style="font-size: 32px; font-weight: 700; color: #0f172a; margin-bottom: 20px;">
+                                        Profil Singkat <span class="text-primary">SMKN 1 Talaga</span>
+                                    </h2>
+                                    <div class="profile-container" style="color: #475569; font-size: 15px; line-height: 1.8;">
+                                        @php
+                                            $plainContent = html_entity_decode(strip_tags($p->content ?? ''), ENT_QUOTES, 'UTF-8');
+                                            $plainContent = preg_replace('/\s+/u', ' ', $plainContent);
+                                            $plainContent = trim($plainContent);
+                                            $cutoff = 350;
+                                        @endphp
+                                        <p>
+                                            {{ \Illuminate\Support\Str::limit($plainContent, $cutoff) }}
+                                        </p>
+                                        @if (mb_strlen($plainContent) > $cutoff)
+                                            <div class="cta-section mt-4">
+                                                <a href="{{ route('profiles.show', $p->id) }}" class="btn btn-outline-primary px-4 py-2" style="font-weight: 600; border-radius: 6px;">
+                                                    Baca Selengkapnya
+                                                </a>
+                                            </div>
+                                        @endif
+                                    </div>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
             @endif
         @endforeach
     @endif
 
-    {{-- =============== Visi & Misi =============== --}}
+    <!-- Visi & Misi Section -->
     @if ($visionMenu)
         @foreach ($visionmissions as $v)
             @if ($v->menu && $v->menu->id === $visionMenu->id)
-                <section class="relative py-24 pb-16 pt-4 xl:py-32 xl:pb-20" id="{{ $v->menu->slug }}">
-                    <div class="container mx-auto px-4 2xl:max-w-[87.5rem]">
-                        <div class="mx-auto text-center xl:max-w-3xl">
-                            <h1 class="mb-0 capitalize leading-normal">Visi & Misi</h1>
+                <section id="{{ $v->menu->slug }}" class="section light-background" style="background-color: #f8fafc; padding: 80px 0;">
+                    <div class="container" data-aos="fade-up">
+                        <div class="text-center mb-5">
+                            <h2 style="font-size: 32px; font-weight: 700; color: #0f172a;">Visi & Misi Sekolah</h2>
+                            <p class="text-muted">Arah, tujuan, dan ikhtiar SMKN 1 Talaga dalam mewujudkan cita-cita pendidikan.</p>
                         </div>
-                        <div class="mt-12 grid grid-cols-1 gap-5 md:grid-cols-2">
-                            <div class="rounded-md bg-gradient-to-b from-slate-100 to-white p-8 dark:from-zinc-800 dark:to-zinc-900"
-                                data-aos="fade-up" data-aos-easing="linear">
-                                <h4 class="text-custom-500 mb-4 text-xl font-bold">Visi</h4>
-                                <p class="text-slate-600 dark:text-zinc-300">{{ $v->vision ?? 'Belum ada visi.' }}</p>
-                            </div><!--end-->
-
-                            <div class="rounded-md bg-gradient-to-b from-slate-100 to-white p-8 dark:from-zinc-800 dark:to-zinc-900"
-                                data-aos="fade-up" data-aos-easing="linear">
-                                <h4 class="text-custom-500 mb-4 text-xl font-bold">Misi</h4>
-
-                                <ol
-                                    class="ms-8 list-outside list-decimal space-y-2 pl-4 ps-2 text-slate-600 dark:text-zinc-300">
-                                    @foreach (preg_split("/\r\n|\r|\n/", $v->mission ?? '') as $misi)
-                                        @php
-                                            $cleanMisi = preg_replace('/^\s*\d+\.\s*/', '', $misi);
-                                        @endphp
-
-                                        @if (trim($cleanMisi) !== '')
-                                            <li>{{ $cleanMisi }}</li>
-                                        @endif
-                                    @endforeach
-                                </ol>
+                        <div class="row g-4 justify-content-center">
+                            <!-- Visi -->
+                            <div class="col-lg-5" data-aos="fade-up" data-aos-delay="100">
+                                <div class="bg-white p-4 rounded-4 shadow-sm h-100 border-top border-primary border-4">
+                                    <div class="d-flex align-items-center mb-3">
+                                        <div class="bg-primary-light p-2.5 rounded-3 me-3" style="background-color: rgba(13, 110, 253, 0.1);">
+                                            <i class="bi bi-eye-fill text-primary" style="font-size: 24px;"></i>
+                                        </div>
+                                        <h4 class="m-0" style="font-size: 20px; font-weight: 700; color: #0f172a;">Visi</h4>
+                                    </div>
+                                    <p style="color: #475569; font-size: 15px; line-height: 1.8;">
+                                        {{ $v->vision ?? 'Belum ada visi.' }}
+                                    </p>
+                                </div>
                             </div>
-
-                        </div><!--end grid-->
-                    </div><!--end container-->
-                </section><!--end -->
+                            <!-- Misi -->
+                            <div class="col-lg-7" data-aos="fade-up" data-aos-delay="200">
+                                <div class="bg-white p-4 rounded-4 shadow-sm h-100 border-top border-success border-4">
+                                    <div class="d-flex align-items-center mb-3">
+                                        <div class="bg-success-light p-2.5 rounded-3 me-3" style="background-color: rgba(25, 135, 84, 0.1);">
+                                            <i class="bi bi-compass-fill text-success" style="font-size: 24px;"></i>
+                                        </div>
+                                        <h4 class="m-0" style="font-size: 20px; font-weight: 700; color: #0f172a;">Misi</h4>
+                                    </div>
+                                    <ol class="ps-3" style="color: #475569; font-size: 14px; line-height: 1.8;">
+                                        @foreach (preg_split("/\r\n|\r|\n/", $v->mission ?? '') as $misi)
+                                            @php
+                                                $cleanMisi = preg_replace('/^\s*\d+\.\s*/', '', $misi);
+                                            @endphp
+                                            @if (trim($cleanMisi) !== '')
+                                                <li class="mb-2">{{ $cleanMisi }}</li>
+                                            @endif
+                                        @endforeach
+                                    </ol>
+                                </div>
+                            </div>
+                        </div>
+                    </div>
+                </section>
             @endif
         @endforeach
     @endif
 
-    {{-- =============== Berita Sekolah =============== --}}
-
-    @if ($newsMenu && $news->count() > 0)
-        <section id="{{ $newsMenu->slug }}" class="dark:bg-zink-700/40 relative bg-slate-50 py-24 pb-16 xl:py-32 xl:pb-20">
-            <div class="container mx-auto px-4 2xl:max-w-[87.5rem]">
-                <div class="mx-auto mb-8 text-center xl:max-w-3xl">
-                    <h2 class="text-gradient mb-0 capitalize leading-normal">{{ $newsMenu->name ?? 'Berita Sekolah' }}
-                    </h2>
-                </div>
-
-                <div class="grid grid-cols-1 gap-6 lg:grid-cols-5">
-                    <!-- Left: Large Auto-Scroll Carousel (3 news) -->
-                    <div class="lg:col-span-2">
-                        <!-- 2 rows: (305px + 305px) + gap 24px = 634px -->
-                        <div class="swiper news-carousel relative" style="height: 634px;">
-                            <div class="swiper-wrapper">
-                                @foreach ($news->take(3) as $item)
-                                    <div class="swiper-slide">
-                                        <a href="{{ route('news.show', $item->id) }}" class="block h-full">
-                                            <div class="dark:bg-zink-600 relative flex h-full overflow-hidden rounded-lg bg-white shadow-md transition-all duration-300 ease-linear hover:shadow-lg"
-                                                data-aos="fade-up" data-aos-easing="linear">
-
-                                                @php
-                                                    $firstImgSrc = null;
-                                                    if (!empty($item->content)) {
-                                                        if (
-                                                            preg_match(
-                                                                '/<img[^>]+src="([^">]+)"/i',
-                                                                $item->content,
-                                                                $matches,
-                                                            )
-                                                        ) {
-                                                            $firstImgSrc = $matches[1];
-                                                        }
-                                                    }
-                                                @endphp
-
-                                                <!-- Full Image with Overlay -->
-                                                <img src="{{ $firstImgSrc ?? asset('assets/images/default-news.png') }}"
-                                                    alt="{{ $item->title }}"
-                                                    class="absolute inset-0 h-full w-full object-cover" loading="lazy" />
-
-                                                <!-- Dark Gradient Overlay - 35% from bottom -->
-                                                <div
-                                                    style="position: absolute; bottom: 0; left: 0; right: 0; height: 35%; background: linear-gradient(to top, rgba(0,0,0,0.9) 0%, rgba(0,0,0,0.6) 50%, transparent 100%);">
-                                                </div>
-
-                                                <!-- Category Badge -->
-                                                @if ($item->category)
-                                                    <span
-                                                        class="absolute right-3 top-3 z-10 rounded bg-gray-800 px-3 py-1.5 text-xs font-medium text-white">
-                                                        {{ $item->category->name }}
-                                                    </span>
-                                                @endif
-
-                                                <!-- Title at Bottom -->
-                                                <div class="absolute bottom-0 left-0 right-0 z-10 p-6">
-                                                    <h3
-                                                        class="line-clamp-3 text-2xl font-bold leading-tight text-white drop-shadow-lg">
-                                                        {{ $item->title }}
-                                                    </h3>
-                                                </div>
-                                            </div>
-                                        </a>
-                                    </div>
-                                @endforeach
-                            </div>
-                            <div></div>
-                            <!-- Navigation buttons -->
-                            <button
-                                class="news-carousel-prev dark:bg-zink-600/80 dark:hover:bg-zink-600 absolute left-2 top-1/2 z-10 flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-full bg-white/80 p-1.5 shadow-md transition-all duration-200 hover:bg-white">
-                                <i data-lucide="chevron-left" class="size-4 text-gray-900 dark:text-white"></i>
-                            </button>
-                            <button
-                                class="news-carousel-next dark:bg-zink-600/80 dark:hover:bg-zink-600 absolute right-2 top-1/2 z-10 flex h-8 w-8 -translate-y-1/2 items-center justify-center rounded-full bg-white/80 p-1.5 shadow-md transition-all duration-200 hover:bg-white">
-                                <i data-lucide="chevron-right" class="size-4 text-gray-900 dark:text-white"></i>
-                            </button>
-                        </div>
-                    </div>
-
-                    <!-- Right: 6 News in Grid (3 columns x 2 rows) -->
-                    <div class="lg:col-span-3">
-                        <div class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-3">
-                            @foreach ($news->skip(3)->take(6) as $item)
-                                <a href="{{ route('news.show', $item->id) }}" class="block">
-                                    <div class="dark:bg-zink-600 flex flex-col overflow-hidden rounded-lg bg-white shadow-md transition-all duration-300 ease-linear hover:-translate-y-2 hover:shadow-lg"
-                                        style="height: 305px;" data-aos="fade-up" data-aos-easing="linear">
-
-                                        <!-- Image Container -->
-                                        <div class="relative overflow-hidden bg-gray-100"
-                                            style="height: 140px; flex-shrink: 0;">
-                                            @php
-                                                $firstImgSrc = null;
-                                                if (!empty($item->content)) {
-                                                    if (
-                                                        preg_match(
-                                                            '/<img[^>]+src="([^">]+)"/i',
-                                                            $item->content,
-                                                            $matches,
-                                                        )
-                                                    ) {
-                                                        $firstImgSrc = $matches[1];
-                                                    }
-                                                }
-                                            @endphp
-
-                                            @if ($firstImgSrc)
-                                                <img src="{{ $firstImgSrc }}" alt="{{ $item->title }}"
-                                                    style="height: 100%; width: 100%; object-fit: cover;"
-                                                    loading="lazy" />
-                                            @else
-                                                <img src="{{ asset('assets/images/default-news.png') }}"
-                                                    alt="{{ $item->title }}"
-                                                    style="height: 100%; width: 100%; object-fit: cover;"
-                                                    loading="lazy" />
-                                            @endif
-
-                                            @if ($item->category)
-                                                <span
-                                                    class="absolute right-2 top-2 rounded bg-gray-800 px-2 py-1 text-xs font-medium text-white">
-                                                    {{ $item->category->name }}
-                                                </span>
-                                            @endif
-                                        </div>
-
-                                        <!-- Content Container -->
-                                        <div class="flex flex-1 flex-col p-3" style="min-height: 0;">
-                                            <!-- Title -->
-                                            <h3
-                                                class="dark:text-zink-50 mb-2 line-clamp-2 text-sm font-semibold leading-tight text-gray-900">
-                                                {{ $item->title }}
-                                            </h3>
-
-                                            <!-- Meta & Preview -->
-                                            <div class="flex flex-1 flex-col" style="min-height: 0;">
-                                                <!-- Date & Author -->
-                                                <div class="dark:text-zink-300 mb-2 text-xs text-gray-600">
-                                                    <div>
-                                                        {{ \Carbon\Carbon::parse($item->created_at)->locale('id')->isoFormat('D MMMM YYYY') }}
-                                                    </div>
-                                                    @if ($item->created_by && $item->createdBy)
-                                                        <div class="mt-0.5">{{ $item->createdBy->name }}</div>
-                                                    @endif
-                                                </div>
-
-                                                <!-- Preview -->
-                                                <div
-                                                    class="dark:text-zink-400 line-clamp-2 text-xs leading-relaxed text-gray-700">
-                                                    {{ Str::limit(strip_tags($item->content), 80, '...') }}
-                                                </div>
-                                            </div>
-                                        </div>
-                                    </div>
-                                </a>
-                            @endforeach
-                        </div>
-                    </div>
-                </div><!--end grid-->
-
-                {{-- =============== Berita Per Kategori =============== --}}
-                @php
-                    // Kelompokkan berita berdasarkan kategori dan urutkan berdasarkan jumlah berita terbanyak
-                    $newsByCategory = $news
-                        ->groupBy('s_category_id')
-                        ->sortByDesc(function ($categoryNews) {
-                            return $categoryNews->count();
-                        })
-                        ->take(3); // Ambil hanya 3 kategori teratas
-                @endphp
-
-                @if ($newsByCategory->count() > 0)
-                    <div class="mt-16">
-                        @foreach ($newsByCategory as $categoryId => $categoryNews)
-                            @php
-                                $category = $categoryNews->first()->category;
-                            @endphp
-                            @if ($category && $categoryNews->count() > 0)
-                                <div class="mb-8" data-aos="fade-up" data-aos-easing="linear">
-                                    <!-- Category Header -->
-                                    <div class="mb-4 flex items-center justify-between">
-                                        <h3 class="text-2xl font-bold text-gray-900 dark:text-zink-50">
-                                            {{ $category->name }}
-                                        </h3>
-                                        <a href="{{ route('news.index', ['category' => $category->id]) }}"
-                                            class="text-custom-500 hover:text-custom-600 flex items-center gap-1 text-sm font-medium transition-colors">
-                                            Lihat Semua
-                                            <i data-lucide="arrow-right" class="size-4"></i>
-                                        </a>
-                                    </div>
-
-                                    <!-- News Grid -->
-                                    <div class="grid grid-cols-1 gap-6 sm:grid-cols-2 lg:grid-cols-5">
-                                        @foreach ($categoryNews->take(5) as $item)
-                                            <a href="{{ route('news.show', $item->id) }}" class="block">
-                                                <div class="dark:bg-zink-600 flex flex-col overflow-hidden rounded-lg bg-white shadow-md transition-all duration-300 ease-linear hover:-translate-y-2 hover:shadow-lg"
-                                                    style="height: 320px;">
-
-                                                    <!-- Image Container -->
-                                                    <div class="relative overflow-hidden bg-gray-100"
-                                                        style="height: 160px; flex-shrink: 0;">
-                                                        @php
-                                                            $firstImgSrc = null;
-                                                            if (!empty($item->content)) {
-                                                                if (
-                                                                    preg_match(
-                                                                        '/<img[^>]+src="([^">]+)"/i',
-                                                                        $item->content,
-                                                                        $matches,
-                                                                    )
-                                                                ) {
-                                                                    $firstImgSrc = $matches[1];
-                                                                }
-                                                            }
-                                                        @endphp
-
-                                                        <img src="{{ $firstImgSrc ?? asset('assets/images/default-news.png') }}"
-                                                            alt="{{ $item->title }}"
-                                                            style="height: 100%; width: 100%; object-fit: cover;"
-                                                            loading="lazy" />
-                                                    </div>
-
-                                                    <!-- Content Container -->
-                                                    <div class="flex flex-1 flex-col p-4" style="min-height: 0;">
-                                                        <!-- Title -->
-                                                        <h4
-                                                            class="dark:text-zink-50 mb-2 line-clamp-2 text-base font-semibold leading-tight text-gray-900">
-                                                            {{ $item->title }}
-                                                        </h4>
-
-                                                        <!-- Meta & Preview -->
-                                                        <div class="flex flex-1 flex-col justify-between"
-                                                            style="min-height: 0;">
-                                                            <!-- Preview -->
-                                                            <div
-                                                                class="dark:text-zink-400 mb-2 line-clamp-2 text-xs leading-relaxed text-gray-700">
-                                                                {{ Str::limit(strip_tags($item->content), 60, '...') }}
-                                                            </div>
-
-                                                            <!-- Date -->
-                                                            <div class="dark:text-zink-300 text-xs text-gray-500">
-                                                                {{ \Carbon\Carbon::parse($item->created_at)->locale('id')->isoFormat('D MMM YYYY') }}
-                                                            </div>
-                                                        </div>
-                                                    </div>
-                                                </div>
-                                            </a>
-                                        @endforeach
-                                    </div>
-                                </div>
-                            @endif
-                        @endforeach
-                    </div>
-                @endif
-
-                <!-- Tombol Lihat Semua Berita -->
-                <div class="mt-8 flex justify-center">
-                    <a href="{{ route('news.index') }}"
-                        class="bg-custom-500 border-custom-500 hover:bg-custom-600 hover:border-custom-600 focus:bg-custom-600 focus:border-custom-600 inline-flex items-center gap-2 rounded border px-6 py-3 text-base font-medium text-white transition-all duration-200 ease-linear">
-                        Lihat Semua Berita
-                        <i data-lucide="arrow-right" class="size-4"></i>
-                    </a>
-                </div>
-            </div>
-        </section><!--end -->
-    @endif
-
-    {{-- =============== Program Keahlian =============== --}}
-
+    <!-- Program Keahlian Section -->
     @if ($programMenu)
         @php
-            // load programs and concentrations from DB (use facade with global alias)
             $programs = \DB::table('core_expertise_programs')->orderBy('name')->get();
             $concs = \DB::table('core_expertise_concentrations')->orderBy('name')->get();
 
-            // manual mapping: ensure Otomotif groups TKR & TSM
-            // and map Bisnis Ritel (BR) to Pemasaran (PN)
             $manualMap = [
                 'teknik-otomotif-to' => ['teknik-kendaraan-ringan-tkr', 'teknik-sepeda-motor-tsm'],
                 'pemasaran-pn' => ['bisnis-ritel-br'],
             ];
 
-            // prepare containers
             $assigned = [];
             $groups = [];
             foreach ($programs as $p) {
                 $groups[$p->slug] = ['program' => $p, 'subs' => []];
             }
 
-            // apply manual mapping first
             foreach ($manualMap as $progSlug => $concSlugs) {
                 foreach ($concSlugs as $cslug) {
                     $found = $concs->firstWhere('slug', $cslug);
@@ -510,7 +304,6 @@
                 }
             }
 
-            // assign remaining concentrations by token similarity
             foreach ($concs as $c) {
                 if (isset($assigned[$c->slug])) {
                     continue;
@@ -528,7 +321,6 @@
                     }
                 }
 
-                // fallback: if no shared tokens, put into first program
                 if (!$bestProg) {
                     $bestProg = $programs->first();
                 }
@@ -538,534 +330,465 @@
             }
         @endphp
 
-        <section id="{{ $programMenu->slug }}"
-            class="dark:from-zink-700/40 dark:to-zink-600/40 relative bg-gradient-to-r from-slate-50 to-slate-100 py-24 pb-16 xl:py-32 xl:pb-20">
-            <div class="container mx-auto px-4 2xl:max-w-[87.5rem]">
-                <div class="mx-auto mb-14 text-center xl:max-w-3xl">
-                    <h1 class="mb-0 capitalize leading-normal">Program Keahlian</h1>
+        <section id="{{ $programMenu->slug }}" class="featured-departments section" style="background-color: #ffffff; padding: 80px 0;">
+            <div class="container" data-aos="fade-up">
+                <div class="text-center mb-5">
+                    <h2 style="font-size: 32px; font-weight: 700; color: #0f172a;">Program & Konsentrasi Keahlian</h2>
+                    <p class="text-muted">Membuka kesempatan belajar di berbagai bidang kejuruan unggulan yang relevan dengan kebutuhan dunia kerja.</p>
                 </div>
 
-                <div class="grid grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-3">
+                <div class="row g-4 justify-content-center">
                     @foreach ($groups as $g)
                         @php
                             $p = $g['program'];
                             $subs = $g['subs'];
                         @endphp
-                        <div class="dark:bg-zink-600 program-card rounded-md bg-white p-7 shadow-md transition-all duration-300 ease-linear hover:-translate-y-2"
-                            data-aos="fade-up" data-aos-easing="linear">
-                            <div class="program-header flex items-center gap-4" style="cursor:pointer">
-                                <div class="shrink-0">
-                                    <div
-                                        class="bg-custom-100 dark:bg-custom-500/20 flex h-12 w-12 items-center justify-center rounded-full">
-                                        <i data-lucide="graduation-cap" class="text-custom-500 size-6"></i>
+                        <div class="col-lg-4 col-md-6" data-aos="zoom-in" data-aos-delay="100">
+                            <div class="department-highlight shadow-sm p-4 rounded-4 h-100 bg-light border-0 d-flex flex-column justify-content-between" style="transition: all 0.3s ease;">
+                                <div>
+                                    <div class="highlight-icon bg-primary p-3 rounded-circle text-white d-inline-flex justify-content-center align-items-center mb-4" style="width: 50px; height: 50px;">
+                                        <i class="bi bi-mortarboard-fill" style="font-size: 20px;"></i>
                                     </div>
+                                    <h4 style="font-size: 18px; font-weight: 700; color: #0f172a; margin-bottom: 15px;">{{ $p->name }}</h4>
+                                    <p class="text-muted mb-4" style="font-size: 13px;">Kelompok Program Keahlian unggulan dengan kompetensi yang dikembangkan terarah.</p>
                                 </div>
-                                <div class="grow">
-                                    <h5 class="dark:text-zink-50 text-base font-semibold text-slate-800">
-                                        {{ $p->name }}</h5>
+                                <div class="expertise-list mb-3">
+                                    <small class="text-muted font-weight-bold mb-2 d-block" style="font-size: 11px; text-transform: uppercase; letter-spacing: 0.5px;">Konsentrasi Keahlian:</small>
+                                    <ul class="list-unstyled m-0 d-flex flex-column gap-2">
+                                        @if (count($subs) === 0)
+                                            <li style="font-size: 13px; color: #64748b;">Belum ada konsentrasi terdaftar.</li>
+                                        @else
+                                            @foreach ($subs as $s)
+                                                <li>
+                                                    <a href="{{ route('expertise.show', $s->slug) }}" class="text-decoration-none text-dark hover-primary d-flex align-items-center" style="font-size: 13px; font-weight: 500;">
+                                                        <i class="bi bi-arrow-right-short text-primary me-1" style="font-size: 16px;"></i>
+                                                        {{ $s->name }}
+                                                    </a>
+                                                </li>
+                                            @endforeach
+                                        @endif
+                                    </ul>
                                 </div>
-                            </div>
-
-                            {{-- HAPUS INLINE STYLE DI SINI --}}
-                            <div class="program-subs mt-4">
-                                @if (count($subs) === 0)
-                                    <div class="text-sm text-slate-500">Belum ada konsentrasi terdaftar.</div>
-                                @else
-                                    @foreach ($subs as $index => $s)
-                                        <a href="{{ route('expertise.show', $s->slug) }}"
-                                            class="program-sub block rounded border border-slate-200 px-3 py-2 mb-2 text-slate-700 hover:bg-slate-50 dark:border-zinc-500 dark:text-zinc-100 dark:hover:bg-zinc-500"
-                                            data-index="{{ $index }}">{{ $s->name }}</a>
-                                    @endforeach
-                                @endif
                             </div>
                         </div>
                     @endforeach
                 </div>
             </div>
         </section>
+    @endif
 
+    <!-- Ekstrakurikuler Section -->
+    @if ($extrakurikulerMenu && $extrakurikulers->count() > 0)
+        <section id="{{ $extrakurikulerMenu->slug }}" class="section light-background" style="background-color: #f8fafc; padding: 80px 0;">
+            <div class="container" data-aos="fade-up">
+                <div class="text-center mb-5">
+                    <h2 style="font-size: 32px; font-weight: 700; color: #0f172a;">Ekstrakurikuler</h2>
+                    <p class="text-muted">Wadah eksplorasi minat, bakat, kepemimpinan, dan kepribadian siswa di luar jam akademik.</p>
+                </div>
 
-        {{-- =============== Ekstrakurikuler =============== --}}
-        @if ($extrakurikulerMenu && $extrakurikulers->count() > 0)
-            <section class="relative py-24 xl:py-32" id="{{ $extrakurikulerMenu->slug }}">
-                <div class="container mx-auto px-4 2xl:max-w-[87.5rem]">
-                    <div class="mx-auto mb-8 text-center xl:max-w-3xl">
-                        <h1 class="mb-0 capitalize leading-normal">{{ $extrakurikulerMenu->name ?? 'Ekstrakurikuler' }}
-                        </h1>
+                <!-- Swiper -->
+                <div class="swiper init-swiper" data-aos="fade-up" data-aos-delay="100">
+                    <script type="json" class="swiper-config">
+                        {
+                            "loop": true,
+                            "speed": 600,
+                            "autoplay": {
+                                "delay": 3500
+                            },
+                            "slidesPerView": "auto",
+                            "pagination": {
+                                "el": ".swiper-pagination",
+                                "type": "bullets",
+                                "clickable": true
+                            },
+                            "breakpoints": {
+                                "320": {
+                                    "slidesPerView": 1,
+                                    "spaceBetween": 20
+                                },
+                                "768": {
+                                    "slidesPerView": 2,
+                                    "spaceBetween": 20
+                                },
+                                "1200": {
+                                    "slidesPerView": 3,
+                                    "spaceBetween": 20
+                                }
+                            }
+                        }
+                    </script>
+                    <div class="swiper-wrapper align-items-stretch">
+                        @foreach ($extrakurikulers as $item)
+                            @php
+                                $imgUrl = null;
+                                if (!empty($item->photo)) {
+                                    if (filter_var($item->photo, FILTER_VALIDATE_URL)) {
+                                        $imgUrl = $item->photo;
+                                    } elseif (preg_match('#^assets/#', $item->photo) || preg_match('#^public/#', $item->photo)) {
+                                        $imgUrl = asset(preg_replace('#^public/#', '', $item->photo));
+                                    } else {
+                                        $rel = preg_replace('#^storage/#', '', $item->photo);
+                                        $imgUrl = route('public.files', ['path' => $rel]);
+                                    }
+                                } else {
+                                    $imgUrl = asset('assets/images/default-extrakurikuler.png');
+                                }
+                            @endphp
+                            <div class="swiper-slide h-auto">
+                                <div class="bg-white p-4 rounded-4 shadow-sm h-100 d-flex flex-column justify-content-between border-0" style="transition: transform 0.3s ease;">
+                                    <div class="text-center">
+                                        <div class="mx-auto mb-3 d-flex align-items-center justify-content-center" style="width: 100px; height: 100px; overflow: hidden;">
+                                            <img src="{{ $imgUrl }}" alt="{{ $item->name }}" class="img-fluid rounded-3" style="max-height: 100%; object-fit: contain;" onerror="this.src='{{ asset('assets/images/default-extrakurikuler.png') }}'">
+                                        </div>
+                                        <h5 style="font-size: 18px; font-weight: 700; color: #0f172a; margin-bottom: 10px;">{{ $item->name }}</h5>
+                                        <p class="text-muted" style="font-size: 13px; line-height: 1.6;">
+                                            "{{ Str::limit($item->description, 100) }}"
+                                        </p>
+                                    </div>
+                                    <div class="text-center mt-3">
+                                        <a href="{{ route('ekstrakurikulers.show', $item->id) }}" class="btn btn-outline-primary btn-sm rounded-pill px-3">
+                                            Selengkapnya
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        @endforeach
                     </div>
-                    <!-- Swiper -->
-                    <div class="swiper feedback-slider pb-6">
-                        <div class="swiper-wrapper">
-                            @foreach ($extrakurikulers as $item)
-                                <div class="swiper-slide flex flex-col">
-                                    <a href="{{ route('ekstrakurikulers.show', $item->id) }}">
+                    <div class="swiper-pagination mt-4"></div>
+                </div>
+            </div>
+        </section>
+    @endif
 
-                                        <div class="flex flex-1 flex-col p-5 text-center" data-aos="fade-up"
-                                            data-aos-easing="linear">
-                                            <div class="mx-auto mb-4 flex h-28 w-28 items-center justify-center">
-                                                @if (!empty($item->photo))
-                                                    @php
-                                                        $p = $item->photo;
-                                                        if (filter_var($p, FILTER_VALIDATE_URL)) {
-                                                            $imgUrl = $p;
-                                                        } elseif (
-                                                            preg_match('#^assets/#', $p) ||
-                                                            preg_match('#^public/assets/#', $p)
-                                                        ) {
-                                                            $imgUrl = asset(preg_replace('#^public/#', '', $p));
-                                                        } else {
-                                                            $rel = preg_replace('#^storage/#', '', $p);
-                                                            $imgUrl = route('public.files', ['path' => $rel]);
-                                                        }
-                                                    @endphp
-                                                    <img src="{{ $imgUrl }}" alt="{{ $item->name }}"
-                                                        class="max-h-full max-w-full object-contain"
-                                                        onerror="this.src='{{ asset('assets/images/default-extrakurikuler.png') }}'">
-                                                @else
-                                                    <img src="{{ asset('assets/images/default-extrakurikuler.png') }}"
-                                                        alt="{{ $item->name }}"
-                                                        class="max-h-full max-w-full object-contain">
+    <!-- Prestasi Section -->
+    @if (isset($achievements) && $achievements->count() > 0)
+        <section id="prestasi-sekolah" class="section" style="background-color: #ffffff; padding: 80px 0; border-top: 1px solid #f1f5f9;">
+            <div class="container" data-aos="fade-up">
+                <div class="text-center mb-5">
+                    <h2 style="font-size: 32px; font-weight: 700; color: #0f172a;">Prestasi Siswa & Sekolah</h2>
+                    <p class="text-muted">Apresiasi dan dokumentasi berbagai pencapaian prestasi akademik & non-akademik civitas SMKN 1 Talaga.</p>
+                </div>
+
+                <!-- Swiper Slider -->
+                <div class="swiper init-swiper" data-aos="fade-up" data-aos-delay="100">
+                    <script type="json" class="swiper-config">
+                        {
+                            "loop": true,
+                            "speed": 600,
+                            "autoplay": {
+                                "delay": 4000
+                            },
+                            "slidesPerView": "auto",
+                            "pagination": {
+                                "el": ".swiper-pagination",
+                                "type": "bullets",
+                                "clickable": true
+                            },
+                            "breakpoints": {
+                                "320": {
+                                    "slidesPerView": 1,
+                                    "spaceBetween": 20
+                                },
+                                "768": {
+                                    "slidesPerView": 2,
+                                    "spaceBetween": 25
+                                },
+                                "1200": {
+                                    "slidesPerView": 3,
+                                    "spaceBetween": 30
+                                }
+                            }
+                        }
+                    </script>
+                    <div class="swiper-wrapper align-items-stretch">
+                        @foreach ($achievements as $item)
+                            @php
+                                $photoUrl = $item->photo ? asset($item->photo) : asset('assets/images/default-news.png');
+                                $catBadge = 'bg-primary';
+                                if ($item->category == 'Non-Akademik') $catBadge = 'bg-purple';
+                                elseif ($item->category == 'Olahraga') $catBadge = 'bg-warning text-dark';
+                                elseif ($item->category == 'Seni') $catBadge = 'bg-info text-white';
+                            @endphp
+                            <div class="swiper-slide h-auto">
+                                <div class="bg-white p-0 rounded-4 shadow-sm h-100 d-flex flex-column justify-content-between border" style="transition: transform 0.3s ease; border: 1px solid #e2e8f0 !important; overflow: hidden;">
+                                    <div>
+                                        <div class="position-relative" style="height: 200px; overflow: hidden;">
+                                            <img src="{{ $photoUrl }}" alt="{{ $item->title }}" class="w-100 h-100 object-fit-cover" onerror="this.src='{{ asset('assets/images/default-news.png') }}'">
+                                            <span class="position-absolute badge {{ $catBadge }} px-3 py-2 shadow-sm" style="font-size: 10px; border-radius: 6px; top: 12px; left: 12px; z-index: 10;">
+                                                {{ $item->category }}
+                                            </span>
+                                        </div>
+                                        <div class="p-4">
+                                            <div class="d-flex align-items-center text-muted mb-2 gap-3" style="font-size: 11px;">
+                                                <div>
+                                                    <i class="bi bi-calendar3 me-1 text-primary"></i>
+                                                    <span>{{ \Carbon\Carbon::parse($item->date)->locale('id')->isoFormat('D MMM YYYY') }}</span>
+                                                </div>
+                                            </div>
+                                            <h5 style="font-size: 16px; font-weight: 700; color: #0f172a; line-height: 1.4; margin-bottom: 15px; min-height: 44px; display: -webkit-box; -webkit-line-clamp: 2; -webkit-box-orient: vertical; overflow: hidden;">
+                                                {{ $item->title }}
+                                            </h5>
+                                            <div class="d-flex align-items-center gap-2 p-2 rounded bg-light mb-3">
+                                                <i class="bi bi-person-fill text-primary" style="font-size: 14px;"></i>
+                                                <div style="font-size: 12px;">
+                                                    <div class="text-muted" style="font-size: 9px; line-height: 1;">Pemenang</div>
+                                                    <div class="fw-bold text-dark">{{ $item->winner_name }}</div>
+                                                </div>
+                                                @if($item->winner_social)
+                                                    <a href="{{ $item->winner_social }}" target="_blank" class="ms-auto text-primary" title="Sosial Media Pemenang">
+                                                        <i class="bi bi-instagram" style="font-size: 16px;"></i>
+                                                    </a>
                                                 @endif
                                             </div>
-                                            <h6 class="mb-1 mt-4 text-3xl">{{ $item->name }}</h6>
-                                            <p class="text-16 mt-2">"{{ $item->description }}"</p>
-
                                         </div>
+                                    </div>
+                                    <div class="px-4 pb-4">
+                                        <hr class="mt-0 mb-3 text-muted">
+                                        <a href="{{ route('public.achievements.show', $item->id) }}" class="btn btn-outline-primary btn-sm w-100 py-2" style="border-radius: 6px; font-weight: 600;">
+                                            Detail Selengkapnya
+                                        </a>
+                                    </div>
+                                </div>
+                            </div>
+                        @endforeach
+                    </div>
+                    <div class="swiper-pagination mt-4"></div>
+                </div>
+
+                <div class="text-center mt-5">
+                    <a href="{{ route('public.achievements.index') }}" class="btn btn-primary px-5 py-3 shadow" style="border-radius: 8px; font-weight: 700; font-size: 15px;">
+                        Lihat Semua Prestasi <i class="bi bi-arrow-right ms-2"></i>
+                    </a>
+                </div>
+            </div>
+        </section>
+    @endif
+
+    <!-- Berita Terkini Section -->
+    @if ($newsMenu && $news->count() > 0)
+        <section id="{{ $newsMenu->slug }}" class="featured-services section" style="background-color: #ffffff; padding: 80px 0;">
+            <div class="container" data-aos="fade-up">
+                <div class="text-center mb-5">
+                    <h2 style="font-size: 32px; font-weight: 700; color: #0f172a;">Berita & Informasi Terbaru</h2>
+                    <p class="text-muted">Ikuti terus berita sekolah, agenda kegiatan, pengumuman, dan artikel edukatif menarik dari kami.</p>
+                </div>
+
+                <div class="row g-4">
+                    @foreach ($news->take(3) as $item)
+                        @php
+                            $newsPhoto = null;
+                            if (!empty($item->photo)) {
+                                $p = $item->photo;
+                                if (filter_var($p, FILTER_VALIDATE_URL)) {
+                                    $newsPhoto = $p;
+                                } elseif (preg_match('#^assets/#', $p) || preg_match('#^public/assets/#', $p)) {
+                                    $newsPhoto = asset(preg_replace('#^public/#', '', $p));
+                                } else {
+                                    $rel = preg_replace('#^storage/#', '', $p);
+                                    $newsPhoto = route('public.files', ['path' => $rel]);
+                                }
+                            } else {
+                                if (!empty($item->content) && preg_match('/<img[^>]+src="([^">]+)"/i', $item->content, $matches)) {
+                                    $newsPhoto = $matches[1];
+                                } else {
+                                    $newsPhoto = asset('assets/images/default-news.png');
+                                }
+                            }
+
+                            // Clean editor markup/spaces for a proper preview
+                            $cleanedContent = strip_tags($item->content);
+                            $cleanedContent = html_entity_decode($cleanedContent);
+                            $cleanedContent = str_replace(["\xc2\xa0", '&nbsp;'], ' ', $cleanedContent);
+                            $cleanedContent = preg_replace('/\s+/', ' ', $cleanedContent);
+                            $cleanedContent = trim($cleanedContent);
+                        @endphp
+                        <div class="col-lg-4 col-md-6" data-aos="fade-up" data-aos-delay="100">
+                             <div class="bg-white rounded-4 shadow-sm h-100 overflow-hidden d-flex flex-column justify-content-between border" style="transition: transform 0.3s ease;">
+                                 <div>
+                                     <div class="position-relative" style="height: 200px; overflow: hidden;">
+                                         <img src="{{ $newsPhoto }}" alt="{{ $item->title }}" class="w-100 h-100 object-fit-cover" style="transition: transform 0.5s ease;" onerror="this.src='{{ asset('assets/images/default-news.png') }}'">
+                                     </div>
+                                    <div class="p-4">
+                                        <div class="d-flex align-items-center text-muted mb-2" style="font-size: 12px;">
+                                            <i class="bi bi-calendar3 me-2 text-primary"></i>
+                                            <span>{{ \Carbon\Carbon::parse($item->created_at)->locale('id')->isoFormat('D MMMM YYYY') }}</span>
+                                        </div>
+                                        @if ($item->category)
+                                            <div class="mb-2">
+                                                <span class="badge bg-primary text-white" style="font-size: 10px; padding: 4px 8px;">
+                                                    {{ $item->category->name }}
+                                                </span>
+                                            </div>
+                                        @endif
+                                        <h5 class="line-clamp-2" style="font-size: 16px; font-weight: 700; color: #0f172a; line-height: 1.4; margin-bottom: 10px;">
+                                            {{ $item->title }}
+                                        </h5>
+                                        <p class="text-muted line-clamp-3" style="font-size: 13px; line-height: 1.6;">
+                                            {{ Str::limit($cleanedContent, 100, '...') }}
+                                        </p>
+                                    </div>
+                                </div>
+                                <div class="px-4 pb-4 mt-auto">
+                                    <a href="{{ route('news.show', $item->id) }}" class="btn btn-outline-primary btn-sm w-100 py-2" style="border-radius: 6px; font-weight: 600;">
+                                        Baca Artikel
                                     </a>
                                 </div>
-                            @endforeach
+                            </div>
                         </div>
-                        <div class="swiper-pagination"></div>
-                    </div>
-                </div><!--end container-->
-            </section><!--end -->
-        @endif
-
-        {{-- =============== Mitra Industri =============== --}}
-        @if (!empty($mitras) && $mitras->count() > 0)
-            <section class="relative py-24 xl:py-32" id="section-mitra">
-                <div class="container mx-auto px-4 2xl:max-w-[87.5rem]">
-                    <div class="mx-auto mb-8 text-center xl:max-w-3xl">
-                        <h1 class="mb-0 capitalize leading-normal">Mitra Industri</h1>
-                    </div>
-                    <!-- Swiper (reuse same classes as ekstrakurikuler for horizontal auto animation) -->
-                    <div class="swiper mitra-slider pb-6">
-                        <div class="swiper-wrapper">
-                            @foreach ($mitras as $item)
-                                <div class="swiper-slide flex flex-col">
-                                    <div class="flex flex-1 flex-col p-5 text-center" data-aos="fade-up"
-                                        data-aos-easing="linear">
-                                        <div class="mx-auto mb-4 flex h-28 w-28 items-center justify-center">
-                                            @if (!empty($item->photo))
-                                                @php
-                                                    $p = $item->photo;
-                                                    if (filter_var($p, FILTER_VALIDATE_URL)) {
-                                                        $imgUrl = $p;
-                                                    } elseif (
-                                                        preg_match('#^assets/#', $p) ||
-                                                        preg_match('#^public/assets/#', $p)
-                                                    ) {
-                                                        $imgUrl = asset(preg_replace('#^public/#', '', $p));
-                                                    } else {
-                                                        $rel = preg_replace('#^storage/#', '', $p);
-                                                        $imgUrl = route('public.files', ['path' => $rel]);
-                                                    }
-                                                @endphp
-                                                <img src="{{ $imgUrl }}" alt="{{ $item->name }}"
-                                                    class="max-h-full max-w-full object-contain"
-                                                    onerror="this.src='{{ asset('assets/images/default-extrakurikuler.png') }}'">
-                                            @else
-                                                <img src="{{ asset('assets/images/default-extrakurikuler.png') }}"
-                                                    alt="{{ $item->name }}"
-                                                    class="max-h-full max-w-full object-contain">
-                                            @endif
-                                        </div>
-                                        <h6 class="mb-1 text-3xl">{{ $item->name }}</h6>
-                                    </div>
-                                </div>
-                            @endforeach
-                        </div>
-                        <div class="swiper-pagination"></div>
-                    </div>
-                </div><!--end container-->
-            </section>
-        @endif
-
-        {{-- =============== Galleries (Galeri) =============== --}}
-        @if (!empty($galleries) && $galleries->count() > 0)
-            @if ($galleryMenu)
-                @php
-                    $sectionId = $galleryMenu->slug ?? 'section-gallery';
-                @endphp
-            @else
-                @php
-                    $sectionId = 'section-gallery';
-                @endphp
-            @endif
-
-            <section id="{{ $sectionId }}"
-                class="dark:bg-zink-800/20 relative bg-white py-24 pb-16 xl:py-32 xl:pb-20">
-                <div class="container mx-auto px-4 2xl:max-w-[87.5rem]">
-                    <div class="mx-auto mb-8 text-center xl:max-w-3xl">
-                        <h2 class="text-gradient mb-0 capitalize leading-normal">Galeri</h2>
-                    </div>
-
-                    <div class="grid grid-cols-1 gap-6 md:grid-cols-2">
-                        {{-- Photos column (left) --}}
-                        <div class="space-y-4">
-                            <div class="mb-4 text-center font-semibold">Foto</div>
-                            @php $photos = $galleries->where('type', 'photo')->take(3); @endphp
-                            @if ($photos->count() === 0)
-                                <div class="text-slate-500">Belum ada foto.</div>
-                            @endif
-                            @foreach ($photos as $item)
-                                <div class="card dark:bg-zink-600 cursor-pointer transition-all duration-300 ease-linear hover:-translate-y-2"
-                                    data-aos="fade-up" data-aos-easing="linear"
-                                    @if (Route::has('galleries.show')) onclick="window.location.href='{{ route('galleries.show', $item->id) }}'" @endif>
-                                    <div class="flex gap-4 p-4">
-                                        <div class="shrink-0">
-                                            <div
-                                                class="group/gallery card relative mb-0 overflow-hidden rounded-md transition-all duration-300 ease-linear hover:-translate-y-2">
-                                                <div class="group/gallery relative overflow-hidden rounded-md">
-                                                    <div
-                                                        style="width:200px; aspect-ratio:1/1; display:flex; align-items:center; justify-content:center; overflow:hidden; background-color:#f3f4f6; position:relative;">
-                                                        @if ($item->embed_html)
-                                                            <div style="width:100%; height:100%; pointer-events:none;">
-                                                                {!! $item->embed_html !!}
-                                                            </div>
-                                                            <div style="position:absolute; inset:0; z-index:10;"></div>
-                                                        @else
-                                                            <img src="{{ asset('assets/images/default-news.png') }}"
-                                                                alt="{{ $item->title }}"
-                                                                style="width:100%; height:100%; object-fit:cover;"
-                                                                class="rounded-md">
-                                                        @endif
-                                                    </div>
-
-                                                    <div
-                                                        class="absolute inset-0 bg-gradient-to-t from-gray-900 to-transparent opacity-0 transition-all duration-300 ease-linear group-hover/gallery:opacity-50">
-                                                    </div>
-                                                    <div
-                                                        class="absolute bottom-0 left-3 right-3 z-20 opacity-0 transition-all duration-300 ease-linear group-hover/gallery:bottom-3 group-hover/gallery:opacity-100">
-                                                        <h5 class="truncate font-normal text-white">{{ $item->title }}
-                                                        </h5>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                        <div class="grow">
-                                            <h6
-                                                class="dark:text-zink-50 hover:text-custom-500 mb-2 text-lg font-semibold text-slate-800 transition-colors">
-                                                {{ $item->title }}</h6>
-                                            <p class="dark:text-zink-200 mb-2 text-sm text-slate-500">
-                                                {{ Str::limit(strip_tags($item->description ?? ($item->caption ?? '')), 150) }}
-                                            </p>
-                                            <p class="dark:text-zink-300 text-xs text-slate-400">
-                                                {{ optional($item->created_at)->diffForHumans() }}</p>
-                                        </div>
-                                    </div>
-                                </div>
-                            @endforeach
-                        </div>
-
-                        {{-- Videos column (right) --}}
-                        <div class="space-y-4">
-                            <div class="mb-4 text-center font-semibold">Video</div>
-                            @php $videos = $galleries->where('type', 'video')->take(3); @endphp
-                            @if ($videos->count() === 0)
-                                <div class="text-slate-500">Belum ada video.</div>
-                            @endif
-                            @foreach ($videos as $item)
-                                <div class="card dark:bg-zink-600 cursor-pointer transition-all duration-300 ease-linear hover:-translate-y-2"
-                                    data-aos="fade-up" data-aos-easing="linear"
-                                    @if (Route::has('galleries.show')) onclick="window.location.href='{{ route('galleries.show', $item->id) }}'" @endif>
-                                    <div class="flex items-start gap-4 p-4">
-                                        <div class="shrink-0">
-                                            <div
-                                                class="group/gallery card relative mb-0 overflow-hidden rounded-md transition-all duration-300 ease-linear hover:-translate-y-2">
-                                                <div class="group/gallery relative overflow-hidden rounded-md">
-                                                    <div
-                                                        style="width:100%; max-width:400px; aspect-ratio:16/9; display:flex; align-items:center; justify-content:center; overflow:hidden; background-color:#f3f4f6; position:relative;">
-                                                        @if ($item->embed_html)
-                                                            <div style="width:100%; height:100%; pointer-events:none;">
-                                                                {!! $item->embed_html !!}
-                                                            </div>
-                                                            <div style="position:absolute; inset:0; z-index:10;"></div>
-                                                        @else
-                                                            <img src="{{ asset('assets/images/default-news.png') }}"
-                                                                alt="{{ $item->title }}"
-                                                                style="width:100%; height:100%; object-fit:cover;"
-                                                                class="rounded-md">
-                                                        @endif
-                                                    </div>
-
-                                                    <div
-                                                        class="absolute inset-0 bg-gradient-to-t from-gray-900 to-transparent opacity-0 transition-all duration-300 ease-linear group-hover/gallery:opacity-50">
-                                                    </div>
-                                                    <div
-                                                        class="absolute bottom-0 left-3 right-3 z-20 opacity-0 transition-all duration-300 ease-linear group-hover/gallery:bottom-3 group-hover/gallery:opacity-100">
-                                                        <h5 class="truncate font-normal text-white">{{ $item->title }}
-                                                        </h5>
-                                                    </div>
-                                                </div>
-                                            </div>
-                                        </div>
-
-                                        <div class="grow">
-                                            <h6
-                                                class="dark:text-zink-50 hover:text-custom-500 mb-2 text-lg font-semibold text-slate-800 transition-colors">
-                                                {{ $item->title }}</h6>
-                                            <p class="dark:text-zink-200 mb-2 text-sm text-slate-500">
-                                                {{ Str::limit(strip_tags($item->description ?? ($item->caption ?? '')), 150) }}
-                                            </p>
-                                            <p class="dark:text-zink-300 text-xs text-slate-400">
-                                                {{ optional($item->created_at)->diffForHumans() }}</p>
-                                        </div>
-                                    </div>
-                                </div>
-                            @endforeach
-                        </div>
-                    </div><!--end grid-->
+                    @endforeach
                 </div>
-            </section>
-            <!--end grid-->
 
-            <!-- Tombol Lihat Semua Galeri -->
-            <div class="mt-8 mb-5 flex justify-center">
-                @if (Route::has('galleries.index'))
-                    <a href="{{ route('galleries.index') }}"
-                        class="bg-custom-500 border-custom-500 hover:bg-custom-600 hover:border-custom-600 focus:bg-custom-600 focus:border-custom-600 inline-flex items-center gap-2 rounded border px-6 py-3 text-base font-medium text-white transition-all duration-200 ease-linear">
-                        Lihat Semua Galeri
-                        <i data-lucide="arrow-right" class="size-4"></i>
+                <div class="text-center mt-5">
+                    <a href="{{ route('news.index') }}" class="btn btn-primary px-4 py-2.5" style="border-radius: 8px; font-weight: 600;">
+                        Lihat Semua Berita <i class="bi bi-arrow-right ms-2"></i>
                     </a>
-                @endif
+                </div>
             </div>
-            </div>
-            </section><!--end -->
-        @endif
-        <style>
-            .program-subs {
-                max-height: 0;
-                overflow: hidden;
-                opacity: 0;
-                transition: max-height 0.4s ease, opacity 0.3s ease;
-            }
-
-            .program-card.open .program-subs {
-                opacity: 1;
-            }
-
-            .program-sub {
-                opacity: 0;
-                transform: translateY(-6px);
-                transition: opacity 0.32s ease, transform 0.32s ease;
-            }
-
-            .program-card.open .program-sub {
-                opacity: 1;
-                transform: translateY(0);
-            }
-        </style>
-
-        <script>
-            document.addEventListener('DOMContentLoaded', function() {
-                const cards = document.querySelectorAll('.program-card');
-
-                function closeCard(card) {
-                    const subs = card.querySelector('.program-subs');
-                    if (!subs) return;
-
-                    card.classList.remove('open');
-                    subs.style.maxHeight = '0';
-
-                    // Reset animasi sub items
-                    subs.querySelectorAll('.program-sub').forEach((el) => {
-                        el.style.transitionDelay = '0ms';
-                    });
-                }
-
-                function openCard(card) {
-                    const subs = card.querySelector('.program-subs');
-                    if (!subs) return;
-
-                    // Close cards lain (accordion behavior)
-                    document.querySelectorAll('.program-card.open').forEach((c) => {
-                        if (c === card) return;
-                        closeCard(c);
-                    });
-
-                    card.classList.add('open');
-
-                    // Set max-height ke scrollHeight untuk trigger transition
-                    const fullHeight = subs.scrollHeight;
-                    subs.style.maxHeight = fullHeight + 'px';
-
-                    // Animasi staggered untuk sub items
-                    subs.querySelectorAll('.program-sub').forEach((el, i) => {
-                        el.style.transitionDelay = (i * 60) + 'ms';
-                    });
-                }
-
-                cards.forEach((card) => {
-                    const header = card.querySelector('.program-header');
-                    if (!header) return;
-
-                    header.addEventListener('click', function() {
-                        if (card.classList.contains('open')) {
-                            closeCard(card);
-                        } else {
-                            openCard(card);
-                        }
-                    });
-                });
-            });
-        </script>
+        </section>
     @endif
-    @push('scripts')
-        <script>
-            document.addEventListener('DOMContentLoaded', function() {
-                const cards = document.querySelectorAll('.program-card');
 
-                function closeCard(card) {
-                    const subs = card.querySelector('.program-subs');
-                    if (!subs) return;
-                    card.classList.remove('open');
-                    subs.style.maxHeight = '0';
-                    subs.style.opacity = '0';
-                    subs.querySelectorAll('.program-sub').forEach((el) => {
-                        el.style.transitionDelay = '0ms';
-                        el.style.opacity = '0';
-                        el.style.transform = 'translateY(-6px)';
-                    });
-                }
-
-                function openCard(card) {
-                    const subs = card.querySelector('.program-subs');
-                    if (!subs) return;
-                    // close other open cards (accordion behavior)
-                    document.querySelectorAll('.program-card.open').forEach((c) => {
-                        if (c === card) return;
-                        closeCard(c);
-                    });
-
-                    card.classList.add('open');
-                    subs.style.opacity = '1';
-                    // allow the browser to compute layout then set maxHeight for transition
-                    const full = subs.scrollHeight;
-                    subs.style.maxHeight = full + 'px';
-
-                    subs.querySelectorAll('.program-sub').forEach((el, i) => {
-                        el.style.opacity = '0';
-                        el.style.transform = 'translateY(-6px)';
-                        el.style.transition = 'opacity 320ms ease, transform 320ms ease';
-                        el.style.transitionDelay = (i * 60) + 'ms';
-                        requestAnimationFrame(() => {
-                            el.style.opacity = '1';
-                            el.style.transform = 'translateY(0)';
-                        });
-                    });
-                }
-
-                cards.forEach((card) => {
-                    const header = card.querySelector('.program-header');
-                    const subs = card.querySelector('.program-subs');
-                    if (!header || !subs) return;
-                    // initialize subs children for hidden state
-                    subs.querySelectorAll('.program-sub').forEach((el) => {
-                        el.style.opacity = '0';
-                        el.style.transform = 'translateY(-6px)';
-                    });
-
-                    header.addEventListener('click', function() {
-                        if (card.classList.contains('open')) {
-                            closeCard(card);
-                        } else {
-                            openCard(card);
-                        }
-                    });
-                });
-            });
-        </script>
-        <script>
-            document.addEventListener('DOMContentLoaded', function() {
-                // Initialize Swiper for mitra slider if Swiper is available
-                try {
-                    if (typeof Swiper !== 'undefined') {
-                        new Swiper('.mitra-slider', {
-                            slidesPerView: 3,
-                            spaceBetween: 20,
-                            loop: true,
-                            autoplay: {
-                                delay: 2200,
-                                disableOnInteraction: false,
+    <!-- Mitra Industri Section -->
+    @if (!empty($mitras) && $mitras->count() > 0)
+        <section class="section light-background" style="background-color: #f8fafc; padding: 60px 0;">
+            <div class="container" data-aos="fade-up">
+                <div class="text-center mb-4">
+                    <h5 class="text-muted font-weight-bold" style="font-size: 14px; text-transform: uppercase; letter-spacing: 1px;">Mitra Industri Kerjasama Kami</h5>
+                </div>
+                <div class="swiper init-swiper" data-aos="fade-up" data-aos-delay="100">
+                    <script type="json" class="swiper-config">
+                        {
+                            "loop": true,
+                            "speed": 800,
+                            "autoplay": {
+                                "delay": 2000
                             },
-                            pagination: {
-                                el: '.mitra-slider .swiper-pagination',
-                                clickable: true,
-                            },
-                            breakpoints: {
-                                320: {
-                                    slidesPerView: 1
+                            "slidesPerView": "auto",
+                            "breakpoints": {
+                                "320": {
+                                    "slidesPerView": 2,
+                                    "spaceBetween": 30
                                 },
-                                640: {
-                                    slidesPerView: 2
+                                "576": {
+                                    "slidesPerView": 3,
+                                    "spaceBetween": 40
                                 },
-                                1024: {
-                                    slidesPerView: 3
-                                },
+                                "992": {
+                                    "slidesPerView": 5,
+                                    "spaceBetween": 50
+                                }
                             }
-                        });
-                    }
-                } catch (e) {
-                    console.error('Swiper init error', e);
-                }
-            });
-        </script>
-        <script>
-            document.addEventListener('DOMContentLoaded', function() {
-                // Initialize Swiper for news carousel if Swiper is available
-                try {
-                    if (typeof Swiper !== 'undefined') {
-                        new Swiper('.news-carousel', {
-                            slidesPerView: 1,
-                            spaceBetween: 10,
-                            loop: true,
-                            autoplay: {
-                                delay: 3000,
-                                disableOnInteraction: false,
-                            },
-                            pagination: {
-                                el: '.news-carousel .swiper-pagination',
-                                clickable: true,
-                            },
-                            navigation: {
-                                nextEl: '.news-carousel-next',
-                                prevEl: '.news-carousel-prev',
-                            }
-                        });
-                    }
-                } catch (e) {
-                    console.error('News carousel init error', e);
-                }
-            });
-        </script>
-        <script>
-            document.addEventListener('DOMContentLoaded', function() {
-                // show 'Selengkapnya' if profile content is overflowing 2 lines
-                document.querySelectorAll('.profile-summary').forEach(function(el) {
-                    // small tolerance to account for rounding
-                    if (el.scrollHeight > el.clientHeight + 2) {
-                        // prefer an ancestor wrapper with a known class, fallback to parent
-                        var container = el.closest('.profile-container') || el.parentElement;
-                        var btn = container ? container.querySelector('.profile-readmore') : null;
-                        if (btn) {
-                            btn.style.display = 'inline';
                         }
-                    }
-                });
-            });
-        </script>
-    @endpush
+                    </script>
+                    <div class="swiper-wrapper align-items-center">
+                        @foreach ($mitras as $item)
+                            @php
+                                $imgUrl = null;
+                                if (!empty($item->photo)) {
+                                    if (filter_var($item->photo, FILTER_VALIDATE_URL)) {
+                                        $imgUrl = $item->photo;
+                                    } elseif (preg_match('#^assets/#', $item->photo) || preg_match('#^public/#', $item->photo)) {
+                                        $imgUrl = asset(preg_replace('#^public/#', '', $item->photo));
+                                    } else {
+                                        $rel = preg_replace('#^storage/#', '', $item->photo);
+                                        $imgUrl = route('public.files', ['path' => $rel]);
+                                    }
+                                } else {
+                                    $imgUrl = asset('assets/images/default-extrakurikuler.png');
+                                }
+                            @endphp
+                            <div class="swiper-slide text-center d-flex align-items-center justify-content-center" style="height: 100px; width: 150px;">
+                                <img src="{{ $imgUrl }}" alt="{{ $item->name }}" class="img-fluid" style="max-height: 60px; filter: grayscale(100%); transition: all 0.3s;" onmouseover="this.style.filter='none'" onmouseout="this.style.filter='grayscale(100%)'">
+                            </div>
+                        @endforeach
+                    </div>
+                </div>
+            </div>
+        </section>
+    @endif
+
+    <!-- Galeri Section -->
+    @if (!empty($galleries) && $galleries->count() > 0)
+        @php
+            $sectionId = $galleryMenu->slug ?? 'section-gallery';
+            $photos = $galleries->where('type', 'photo')->take(4);
+            $videos = $galleries->where('type', 'video')->take(2);
+        @endphp
+        <section id="{{ $sectionId }}" class="section" style="background-color: #ffffff; padding: 80px 0;">
+            <div class="container" data-aos="fade-up">
+                <div class="text-center mb-5">
+                    <h2 style="font-size: 32px; font-weight: 700; color: #0f172a;">Galeri Sekolah</h2>
+                    <p class="text-muted">Dokumentasi momen berharga, fasilitas sekolah, prestasi siswa, dan berbagai acara penting.</p>
+                </div>
+
+                <div class="row g-4">
+                    <!-- Foto Grid -->
+                    @foreach ($photos as $item)
+                        @php
+                            $imgUrl = null;
+                            if (!empty($item->file_path)) {
+                                $imgUrl = asset($item->file_path);
+                            } elseif ($item->embed_html && preg_match('/src="([^"]+)"/i', $item->embed_html, $matches)) {
+                                $imgUrl = $matches[1];
+                            } else {
+                                $imgUrl = asset('assets/images/default-news.png');
+                            }
+                        @endphp
+                        <div class="col-lg-3 col-md-6" data-aos="zoom-in" data-aos-delay="100">
+                            <div class="position-relative overflow-hidden rounded-4 shadow-sm" style="aspect-ratio: 1/1; cursor: pointer;">
+                                <a href="{{ $imgUrl }}" class="glightbox" data-gallery="gallery-images" data-title="{{ $item->title }}">
+                                    <img src="{{ $imgUrl }}" alt="{{ $item->title }}" class="w-100 h-100 object-fit-cover hover-scale" style="transition: all 0.5s;" onerror="this.src='{{ asset('assets/images/default-news.png') }}'">
+                                    <div class="overlay d-flex flex-column justify-content-end p-3 text-white position-absolute w-100 h-100" style="bottom: 0; left: 0; background: linear-gradient(to top, rgba(0,0,0,0.8) 0%, transparent 100%);">
+                                        <h6 class="m-0" style="font-size: 14px; font-weight: 600;">{{ $item->title }}</h6>
+                                    </div>
+                                </a>
+                            </div>
+                        </div>
+                    @endforeach
+
+                    <!-- Video Grid -->
+                    @foreach ($videos as $item)
+                        <div class="col-lg-6 col-md-12" data-aos="zoom-in" data-aos-delay="200">
+                            <div class="position-relative overflow-hidden rounded-4 shadow-sm bg-light" style="aspect-ratio: 16/9;">
+                                @if($item->embed_html)
+                                    {!! preg_replace('/width="\d+"/', 'width="100%"', preg_replace('/height="\d+"/', 'height="100%"', $item->embed_html)) !!}
+                                @endif
+                                <div class="p-3 text-white position-absolute w-100" style="bottom: 0; left: 0; background: linear-gradient(to top, rgba(0,0,0,0.8) 0%, transparent 100%); pointer-events: none;">
+                                    <h6 class="m-0" style="font-size: 14px; font-weight: 600;">{{ $item->title }}</h6>
+                                </div>
+                            </div>
+                        </div>
+                    @endforeach
+                </div>
+
+                <div class="text-center mt-5">
+                    @if (Route::has('galleries.index'))
+                        <a href="{{ route('galleries.index') }}" class="btn btn-primary px-4 py-2.5" style="border-radius: 8px; font-weight: 600;">
+                            Lihat Semua Galeri <i class="bi bi-arrow-right ms-2"></i>
+                        </a>
+                    @endif
+                </div>
+            </div>
+        </section>
+    @endif
 
 @endsection
+
+@push('scripts')
+    <style>
+        .hover-scale:hover {
+            transform: scale(1.08);
+        }
+        .line-clamp-2 {
+            display: -webkit-box;
+            -webkit-line-clamp: 2;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+        .line-clamp-3 {
+            display: -webkit-box;
+            -webkit-line-clamp: 3;
+            -webkit-box-orient: vertical;
+            overflow: hidden;
+        }
+    </style>
+@endpush

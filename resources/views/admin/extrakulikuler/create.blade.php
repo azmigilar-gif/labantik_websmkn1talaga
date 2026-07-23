@@ -51,6 +51,7 @@
                         <div class="col-span-12 md:col-span-6">
                             <label class="block text-sm font-medium mb-2">Foto</label>
                             <input type="file" name="photo" accept="image/*">
+                            <span class="text-xs text-slate-500 mt-1 block">Maksimal ukuran file: 2 MB</span>
                         </div>
 
                         <div class="col-span-12 text-right mt-4">

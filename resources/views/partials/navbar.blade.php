@@ -1,230 +1,185 @@
-<nav class="navbar fixed inset-x-0 top-0 z-50 flex h-20 items-center justify-center border-b border-slate-200 py-3 dark:border-zinc-800 [&.is-sticky]:bg-white [&.is-sticky]:shadow-lg [&.is-sticky]:shadow-slate-200/25 dark:[&.is-sticky]:bg-zinc-900 dark:[&.is-sticky]:shadow-zinc-700/30"
-    id="navbar">
-    <div class="container mx-auto flex w-full items-center self-center px-4 2xl:max-w-[87.5rem]">
-        <!-- Logo - Fixed Width -->
-        <div class="shrink-0" style="width: 180px;">
-            <a href="#!">
-                <img src="{{ asset('assets/images/logosmk.png') }}" alt="" class="block h-12 dark:hidden">
-                <img src="{{ asset('assets/images/logosmk.png') }}" alt="" class="hidden h-12 dark:block">
-            </a>
-        </div>
+@php
+    $menus = $menus ?? \App\Models\S_Menu::with('submenus')->get();
+    // Definisikan urutan menu yang diinginkan
+    $menuOrder = ['Profil Sekolah', 'Berita', 'Program Keahlian', 'Ekstrakurikuler', 'Prestasi', 'Kontak'];
 
-        <!-- Menu - Centered -->
-        <div class="flex-1 flex justify-center">
-            <ul id="navbar7"
-                class="navbar-menu absolute inset-x-0 top-full z-20 mt-px hidden items-center rounded-b-md bg-white py-3 shadow-lg md:relative md:top-auto md:z-0 md:mt-0 md:flex md:rounded-none md:bg-transparent md:py-0 md:shadow-none dark:bg-zinc-800 dark:md:bg-transparent">
-                <li>
-                    <a href="{{ url('/#home') }}"
-                        class="nav-link text-15 hover:text-custom-500 [&.active]:text-custom-500 dark:hover:text-custom-500 dark:[&.active]:text-custom-500 block px-4 py-2.5 font-medium text-slate-800 transition-all duration-300 ease-linear md:inline-block md:px-3 md:py-0.5 dark:text-zinc-200">Home</a>
-                </li>
+    // Pisahkan menu berdasarkan urutan
+    $orderedMenus = [];
+    $otherMenus = [];
 
-                @php
-                    // Definisikan urutan menu yang diinginkan
-                    $menuOrder = ['Profil Sekolah', 'Berita', 'Program Keahlian', 'Ekstrakurikuler', 'Kontak'];
+    foreach ($menus as $m) {
+        $position = array_search($m->name, $menuOrder);
+        if ($position !== false) {
+            $orderedMenus[$position] = $m;
+        } else {
+            $otherMenus[] = $m;
+        }
+    }
 
-                    // Pisahkan menu berdasarkan urutan
-                    $orderedMenus = [];
-                    $otherMenus = [];
+    // Sort ordered menus berdasarkan key
+    ksort($orderedMenus);
 
-                    foreach ($menus as $m) {
-                        $position = array_search($m->name, $menuOrder);
-                        if ($position !== false) {
-                            $orderedMenus[$position] = $m;
-                        } else {
-                            $otherMenus[] = $m;
-                        }
-                    }
+    // Gabungkan: ordered menus + other menus (menu lain muncul setelah Kontak)
+    $sortedMenus = array_merge($orderedMenus, $otherMenus);
+    $contact = $contact ?? \App\Models\S_Contact::first();
+@endphp
 
-                    // Sort ordered menus berdasarkan key
-                    ksort($orderedMenus);
+<header id="header" class="header fixed-top">
 
-                    // Gabungkan: ordered menus + other menus (menu lain muncul setelah Kontak)
-                    $sortedMenus = array_merge($orderedMenus, $otherMenus);
-                @endphp
+    <div class="topbar d-flex align-items-center dark-background">
+        <div class="container d-flex justify-content-center justify-content-md-between">
+            <div class="contact-info d-flex align-items-center">
+                @if($contact && !empty($contact->email))
+                    <i class="bi bi-envelope d-flex align-items-center">
+                        <a href="mailto:{{ $contact->email }}">{{ $contact->email }}</a>
+                    </i>
+                @else
+                    <i class="bi bi-envelope d-flex align-items-center">
+                        <a href="mailto:info@smkn1talaga.sch.id">info@smkn1talaga.sch.id</a>
+                    </i>
+                @endif
 
-                {{-- Tampilkan semua menu dengan urutan yang benar --}}
-                @foreach ($sortedMenus as $m)
-                    <li class="dropdown relative">
-                        @if ($m->submenus && $m->submenus->count() > 0)
-                            <!-- Menu dengan Submenu (Split Dropdown Button) -->
-                            <div class="flex items-center justify-between md:justify-start md:gap-0">
-                                @php
-                                    // Cek apakah slug dimulai dengan http:// atau https://
-                                    $isExternalLink = preg_match('/^https?:\/\//', $m->slug);
-                                    $menuUrl = $isExternalLink ? $m->slug : url('/#' . $m->slug);
-                                @endphp
-
-                                <a href="{{ $menuUrl }}"
-                                    @if ($isExternalLink) target="_blank" rel="noopener noreferrer" @endif
-                                    class="nav-link text-15 hover:text-custom-500 [&.active]:text-custom-500 dark:hover:text-custom-500 dark:[&.active]:text-custom-500 block px-4 py-2.5 font-medium text-slate-800 transition-all duration-300 ease-linear md:inline-block md:px-3 md:py-0.5 dark:text-zinc-200">
-                                    {{ $m->name }}
-                                </a>
-                                <button type="button"
-                                    class="dropdown-toggle-custom hover:text-custom-500 dark:hover:text-custom-500 mr-2 flex items-center justify-center p-0 text-slate-800 transition-all duration-300 md:h-auto md:px-0 md:py-0.5 dark:text-zinc-200">
-                                    <i data-lucide="chevron-down" class="inline-block size-4"></i>
-                                </button>
-                            </div>
-
-                            <!-- Dropdown Menu -->
-                            <ul
-                                class="dropdown-menu-custom absolute z-[1000] mt-2 hidden min-w-[10rem] list-none rounded-md bg-white py-2 text-left shadow-lg dark:bg-zinc-600">
-                                @foreach ($m->submenus as $submenu)
-                                    <li>
-                                        @php
-                                            // Cek apakah URL submenu adalah external link
-                                            $isSubmenuExternal = preg_match('/^https?:\/\//', $submenu->url);
-                                            $submenuUrl = $isSubmenuExternal
-                                                ? $submenu->url
-                                                : url('sub/' . $submenu->url);
-                                        @endphp
-
-                                        <a href="{{ $submenuUrl }}"
-                                            @if ($isSubmenuExternal) target="_blank" rel="noopener noreferrer" @endif
-                                            class="dropdown-item hover:text-custom-500 dark:hover:text-custom-500 block whitespace-nowrap bg-transparent px-4 py-2 font-normal text-slate-600 hover:bg-slate-100 dark:text-zinc-100 dark:hover:bg-zinc-500">
-                                            {{ $submenu->name }}
-                                        </a>
-                                    </li>
-                                @endforeach
-                            </ul>
-                        @else
-                            <!-- Menu Biasa (Tanpa Submenu) -->
-                            @php
-                                // Cek apakah slug dimulai dengan http:// atau https://
-                                $isExternalLink = preg_match('/^https?:\/\//', $m->slug);
-                                $menuUrl = $isExternalLink ? $m->slug : url('/#' . $m->slug);
-                            @endphp
-
-                            <a href="{{ $menuUrl }}"
-                                @if ($isExternalLink) target="_blank" rel="noopener noreferrer" @endif
-                                class="nav-link text-15 hover:text-custom-500 [&.active]:text-custom-500 dark:hover:text-custom-500 dark:[&.active]:text-custom-500 block px-4 py-2.5 font-medium text-slate-800 transition-all duration-300 ease-linear md:inline-block md:px-3 md:py-0.5 dark:text-zinc-200">
-                                {{ $m->name }}
-                            </a>
-                        @endif
-                    </li>
-                @endforeach
-            </ul>
-        </div>
-
-        <!-- Right Section - Fixed Width (sama dengan logo) -->
-        <div class="flex items-center justify-end gap-2" style="width: 180px;">
-            <!-- Tombol Dashboard (hanya muncul jika sudah login) -->
-            @auth
-                <!-- Desktop: dengan text dan icon -->
-                <a href="{{ route('admin.dashboard') }}"
-                    class="bg-white text-custom-500 btn border-custom-500 hover:text-white hover:bg-custom-600 hover:border-custom-600 focus:text-white focus:bg-custom-600 focus:border-custom-600 focus:ring focus:ring-custom-100 active:text-white active:bg-custom-600 active:border-custom-600 active:ring active:ring-custom-100 dark:bg-zink-700 dark:hover:bg-custom-500 dark:ring-custom-400/20 dark:focus:bg-custom-500 hidden md:flex items-center gap-2 px-4 py-2">
-                    <i data-lucide="layout-dashboard" class="size-4"></i>
-                    <span>Dashboard</span>
-                </a>
-
-                <!-- Mobile: icon only -->
-                <a href="{{ route('admin.dashboard') }}"
-                    class="bg-white text-custom-500 btn border-custom-500 hover:text-white hover:bg-custom-600 hover:border-custom-600 focus:text-white focus:bg-custom-600 focus:border-custom-600 focus:ring focus:ring-custom-100 active:text-white active:bg-custom-600 active:border-custom-600 active:ring active:ring-custom-100 dark:bg-zink-700 dark:hover:bg-custom-500 dark:ring-custom-400/20 dark:focus:bg-custom-500 md:hidden flex size-[37.5px] items-center justify-center p-0">
-                    <i data-lucide="layout-dashboard" class="size-4"></i>
-                </a>
-            @endauth
-
-            <!-- Tombol Menu Toggle (Mobile) -->
-            <div class="navbar-toggale-button md:hidden">
-                <button type="button"
-                    class="btn bg-custom-500 border-custom-500 hover:bg-custom-600 hover:border-custom-600 focus:bg-custom-600 focus:border-custom-600 focus:ring-custom-100 active:bg-custom-600 active:border-custom-600 active:ring-custom-100 dark:ring-custom-400/20 flex size-[37.5px] items-center justify-center p-0 text-white hover:text-white focus:text-white focus:ring active:text-white active:ring">
-                    <i data-lucide="menu"></i>
-                </button>
+                @if($contact && !empty($contact->no_telp))
+                    <i class="bi bi-phone d-flex align-items-center ms-4">
+                        <span>{{ $contact->no_telp }}</span>
+                    </i>
+                @else
+                    <i class="bi bi-phone d-flex align-items-center ms-4">
+                        <span>(0262) 123456</span>
+                    </i>
+                @endif
+            </div>
+            <div class="social-links d-none d-md-flex align-items-center">
+                <a href="https://www.facebook.com/smkn1tlg/" class="facebook" target="_blank"><i class="bi bi-facebook"></i></a>
+                <a href="https://www.instagram.com/smkn1tlg" class="instagram" target="_blank"><i class="bi bi-instagram"></i></a>
+                <a href="https://youtube.com/@smkn1tlg" class="youtube" target="_blank"><i class="bi bi-youtube"></i></a>
             </div>
         </div>
+    </div><!-- End Top Bar -->
+
+    <div class="branding d-flex align-items-center">
+
+        <div class="container position-relative d-flex align-items-center justify-content-between">
+            <a href="{{ url('/') }}" class="logo d-flex align-items-center me-auto" style="flex-shrink: 0;">
+                <img src="{{ asset('assets/images/logosmk.png') }}" alt="Logo SMKN 1 Talaga" style="max-height: 40px; margin-right: 10px;">
+                <h1 class="sitename" style="font-size: 22px; font-weight: 700; color: #1e3a8a; margin: 0; letter-spacing: 0.5px; white-space: nowrap;">SMKN 1 Talaga</h1>
+            </a>
+
+            <nav id="navmenu" class="navmenu">
+                <ul>
+                    <li><a href="{{ url('/#home') }}">Home</a></li>
+
+                    @foreach ($sortedMenus as $m)
+                        @if ($m->submenus && $m->submenus->count() > 0)
+                            <li class="dropdown">
+                                @php
+                                    $isExternalLink = preg_match('/^(https?:\/\/|\/)/', $m->slug);
+                                    $menuUrl = $isExternalLink ? $m->slug : url('/#' . $m->slug);
+                                @endphp
+                                <a href="{{ $menuUrl }}">
+                                    <span>{{ $m->name }}</span>
+                                    <i class="bi bi-chevron-down toggle-dropdown"></i>
+                                </a>
+                                <ul>
+                                    @foreach ($m->submenus as $submenu)
+                                        <li>
+                                            @php
+                                                $submenuUrl = '#';
+                                                $isSubmenuExternal = false;
+
+                                                if (!empty($submenu->url) && preg_match('/^https?:\/\//', $submenu->url)) {
+                                                    $submenuUrl = $submenu->url;
+                                                    $isSubmenuExternal = true;
+                                                } elseif (!empty($submenu->external_url) && preg_match('/^https?:\/\//', $submenu->external_url)) {
+                                                    $submenuUrl = $submenu->external_url;
+                                                    $isSubmenuExternal = true;
+                                                } elseif ($m->slug === 'section-konsentrasi') {
+                                                    $concentrations = $concentrations ?? \DB::table('core_expertise_concentrations')->get();
+                                                    $match = $concentrations->first(function($c) use ($submenu) {
+                                                        $cSlug = \Illuminate\Support\Str::slug($c->name);
+                                                        $sSlug = \Illuminate\Support\Str::slug($submenu->name);
+                                                        return \Illuminate\Support\Str::contains($cSlug, $sSlug) || \Illuminate\Support\Str::contains($sSlug, $cSlug);
+                                                    });
+                                                    if ($match) {
+                                                        $submenuUrl = route('expertise.show', $match->slug);
+                                                    } else {
+                                                        $submenuUrl = url('sub/' . $submenu->url);
+                                                    }
+                                                } elseif (isset($submenu->type)) {
+                                                    if ($submenu->type === 'url') {
+                                                        $submenuUrl = $submenu->external_url;
+                                                        $isSubmenuExternal = preg_match('/^https?:\/\//', $submenuUrl);
+                                                    } elseif ($submenu->type === 'module') {
+                                                        switch ($submenu->module_name) {
+                                                            case 'news':
+                                                                $submenuUrl = route('news.index');
+                                                                break;
+                                                            case 'gallery':
+                                                                $submenuUrl = route('galleries.index');
+                                                                break;
+                                                            case 'profil':
+                                                                $submenuUrl = url('/#section-profil');
+                                                                break;
+                                                            case 'visi-misi':
+                                                                $submenuUrl = url('/#section-visimisi');
+                                                                break;
+                                                            case 'expertise':
+                                                                $submenuUrl = url('/#section-konsentrasi');
+                                                                break;
+                                                            case 'ekskul':
+                                                                $submenuUrl = url('/#section-ekskul');
+                                                                break;
+                                                            case 'contact':
+                                                                $submenuUrl = url('/#section-kontak');
+                                                                break;
+                                                            default:
+                                                                $submenuUrl = url('/');
+                                                        }
+                                                    } else {
+                                                        $submenuUrl = url('sub/' . $submenu->url);
+                                                    }
+                                                } else {
+                                                    if ($submenu->redirectTo && !empty($submenu->redirectTo->slug)) {
+                                                        $submenuUrl = $submenu->redirectTo->slug;
+                                                        $isSubmenuExternal = preg_match('/^https?:\/\//', $submenuUrl);
+                                                    } else {
+                                                        $isSubmenuExternal = preg_match('/^https?:\/\//', $submenu->url);
+                                                        $submenuUrl = $isSubmenuExternal ? $submenu->url : url('sub/' . $submenu->url);
+                                                    }
+                                                }
+                                            @endphp
+                                            <a href="{{ $submenuUrl }}" @if ($isSubmenuExternal) target="_blank" rel="noopener noreferrer" @endif>
+                                                {{ $submenu->name }}
+                                            </a>
+                                        </li>
+                                    @endforeach
+                                </ul>
+                            </li>
+                        @else
+                            @php
+                                $isExternalLink = preg_match('/^(https?:\/\/|\/)/', $m->slug);
+                                $menuUrl = $isExternalLink ? $m->slug : url('/#' . $m->slug);
+                            @endphp
+                            <li>
+                                <a href="{{ $menuUrl }}" @if ($isExternalLink) target="_blank" rel="noopener noreferrer" @endif>
+                                    {{ $m->name }}
+                                </a>
+                            </li>
+                        @endif
+                    @endforeach
+
+                    @auth
+                        <li>
+                            <a href="{{ route('admin.dashboard') }}" class="btn-dashboard mx-3 my-2 px-3 py-2 text-white bg-primary rounded-2 text-center d-block d-lg-inline-block ms-lg-3" style="font-size: 14px;">
+                                <i class="bi bi-speedometer2 me-1"></i> Dashboard
+                            </a>
+                        </li>
+                    @endauth
+                </ul>
+                <i class="mobile-nav-toggle d-xl-none bi bi-list"></i>
+            </nav>
+
+        </div>
     </div>
-</nav>
 
-<script>
-    document.addEventListener('DOMContentLoaded', function() {
-        // ========================================
-        // CUSTOM DROPDOWN HANDLER UNTUK MUNCUL KE KIRI
-        // ========================================
-        const dropdowns = document.querySelectorAll('.dropdown');
-
-        dropdowns.forEach(dropdown => {
-            const toggle = dropdown.querySelector('.dropdown-toggle-custom');
-            const menu = dropdown.querySelector('.dropdown-menu-custom');
-
-            if (toggle && menu) {
-                toggle.addEventListener('click', function(e) {
-                    e.preventDefault();
-                    e.stopPropagation();
-
-                    // Close dropdown lain
-                    document.querySelectorAll('.dropdown-menu-custom').forEach(m => {
-                        if (m !== menu) {
-                            m.classList.add('hidden');
-                        }
-                    });
-
-                    // Toggle current dropdown
-                    const isHidden = menu.classList.contains('hidden');
-                    menu.classList.toggle('hidden');
-
-                    // PAKSA POSISI KE KIRI
-                    if (isHidden) {
-                        // Reset positioning
-                        menu.style.left = 'auto';
-                        menu.style.right = '0';
-                        menu.style.transform = 'none';
-                    }
-                });
-            }
-        });
-
-        // Close dropdown saat klik di luar
-        document.addEventListener('click', function(e) {
-            if (!e.target.closest('.dropdown')) {
-                document.querySelectorAll('.dropdown-menu-custom').forEach(menu => {
-                    menu.classList.add('hidden');
-                });
-            }
-        });
-
-        // Fungsi untuk update active state
-        function updateActiveMenu() {
-            const sections = document.querySelectorAll('section[id]');
-            const navLinks = document.querySelectorAll('.nav-link');
-
-            let currentSection = '';
-
-            sections.forEach(section => {
-                const sectionTop = section.offsetTop;
-                const sectionHeight = section.clientHeight;
-
-                if (window.scrollY >= (sectionTop - 100)) {
-                    currentSection = section.getAttribute('id');
-                }
-            });
-
-            navLinks.forEach(link => {
-                link.classList.remove('active');
-                const href = link.getAttribute('href');
-
-                // Hanya aktifkan untuk link internal (bukan external)
-                if (href && href.includes('#') && href === '#' + currentSection) {
-                    link.classList.add('active');
-                }
-            });
-        }
-
-        // Update saat scroll
-        window.addEventListener('scroll', updateActiveMenu);
-
-        // Update saat page load
-        updateActiveMenu();
-
-        // Update saat klik menu (hanya untuk internal link)
-        document.querySelectorAll('.nav-link').forEach(link => {
-            link.addEventListener('click', function() {
-                const href = this.getAttribute('href');
-                // Hanya update active untuk internal link
-                if (href && href.includes('#')) {
-                    document.querySelectorAll('.nav-link').forEach(l => l.classList.remove(
-                        'active'));
-                    this.classList.add('active');
-                }
-            });
-        });
-    });
-</script>
+</header>

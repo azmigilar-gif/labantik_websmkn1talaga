@@ -1,53 +1,58 @@
 <!DOCTYPE html>
-<html lang="en" class="group overflow-x-hidden scroll-smooth" data-mode="light" dir="ltr">
+<html lang="en">
 
 <head>
-
     <meta charset="utf-8">
-    <title>@yield('title', 'SMKN 1 Talaga Web')</title>
-    <meta name="viewport" content="width=device-width, initial-scale=1.0, user-scalable=no">
-    <meta content="SMKN 1 Talaga Web" name="description">
-    <meta content="ICT SMKN 1 Talaga" name="author">
-    <!-- App favicon -->
+    <meta content="width=device-width, initial-scale=1.0" name="viewport">
+    <title>@yield('title', 'SMKN 1 Talaga')</title>
+    <meta name="description" content="Website Resmi SMKN 1 Talaga">
+    <meta name="keywords" content="SMKN 1 Talaga, Sekolah, Majalengka, Jawa Barat">
+
+    <!-- Favicons -->
     <link rel="shortcut icon" href="{{ asset('assets/images/favicon.ico') }}">
-    <link href="{{ asset('../../css2?family=Tourney:wght@100&display=swap') }}" rel="stylesheet">
 
-    <link rel="stylesheet" href="{{ asset('../../aos%403.0.0-beta.6/dist/aos.css') }}">
+    <!-- Fonts -->
+    <link href="https://fonts.googleapis.com" rel="preconnect">
+    <link href="https://fonts.gstatic.com" rel="preconnect" crossorigin>
+    <link href="https://fonts.googleapis.com/css2?family=Roboto:ital,wght@0,100;0,300;0,400;0,500;0,700;0,900;1,100;1,300;1,400;1,500;1,700;1,900&family=Montserrat:ital,wght@0,100;0,200;0,300;0,400;0,500;0,600;0,700;0,800;0,900;1,100;1,200;1,300;1,400;1,500;1,600;1,700;1,800;1,900&family=Lato:ital,wght@0,100;0,300;0,400;0,700;0,900;1,100;1,300;1,400;1,700;1,900&display=swap" rel="stylesheet">
 
-    <!-- Swiper Slider css-->
+    <!-- Vendor CSS Files -->
+    <link href="{{ asset('assets/vendor/bootstrap/css/bootstrap.min.css') }}" rel="stylesheet">
+    <link href="{{ asset('assets/vendor/bootstrap-icons/bootstrap-icons.css') }}" rel="stylesheet">
+    <link href="{{ asset('assets/vendor/aos/aos.css') }}" rel="stylesheet">
+    <link href="{{ asset('assets/vendor/glightbox/css/glightbox.min.css') }}" rel="stylesheet">
+    <link href="{{ asset('assets/vendor/fontawesome-free/css/all.min.css') }}" rel="stylesheet">
+    <link href="{{ asset('assets/vendor/swiper/swiper-bundle.min.css') }}" rel="stylesheet">
 
-    <!-- Layout config Js -->
-    <script src="{{ asset('assets/js/layout.js') }}"></script>
-    <!-- Icons CSS -->
-
-    <!-- StarCode CSS -->
-
-    <link rel="stylesheet" href="{{ asset('assets/css/starcode2.css') }}">
+    <!-- Main CSS File -->
+    <link href="{{ asset('assets/css/main.css') }}" rel="stylesheet">
 </head>
 
-<body>
+<body class="index-page">
+
     @include('partials.navbar')
 
-    @yield('content')
+    <main class="main">
+        @yield('content')
+    </main>
 
     @include('partials.footer')
 
-    <script src='{{ asset('assets/libs/choices.js/public/assets/scripts/choices.min.js') }}'></script>
-    <script src="{{ asset('assets/libs/%40popperjs/core/umd/popper.min.js') }}"></script>
-    <script src="{{ asset('assets/libs/tippy.js/tippy-bundle.umd.min.js') }}"></script>
-    <script src="{{ asset('assets/libs/simplebar/simplebar.min.js') }}"></script>
-    <script src="{{ asset('assets/libs/prismjs/prism.js') }}"></script>
-    <script src="{{ asset('assets/libs/lucide/umd/lucide.js') }}"></script>
-    <script src="{{ asset('assets/js/starcode.bundle.js') }}"></script>
-    <script src="{{ asset('assets/libs/swiper/swiper-bundle.min.js') }}"></script>
-    <script src="{{ asset('assets/libs/aos/aos.js') }}"></script>
+    <!-- Scroll Top -->
+    <a href="#" id="scroll-top" class="scroll-top d-flex align-items-center justify-content-center"><i class="bi bi-arrow-up-short"></i></a>
 
-    <!-- App js -->
-    <script src="{{ asset('assets/js/app.js') }}"></script>
-    <script src="{{ asset('assets/libs/apexcharts/apexcharts.min.js') }}"></script>
+    <!-- Preloader -->
+    <div id="preloader"></div>
 
-    <script src="{{ asset('assets/js/pages/landing-product.init.js') }}"></script>
-    <script src="{{ asset('assets/js/pages/report-chart.js') }}"></>
+    <!-- Vendor JS Files -->
+    <script src="{{ asset('assets/vendor/bootstrap/js/bootstrap.bundle.min.js') }}"></script>
+    <script src="{{ asset('assets/vendor/aos/aos.js') }}"></script>
+    <script src="{{ asset('assets/vendor/glightbox/js/glightbox.min.js') }}"></script>
+    <script src="{{ asset('assets/vendor/purecounter/purecounter_vanilla.js') }}"></script>
+    <script src="{{ asset('assets/vendor/swiper/swiper-bundle.min.js') }}"></script>
+
+    <!-- Main JS File -->
+    <script src="{{ asset('assets/js/main.js') }}"></script>
 
     <!-- Page-specific scripts pushed from views -->
     @stack('scripts')

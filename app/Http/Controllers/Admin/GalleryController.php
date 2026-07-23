@@ -3,12 +3,12 @@
 namespace App\Http\Controllers\Admin;
 
 use App\Http\Controllers\Controller;
-use Illuminate\Http\Request;
 use App\Models\Gallery;
-use Illuminate\Support\Facades\Storage;
-use Illuminate\Support\Facades\Http;
-use Illuminate\Support\Str;
+use Illuminate\Http\Request;
 use Illuminate\Support\Facades\Auth;
+use Illuminate\Support\Facades\Http;
+use Illuminate\Support\Facades\Storage;
+use Illuminate\Support\Str;
 
 class GalleryController extends Controller
 {
@@ -19,7 +19,8 @@ class GalleryController extends Controller
         if ($type && in_array($type, [Gallery::TYPE_PHOTO, Gallery::TYPE_VIDEO])) {
             $query->where('type', $type);
         }
-        $items = $query->paginate(20);
+        $items = $query->simplePaginate(15);
+
         return view('admin.galleries.index', compact('items', 'type'));
     }
 
@@ -42,22 +43,22 @@ class GalleryController extends Controller
         // Attempt to download a thumbnail (if available) and save locally similar to other controllers
         try {
             $thumb = $item->thumbnail;
-            if (!empty($thumb)) {
+            if (! empty($thumb)) {
                 $resp = Http::get($thumb);
                 if ($resp->successful()) {
-                    $dirPath = 'assets/images/galleries/' . date('Y') . '/' . date('m') . '/' . date('d');
+                    $dirPath = 'assets/images/galleries/'.date('Y').'/'.date('m').'/'.date('d');
                     $publicDir = public_path($dirPath);
-                    if (!file_exists($publicDir)) {
+                    if (! file_exists($publicDir)) {
                         mkdir($publicDir, 0755, true);
                     }
                     // attempt to determine extension from URL, otherwise fallback to jpg
                     $ext = pathinfo(parse_url($thumb, PHP_URL_PATH), PATHINFO_EXTENSION) ?: 'jpg';
-                    $filename = time() . '_' . Str::slug($item->id) . '.' . $ext;
-                    $fullPath = $publicDir . DIRECTORY_SEPARATOR . $filename;
+                    $filename = time().'_'.Str::slug($item->id).'.'.$ext;
+                    $fullPath = $publicDir.DIRECTORY_SEPARATOR.$filename;
                     file_put_contents($fullPath, $resp->body());
                     // verify file saved and is not empty, otherwise remove and do not set file_path
                     if (file_exists($fullPath) && filesize($fullPath) > 0) {
-                        $item->file_path = $dirPath . '/' . $filename;
+                        $item->file_path = $dirPath.'/'.$filename;
                         $item->save();
                     } else {
                         if (file_exists($fullPath)) {
@@ -76,12 +77,14 @@ class GalleryController extends Controller
     public function show($id)
     {
         $item = Gallery::findOrFail($id);
+
         return view('admin.galleries.show', compact('item'));
     }
 
     public function edit($id)
     {
         $item = Gallery::findOrFail($id);
+
         return view('admin.galleries.edit', compact('item'));
     }
 
@@ -114,20 +117,20 @@ class GalleryController extends Controller
             // try to download new thumbnail
             try {
                 $thumb = $item->thumbnail;
-                if (!empty($thumb)) {
+                if (! empty($thumb)) {
                     $resp = Http::get($thumb);
                     if ($resp->successful()) {
-                        $dirPath = 'assets/images/galleries/' . date('Y') . '/' . date('m') . '/' . date('d');
+                        $dirPath = 'assets/images/galleries/'.date('Y').'/'.date('m').'/'.date('d');
                         $publicDir = public_path($dirPath);
-                        if (!file_exists($publicDir)) {
+                        if (! file_exists($publicDir)) {
                             mkdir($publicDir, 0755, true);
                         }
                         $ext = pathinfo(parse_url($thumb, PHP_URL_PATH), PATHINFO_EXTENSION) ?: 'jpg';
-                        $filename = time() . '_' . Str::slug($item->id) . '.' . $ext;
-                        $fullPath = $publicDir . DIRECTORY_SEPARATOR . $filename;
+                        $filename = time().'_'.Str::slug($item->id).'.'.$ext;
+                        $fullPath = $publicDir.DIRECTORY_SEPARATOR.$filename;
                         file_put_contents($fullPath, $resp->body());
                         if (file_exists($fullPath) && filesize($fullPath) > 0) {
-                            $item->file_path = $dirPath . '/' . $filename;
+                            $item->file_path = $dirPath.'/'.$filename;
                             $item->save();
                         } else {
                             if (file_exists($fullPath)) {
@@ -156,6 +159,7 @@ class GalleryController extends Controller
             }
         }
         $item->delete();
+
         return redirect()->route('admin.galleries.index')->with('success', 'Gallery deleted.');
     }
 }

@@ -13,8 +13,9 @@ class VisionMissionController extends Controller
 {
     public function index()
     {
-        $visionMissions = S_VisionMission::latest()->paginate();
+        $visionMissions = S_VisionMission::latest()->simplePaginate(15);
         $menus = S_Menu::all();
+
         return view('admin.visionmissions.index', compact('visionMissions', 'menus'));
     }
 
@@ -23,7 +24,7 @@ class VisionMissionController extends Controller
         $request->validate([
             's_menu_id' => 'required|exists:s_menus,id',
             'vision' => 'required|string',
-            'mission' => 'required|regex:/^\s*\d+\.\s.+/m'
+            'mission' => 'required|regex:/^\s*\d+\.\s.+/m',
         ]);
 
         S_VisionMission::create([
@@ -44,7 +45,7 @@ class VisionMissionController extends Controller
         $request->validate([
             's_menu_id' => 'required|exists:s_menus,id',
             'vision' => 'required|string',
-            'mission' => 'required|regex:/^\s*\d+\.\s.+/m'
+            'mission' => 'required|regex:/^\s*\d+\.\s.+/m',
         ]);
 
         $visionMission->update($request->all());
