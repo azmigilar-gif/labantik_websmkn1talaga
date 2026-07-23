@@ -113,8 +113,8 @@
                                                                     <img src="{{ asset($p->photo) }}" alt="Foto Profil" class="h-20 rounded shadow-sm">
                                                                 </div>
                                                             @endif
-                                                            <input type="file" id="edit_photo_{{ $p->id }}" name="photo" class="form-input dark:border-zink-500 focus:border-custom-500 border-slate-200" accept="image/*">
-                                                            <span class="text-xs text-slate-500 mt-1 block">Maksimal ukuran file: 2 MB</span>
+                                                            <input type="file" id="edit_photo_{{ $p->id }}" name="photo" class="form-input dark:border-zink-500 focus:border-custom-500 border-slate-200" accept="image/*" data-cropper="true" data-aspect-ratio="4/3">
+                                                            <span class="text-xs text-slate-500 mt-1 block">Rekomendasi ukuran: 800 x 600 px (Rasio 4:3) agar tidak terpotong. Maksimal ukuran file: 2 MB</span>
                                                         </div>
 
                                                         <!-- Ganti bagian textarea di modal edit -->
@@ -229,8 +229,8 @@
  
                                 <div class="mt-3 xl:col-span-6">
                                     <label for="add_photo" class="mb-2 inline-block text-base font-medium">Foto Profil/Thumbnail</label>
-                                    <input type="file" id="add_photo" name="photo" class="form-input dark:border-zink-500 focus:border-custom-500 border-slate-200" accept="image/*">
-                                    <span class="text-xs text-slate-500 mt-1 block">Maksimal ukuran file: 2 MB</span>
+                                    <input type="file" id="add_photo" name="photo" class="form-input dark:border-zink-500 focus:border-custom-500 border-slate-200" accept="image/*" data-cropper="true" data-aspect-ratio="4/3">
+                                    <span class="text-xs text-slate-500 mt-1 block">Rekomendasi ukuran: 800 x 600 px (Rasio 4:3) agar tidak terpotong. Maksimal ukuran file: 2 MB</span>
                                 </div>
                                 <div class="xl:col-span-6">
                                     <label for="slugInput" class="mb-2 inline-block text-base font-medium">Profile

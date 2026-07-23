@@ -68,9 +68,9 @@
                             @csrf
                             <div class="mb-4">
                                 <label class="block mb-2 text-sm font-medium text-slate-700 dark:text-zink-200">Pilih Foto/Gambar</label>
-                                <input type="file" name="photo" accept="image/*" required 
+                                <input type="file" name="photo" accept="image/*" required data-cropper="true" data-aspect-ratio="16/9"
                                     class="cursor-pointer relative block w-full rounded border border-slate-200 dark:border-zink-500 bg-white dark:bg-zink-600 px-3 py-2 text-slate-800 dark:text-zink-100 file:mr-4 file:py-1 file:px-3 file:rounded file:border-0 file:text-xs file:font-semibold file:bg-custom-500 file:text-white hover:file:bg-custom-600" />
-                                <span class="text-xs text-slate-500 mt-1 block">Maksimal ukuran file: 3 MB</span>
+                                <span class="text-xs text-slate-500 mt-1 block">Rekomendasi ukuran: 1920 x 1080 px (Rasio 16:9) agar pas dengan layar. Maksimal ukuran file: 3 MB</span>
                                 @error('photo')
                                     <div class="text-red-500 text-xs mt-1">{{ $message }}</div>
                                 @enderror

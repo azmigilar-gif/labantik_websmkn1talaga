@@ -649,20 +649,38 @@
 
     <!-- Mitra Industri Section -->
     @if (!empty($mitras) && $mitras->count() > 0)
+        @php
+            $slideMitras = $mitras;
+            if ($mitras->count() > 0 && $mitras->count() < 10) {
+                // Duplicate slides multiple times to ensure seamless infinite looping marquee scroll
+                $slideMitras = $mitras;
+                for ($i = 0; $i < 4; $i++) {
+                    $slideMitras = $slideMitras->concat($mitras);
+                }
+            }
+        @endphp
         <section class="section light-background" style="background-color: #f8fafc; padding: 60px 0;">
+            <style>
+                .mitras-swiper .swiper-wrapper {
+                    transition-timing-function: linear !important;
+                }
+            </style>
             <div class="container" data-aos="fade-up">
                 <div class="text-center mb-4">
                     <h5 class="text-muted font-weight-bold" style="font-size: 14px; text-transform: uppercase; letter-spacing: 1px;">Mitra Industri Kerjasama Kami</h5>
                 </div>
-                <div class="swiper init-swiper" data-aos="fade-up" data-aos-delay="100">
+                <div class="swiper init-swiper mitras-swiper" data-aos="fade-up" data-aos-delay="100">
                     <script type="json" class="swiper-config">
                         {
                             "loop": true,
-                            "speed": 800,
+                            "speed": 4000,
                             "autoplay": {
-                                "delay": 2000
+                                "delay": 0,
+                                "disableOnInteraction": false
                             },
                             "slidesPerView": "auto",
+                            "freeMode": true,
+                            "freeModeMomentum": false,
                             "breakpoints": {
                                 "320": {
                                     "slidesPerView": 2,
@@ -680,7 +698,7 @@
                         }
                     </script>
                     <div class="swiper-wrapper align-items-center">
-                        @foreach ($mitras as $item)
+                        @foreach ($slideMitras as $item)
                             @php
                                 $imgUrl = null;
                                 if (!empty($item->photo)) {
@@ -693,11 +711,11 @@
                                         $imgUrl = route('public.files', ['path' => $rel]);
                                     }
                                 } else {
-                                    $imgUrl = asset('assets/images/default-extrakurikuler.png');
+                                    $imgUrl = asset('assets/images/default-mitra.png');
                                 }
                             @endphp
                             <div class="swiper-slide text-center d-flex align-items-center justify-content-center" style="height: 100px; width: 150px;">
-                                <img src="{{ $imgUrl }}" alt="{{ $item->name }}" class="img-fluid" style="max-height: 60px; filter: grayscale(100%); transition: all 0.3s;" onmouseover="this.style.filter='none'" onmouseout="this.style.filter='grayscale(100%)'">
+                                <img src="{{ $imgUrl }}" alt="{{ $item->name }}" class="img-fluid" style="max-height: 60px; filter: grayscale(100%); transition: all 0.3s;" onmouseover="this.style.filter='none'" onmouseout="this.style.filter='grayscale(100%)'" onerror="this.src='{{ asset('assets/images/default-mitra.png') }}'">
                             </div>
                         @endforeach
                     </div>

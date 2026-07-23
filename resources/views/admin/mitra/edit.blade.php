@@ -27,10 +27,10 @@
 
                         <div class="col-span-12 md:col-span-4">
                             <label class="mb-2 block text-sm font-medium">Foto</label>
-                            <input type="file"
+                             <input type="file"
                                 class="cursor-pointer form-file form-file-sm border-slate-200 dark:border-zink-500 focus:outline-none focus:border-custom-500"
-                                name="photo" accept="image/*">
-                            <span class="text-xs text-slate-500 mt-1 block">Maksimal ukuran file: 2 MB</span>
+                                name="photo" accept="image/*" data-cropper="true" data-aspect-ratio="3/2">
+                            <span class="text-xs text-slate-500 mt-1 block">Rekomendasi ukuran: 600 x 400 px (Rasio 3:2) agar logo presisi. Maksimal ukuran file: 2 MB</span>
                         </div>
 
                         <div class="col-span-12 mt-4 text-right">

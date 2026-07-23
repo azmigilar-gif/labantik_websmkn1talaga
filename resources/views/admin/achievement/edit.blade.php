@@ -80,9 +80,9 @@
                         <!-- Foto Dokumentasi -->
                         <div class="col-span-12 md:col-span-6">
                             <label class="mb-2 block text-sm font-medium text-slate-700">Foto Dokumentasi (Kosongkan jika tidak diubah)</label>
-                            <input type="file" name="photo" accept="image/*"
+                            <input type="file" name="photo" accept="image/*" data-cropper="true" data-aspect-ratio="4/3"
                                 class="form-input w-full border-slate-200 dark:border-zink-500 focus:outline-none focus:border-custom-500 mb-2">
-                            <span class="text-xs text-slate-500 mt-1 block">Maksimal ukuran file: 2 MB</span>
+                            <span class="text-xs text-slate-500 mt-1 block">Rekomendasi ukuran: 800 x 600 px (Rasio 4:3) agar tidak terpotong. Maksimal ukuran file: 2 MB</span>
                             @if ($a->photo)
                                 <div class="mt-2">
                                     <img src="{{ asset($a->photo) }}" alt="Foto lama" class="h-20 rounded border">

@@ -48,30 +48,16 @@ class DashboardController extends Controller
         $published = [];
         $pending = [];
 
-        $currentDate = Carbon::now();
-        $startDate = Carbon::now()->subWeeks(8)->startOfWeek();
-
-        $currentMonth = null;
-        $weekInMonth = 0;
+        // Start 7 weeks ago (so total is 8 weeks including the current week)
+        $startDate = Carbon::now()->subWeeks(7)->startOfWeek();
 
         for ($i = 0; $i < 8; $i++) {
             $startOfWeek = $startDate->copy()->addWeeks($i)->startOfWeek();
             $endOfWeek = $startOfWeek->copy()->endOfWeek();
 
-            $monthName = $startOfWeek->locale('id')->translatedFormat('F');
-
-            if ($currentMonth !== $monthName) {
-                $currentMonth = $monthName;
-                $weekInMonth = 1;
-
-                $weeks[] = $monthName;
-                $published[] = null;
-                $pending[] = null;
-            } else {
-                $weekInMonth++;
-            }
-
-            $weeks[] = "Minggu ke-{$weekInMonth}";
+            // Format date range: e.g., "20 Jul - 26 Jul"
+            $label = $startOfWeek->locale('id')->translatedFormat('d M') . ' - ' . $endOfWeek->locale('id')->translatedFormat('d M');
+            $weeks[] = $label;
 
             $publishingCount = S_News::where('approve', 'approve')
                 ->whereBetween('created_at', [$startOfWeek, $endOfWeek])

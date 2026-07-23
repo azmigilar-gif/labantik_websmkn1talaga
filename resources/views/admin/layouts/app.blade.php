@@ -437,6 +437,25 @@
         }, 5000);
     </script>
 
+    <!-- Reusable Cropper Modal -->
+    <div id="cropperModal" class="fixed inset-0 z-[9999] hidden bg-slate-950/50 items-center justify-center p-4">
+        <div class="bg-white dark:bg-zink-900 rounded-lg shadow-xl max-w-lg w-full overflow-hidden flex flex-col">
+            <div class="p-4 border-b border-slate-200 dark:border-zink-700 flex justify-between items-center">
+                <h5 class="text-lg font-bold text-slate-800 dark:text-zink-50">Sesuaikan Gambar (Crop)</h5>
+                <button type="button" id="closeCropperModal" class="text-slate-400 hover:text-slate-600 dark:hover:text-slate-200">
+                    <i data-lucide="x" class="h-5 w-5"></i>
+                </button>
+            </div>
+            <div class="p-4 flex-grow flex justify-center items-center bg-slate-50 dark:bg-zink-950" style="max-height: 400px; min-height: 250px;">
+                <img id="cropperImage" class="max-w-full max-h-[350px] block" src="">
+            </div>
+            <div class="p-4 border-t border-slate-200 dark:border-zink-700 flex justify-end gap-2">
+                <button type="button" id="cancelCropBtn" class="px-4 py-2 border border-slate-200 rounded text-slate-500 hover:bg-slate-50 text-sm font-medium">Batal</button>
+                <button type="button" id="saveCropBtn" class="px-4 py-2 bg-blue-500 text-white rounded hover:bg-blue-600 text-sm font-medium">Potong & Simpan</button>
+            </div>
+        </div>
+    </div>
+
     @include('admin.layouts.script')
 </body>
 

@@ -90,4 +90,109 @@
     });
 </script>
 
+<!-- Cropper.js JS -->
+<script src="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.2/cropper.min.js"></script>
+<script>
+    document.addEventListener('DOMContentLoaded', function() {
+        const fileInputs = document.querySelectorAll('input[type="file"][data-cropper="true"]');
+        if (fileInputs.length === 0) return;
+
+        const modal = document.getElementById('cropperModal');
+        const cropperImage = document.getElementById('cropperImage');
+        const saveBtn = document.getElementById('saveCropBtn');
+        const cancelBtn = document.getElementById('cancelCropBtn');
+        const closeBtn = document.getElementById('closeCropperModal');
+        
+        let cropper = null;
+        let activeInput = null;
+        let originalFileName = '';
+
+        fileInputs.forEach(input => {
+            input.addEventListener('change', function(e) {
+                const files = e.target.files;
+                if (files && files.length > 0) {
+                    activeInput = input;
+                    const file = files[0];
+                    originalFileName = file.name;
+                    const reader = new FileReader();
+                    reader.onload = function(e) {
+                        cropperImage.src = e.target.result;
+                        modal.classList.remove('hidden');
+                        modal.classList.add('flex');
+                        
+                        // Get aspect ratio
+                        const ratioStr = input.getAttribute('data-aspect-ratio');
+                        let ratio = NaN;
+                        if (ratioStr) {
+                            if (ratioStr.includes('/')) {
+                                const parts = ratioStr.split('/');
+                                ratio = parseFloat(parts[0]) / parseFloat(parts[1]);
+                            } else {
+                                ratio = parseFloat(ratioStr);
+                            }
+                        }
+                        
+                        if (cropper) {
+                            cropper.destroy();
+                        }
+                        
+                        cropper = new Cropper(cropperImage, {
+                            aspectRatio: ratio,
+                            viewMode: 1,
+                            background: false,
+                            autoCropArea: 1,
+                        });
+                    };
+                    reader.readAsDataURL(file);
+                }
+            });
+        });
+
+        function closeModal() {
+            modal.classList.add('hidden');
+            modal.classList.remove('flex');
+            if (cropper) {
+                cropper.destroy();
+                cropper = null;
+            }
+            if (activeInput && !activeInput.dataset.cropped) {
+                activeInput.value = '';
+            }
+            if (activeInput) {
+                delete activeInput.dataset.cropped;
+            }
+        }
+
+        if (cancelBtn) cancelBtn.addEventListener('click', closeModal);
+        if (closeBtn) closeBtn.addEventListener('click', closeModal);
+
+        if (saveBtn) {
+            saveBtn.addEventListener('click', function() {
+                if (!cropper || !activeInput) return;
+
+                const canvas = cropper.getCroppedCanvas();
+                canvas.toBlob(function(blob) {
+                    const file = new File([blob], originalFileName, { type: 'image/jpeg' });
+                    const container = new DataTransfer();
+                    container.items.add(file);
+                    
+                    activeInput.dataset.cropped = 'true';
+                    activeInput.files = container.files;
+                    
+                    // Trigger preview if data-preview-id is provided
+                    const previewId = activeInput.getAttribute('data-preview-id');
+                    if (previewId) {
+                        const previewImg = document.getElementById(previewId);
+                        if (previewImg) {
+                            previewImg.src = URL.createObjectURL(blob);
+                        }
+                    }
+                    
+                    closeModal();
+                }, 'image/jpeg', 0.9);
+            });
+        }
+    });
+</script>
+
 @stack('scripts')

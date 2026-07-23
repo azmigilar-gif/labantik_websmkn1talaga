@@ -16,4 +16,6 @@
 
 
     <link rel="stylesheet" href="{{ asset('assets/css/starcode2.css') }}">
+    <!-- Cropper.js CSS -->
+    <link rel="stylesheet" href="https://cdnjs.cloudflare.com/ajax/libs/cropperjs/1.6.2/cropper.min.css">
 </head>
